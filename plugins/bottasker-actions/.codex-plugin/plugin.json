@@ -5,7 +5,7 @@
   "author": {
     "name": "BotTasker"
   },
-  "homepage": "https://bottasker.com",
+  "homepage": "https://bottasker.ai",
   "license": "UNLICENSED",
   "keywords": [
     "bottasker",
@@ -13,14 +13,16 @@
     "apps",
     "workflows",
     "automation",
-    "data-hub"
+    "data-hub",
+    "ai-agents",
+    "dynamic-tools"
   ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "BotTasker Actions",
     "shortDescription": "Create and operate BotTasker apps with MCP tools.",
-    "longDescription": "BotTasker Actions gives Codex guided skills for creating apps, Data Hubs, dashboards, AI agents, workflows, and operational modules through the BotTasker external MCP.",
+    "longDescription": "BotTasker Actions gives Codex guided skills for creating apps, Data Hubs, dashboards, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
     "developerName": "BotTasker",
     "category": "Developer Tools",
     "capabilities": [
@@ -28,13 +30,13 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://bottasker.com",
-    "privacyPolicyURL": "https://bottasker.com/privacy",
-    "termsOfServiceURL": "https://bottasker.com/terms",
+    "websiteURL": "https://bottasker.ai",
+    "privacyPolicyURL": "https://bottasker.ai/privacy",
+    "termsOfServiceURL": "https://bottasker.ai/terms",
     "defaultPrompt": [
       "Create a BotTasker app with data models and workflows.",
       "Design a Data Hub and dashboard in BotTasker.",
-      "Build an AI agent workflow in BotTasker."
+      "Build an AI agent with subagents and dynamically discovered tools in BotTasker."
     ],
     "brandColor": "#2563EB",
     "composerIcon": "./assets/bottasker-actions.svg",
@@ -42,4 +44,3 @@
     "screenshots": []
   }
 }
-

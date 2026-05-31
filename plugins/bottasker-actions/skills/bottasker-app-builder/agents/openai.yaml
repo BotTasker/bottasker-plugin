@@ -1,8 +1,7 @@
 interface:
   display_name: "BotTasker App Builder"
-  short_description: "Create apps, modules, menus, and templates."
+  short_description: "Design complete apps by selecting modules and delegating specialists."
   brand_color: "#2563EB"
-  default_prompt: "Create a BotTasker app with the right modules and menu."
+  default_prompt: "Design a complete BotTasker app blueprint with the right modules, specialists, and execution plan."
 policy:
   allow_implicit_invocation: true
-

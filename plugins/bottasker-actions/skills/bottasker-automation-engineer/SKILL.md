@@ -7,11 +7,14 @@ description: Use when the user wants to create BotTasker AI agents, equip tools,
 
 Use this skill to build AI agents and workflow automations in BotTasker.
 
+For complex AI Agent systems with subagents, dynamically discovered tools, tool configuration schemas, or natural-language app blueprints, delegate planning to `bottasker-ai-agent-architect` first. Continue here when the approved plan needs workflow graphs, action instances, edges, or test runs.
+
 ## Workflow
 
 1. Call `bt_context_get_profile`.
 2. Resolve `appId` when the workflow or agent belongs to an app.
 3. Discover automation building blocks:
+   - `bt_ai_agent_tools_discover`
    - `bt_registry_list_workers`
    - `bt_registry_get_worker_actions`
    - `bt_ai_agents_list`
@@ -25,6 +28,7 @@ Use this skill to build AI agents and workflow automations in BotTasker.
 
 ## Design Rules
 
+- Use `bottasker-ai-agent-architect` for agent/subagent/tool architecture before writing complex agent changes.
 - Discover worker actions before adding workflow nodes.
 - Use explicit `actionKey` values from worker registry results.
 - Keep workflow graphs small and testable in the first pass.
@@ -33,5 +37,4 @@ Use this skill to build AI agents and workflow automations in BotTasker.
 
 ## Expected MCP Tools
 
-Use `bt_registry_*`, `bt_ai_agents_*`, `bt_workflows_*`, `bt_action_instances_*`, and `bt_workflow_runs_get_events`.
-
+Use `bt_ai_agent_tools_discover`, `bt_registry_*`, `bt_ai_agents_*`, `bt_workflows_*`, `bt_action_instances_*`, and `bt_workflow_runs_get_events`.
