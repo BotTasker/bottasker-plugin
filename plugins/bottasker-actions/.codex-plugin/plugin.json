@@ -1,0 +1,45 @@
+{
+  "name": "bottasker-actions",
+  "version": "0.1.0",
+  "description": "Build and operate BotTasker apps through the BotTasker MCP.",
+  "author": {
+    "name": "BotTasker"
+  },
+  "homepage": "https://bottasker.com",
+  "license": "UNLICENSED",
+  "keywords": [
+    "bottasker",
+    "mcp",
+    "apps",
+    "workflows",
+    "automation",
+    "data-hub"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "BotTasker Actions",
+    "shortDescription": "Create and operate BotTasker apps with MCP tools.",
+    "longDescription": "BotTasker Actions gives Codex guided skills for creating apps, Data Hubs, dashboards, AI agents, workflows, and operational modules through the BotTasker external MCP.",
+    "developerName": "BotTasker",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://bottasker.com",
+    "privacyPolicyURL": "https://bottasker.com/privacy",
+    "termsOfServiceURL": "https://bottasker.com/terms",
+    "defaultPrompt": [
+      "Create a BotTasker app with data models and workflows.",
+      "Design a Data Hub and dashboard in BotTasker.",
+      "Build an AI agent workflow in BotTasker."
+    ],
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/bottasker-actions.svg",
+    "logo": "./assets/bottasker-actions.svg",
+    "screenshots": []
+  }
+}
+

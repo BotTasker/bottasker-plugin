@@ -1,0 +1,8 @@
+interface:
+  display_name: "BotTasker Automation Engineer"
+  short_description: "Build AI agents, workflows, nodes, and tests."
+  brand_color: "#2563EB"
+  default_prompt: "Build and test a BotTasker AI agent workflow."
+policy:
+  allow_implicit_invocation: true
+

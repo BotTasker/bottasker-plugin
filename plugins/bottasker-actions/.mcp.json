@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "bottasker": {
+      "url": "http://localhost:3200/mcp",
+      "bearer_token_env_var": "BOTASKER_API_KEY"
+    }
+  }
+}
+

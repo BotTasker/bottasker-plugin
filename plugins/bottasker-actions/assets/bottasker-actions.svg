@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="BotTasker Actions">
+  <rect width="256" height="256" rx="56" fill="#2563EB"/>
+  <path d="M64 74c0-13.255 10.745-24 24-24h80c13.255 0 24 10.745 24 24v108c0 13.255-10.745 24-24 24H88c-13.255 0-24-10.745-24-24V74Z" fill="#EFF6FF"/>
+  <path d="M92 92h72v18H92V92Zm0 34h72v18H92v-18Zm0 34h46v18H92v-18Z" fill="#1D4ED8"/>
+  <circle cx="174" cy="169" r="28" fill="#10B981"/>
+  <path d="m161 169 8 8 17-19" fill="none" stroke="#ECFDF5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
