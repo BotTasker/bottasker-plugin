@@ -21,6 +21,9 @@
         "catalogs",
         "products",
         "sales-carts",
+        "dashboards",
+        "kpis",
+        "reporting",
         "ai-agents",
         "dynamic-tools"
       ]

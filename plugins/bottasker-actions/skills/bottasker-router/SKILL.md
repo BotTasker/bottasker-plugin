@@ -34,9 +34,10 @@ If there is no explicit approval after the visual blueprint, do not call create,
 - Complete app design from natural language, including module selection and specialist delegation: use `bottasker-app-builder`.
 - Data Hub, models, fields, relations, records, Dynamic Tables: use `bottasker-data-architect`.
 - Catalogs, product categories, products, variants, modifier groups, product properties, availability, and sales carts: use `bottasker-catalog-architect`.
+- Dashboards, KPIs, tracking, control views, reporting, widget strategy, and area-specific dashboards: use `bottasker-dashboard-architect`.
 - AI agents inside an app, subagents, tool discovery, and tool config: use `bottasker-ai-agent-architect`.
 - Workflows, action instances, graph edges, and workflow tests: use `bottasker-automation-engineer`.
-- Dashboards, boards, calendar, files, knowledge, conversations: use `bottasker-ops-builder`.
+- Boards, calendar, files, knowledge, conversations: use `bottasker-ops-builder`.
 
 ## Safety Rules
 

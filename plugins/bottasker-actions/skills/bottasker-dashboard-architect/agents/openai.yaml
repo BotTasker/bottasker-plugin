@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Dashboard Architect"
+  short_description: "Design useful tracking and control dashboards by audience, area, KPI, source, and action."
+  brand_color: "#2563EB"
+  default_prompt: "Design BotTasker dashboards for control, follow-up, KPIs, and area-specific decisions."
+policy:
+  allow_implicit_invocation: true

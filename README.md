@@ -135,7 +135,8 @@ claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-ac
 - `bottasker-data-architect`: Data Hub and Dynamic Tables.
 - `bottasker-ai-agent-architect`: AI Agents module specialist for agents, subagents, dynamic tools, tool schemas, inputs, and outputs inside an app.
 - `bottasker-automation-engineer`: AI agents, workflows, workers, and tests.
-- `bottasker-ops-builder`: operational modules such as dashboards, boards, catalogs, calendar, files, knowledge, and conversations.
+- `bottasker-dashboard-architect`: useful dashboards for tracking, control, KPIs, reporting, and area-specific follow-up.
+- `bottasker-ops-builder`: operational modules such as boards, calendar, files, knowledge, and conversations.
 - `bottasker-catalog-architect`: catalogs, products, variants, properties, modifiers, availability, and sales carts.
 
 ## References
