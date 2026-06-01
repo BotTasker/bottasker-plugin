@@ -22,17 +22,21 @@ For any request that can create or modify an app, data model, AI agent, workflow
 
 1. Discover capabilities first.
 2. Build a clear plan: use `bt_apps_blueprint_plan` for complete apps and `bt_ai_agent_blueprint_plan` only for AI Agents inside an app.
-3. Ask only relevant unresolved questions.
-4. Wait for explicit user approval before calling write tools.
+3. Show a visual blueprint before writes: Mermaid diagram plus component/configuration tables.
+4. Ask only relevant unresolved questions.
+5. Wait for explicit user approval after the visual blueprint before calling write tools.
+
+If there is no explicit approval after the visual blueprint, do not call create, update, add, configure, archive, remove, delete, or submit tools.
 
 ## Routing
 
 - App creation, module enablement, menu structure, templates: use `bottasker-app-builder`.
 - Complete app design from natural language, including module selection and specialist delegation: use `bottasker-app-builder`.
 - Data Hub, models, fields, relations, records, Dynamic Tables: use `bottasker-data-architect`.
+- Catalogs, product categories, products, variants, modifier groups, product properties, availability, and sales carts: use `bottasker-catalog-architect`.
 - AI agents inside an app, subagents, tool discovery, and tool config: use `bottasker-ai-agent-architect`.
 - Workflows, action instances, graph edges, and workflow tests: use `bottasker-automation-engineer`.
-- Dashboards, boards, catalogs, sales carts, calendar, files, knowledge, conversations: use `bottasker-ops-builder`.
+- Dashboards, boards, calendar, files, knowledge, conversations: use `bottasker-ops-builder`.
 
 ## Safety Rules
 
@@ -45,3 +49,5 @@ For any request that can create or modify an app, data model, AI agent, workflow
 ## Expected MCP Tools
 
 Core tools include `bt_context_get_profile`, `bt_apps_list_modules`, `bt_apps_blueprint_plan`, `bt_apps_list`, `bt_apps_get`, `bt_ai_agent_tools_discover`, `bt_ai_agent_blueprint_plan`, `bt_mcp_list_skills`, and `bt_mcp_load_skill`.
+
+For AI Agent item configuration also use `bt_ai_agent_prepare_item_config` and `bt_ai_agent_validate_item_config` before `bt_ai_agents_add_item`.

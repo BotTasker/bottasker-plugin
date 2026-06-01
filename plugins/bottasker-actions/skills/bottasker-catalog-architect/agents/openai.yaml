@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Catalog Architect"
+  short_description: "Design catalogs, products, variants, modifiers, availability, and carts."
+  brand_color: "#2563EB"
+  default_prompt: "Design a BotTasker catalog with products, variants, properties, availability, and cart behavior."
+policy:
+  allow_implicit_invocation: true

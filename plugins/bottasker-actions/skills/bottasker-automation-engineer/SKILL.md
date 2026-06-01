@@ -31,6 +31,7 @@ For complex AI Agent systems with subagents, dynamically discovered tools, tool 
 - Use `bottasker-ai-agent-architect` for agent/subagent/tool architecture before writing complex agent changes.
 - Discover worker actions before adding workflow nodes.
 - Use explicit `actionKey` values from worker registry results.
+- For AI Agent inputs, outputs, and tools, require prepared and validated `initialConfig` from `bt_ai_agent_prepare_item_config` and `bt_ai_agent_validate_item_config` before adding items.
 - Keep workflow graphs small and testable in the first pass.
 - Add agent tools incrementally and test after each major capability.
 - Ask for confirmation before removing agents, workflows, nodes, or edges.

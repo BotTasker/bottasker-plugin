@@ -1,6 +1,6 @@
 ---
 name: bottasker-ops-builder
-description: Use when the user wants to build or operate BotTasker dashboards, boards, catalogs, products, sales carts, calendar, files, knowledge, conversations, messages, calls, or WhatsApp templates.
+description: Use when the user wants to build or operate BotTasker dashboards, boards, calendar, files, knowledge, conversations, messages, calls, WhatsApp templates, or general operational modules.
 ---
 
 # BotTasker Ops Builder
@@ -15,8 +15,7 @@ Use this skill for operational modules after the app and data foundation are kno
 4. Use the module-specific tools:
    - dashboards: `bt_dashboards_*`
    - boards: `bt_boards_*`
-   - catalogs/products/categories: `bt_catalogs_*`, `bt_products_*`, `bt_product_categories_*`
-   - sales carts: `bt_sales_carts_*`
+   - catalogs/products/categories/variants/sales carts: delegate to `bottasker-catalog-architect`
    - calendar: `bt_calendar_*`
    - files: `bt_files_*`
    - knowledge: `bt_knowledge_*`
@@ -28,10 +27,10 @@ Use this skill for operational modules after the app and data foundation are kno
 
 - Use Data Hub or Dynamic Tables as the source of truth when dashboards and boards need structured records.
 - Prefer creating a minimal dashboard or board first, then iterating.
+- Use `bottasker-catalog-architect` for product catalogs, categories, variants, modifier groups, properties, availability, product search, and sales cart behavior.
 - Do not submit WhatsApp templates for approval unless the user explicitly asks.
 - Ask for confirmation before archive/remove/delete tools or broad status changes.
 
 ## Expected MCP Tools
 
 Use operational module tools plus `bt_apps_list`, `bt_apps_get`, `bt_mcp_list_skills`, and `bt_mcp_load_skill` for discovery.
-

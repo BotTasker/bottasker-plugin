@@ -14,6 +14,9 @@
     "workflows",
     "automation",
     "data-hub",
+    "catalogs",
+    "products",
+    "sales-carts",
     "ai-agents",
     "dynamic-tools"
   ],
@@ -22,7 +25,7 @@
   "interface": {
     "displayName": "BotTasker Actions",
     "shortDescription": "Create and operate BotTasker apps with MCP tools.",
-    "longDescription": "BotTasker Actions gives Codex guided skills for creating apps, Data Hubs, dashboards, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
+    "longDescription": "BotTasker Actions gives Codex guided skills for creating apps, Data Hubs, catalogs, products, carts, dashboards, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
     "developerName": "BotTasker",
     "category": "Developer Tools",
     "capabilities": [
@@ -36,6 +39,7 @@
     "defaultPrompt": [
       "Create a BotTasker app with data models and workflows.",
       "Design a Data Hub and dashboard in BotTasker.",
+      "Design a catalog with products, variants, modifiers, availability, and sales carts.",
       "Build an AI agent with subagents and dynamically discovered tools in BotTasker."
     ],
     "brandColor": "#2563EB",

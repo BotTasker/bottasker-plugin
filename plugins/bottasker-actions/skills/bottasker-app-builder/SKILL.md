@@ -17,13 +17,14 @@ Module specialists do not own the full app design. They implement their module i
 4. If AI Agents may be needed, call `bt_ai_agent_tools_discover` only as supporting discovery, not as the owner of the app plan.
 5. Call `bt_apps_list` to avoid duplicate apps.
 6. For an existing app, resolve `appId` with `bt_apps_list` or `bt_apps_get`.
-7. Present the app blueprint and ask for approval before writes.
+7. Present the app blueprint as a visual design and ask for approval before writes.
 8. Create or update the app with `bt_apps_create`, `bt_apps_update`, or `bt_apps_update_menu`.
 9. Delegate module implementation to specialists after app creation:
    - `bottasker-data-architect` for Data Hub, models, relations, records, and Dynamic Tables.
+   - `bottasker-catalog-architect` for catalogs, categories, products, variants, modifiers, availability, and sales carts.
    - `bottasker-ai-agent-architect` for AI Agents, subagents, tools, inputs, outputs, and tool configuration.
    - `bottasker-automation-engineer` for workflow graphs, action instances, edges, and tests.
-   - `bottasker-ops-builder` for dashboards, boards, catalogs/products, calendar, files, knowledge, conversations, calls, and WhatsApp templates.
+   - `bottasker-ops-builder` for dashboards, boards, calendar, files, knowledge, conversations, calls, and WhatsApp templates.
 10. If building from a reusable design, use `bt_apps_create_from_template`.
 11. If packaging an existing app as a starter, use `bt_apps_export_template`.
 
@@ -38,6 +39,18 @@ App Builder must explain:
 - Which module specialist handles each part.
 - What questions must be answered before execution.
 - The exact execution order after approval.
+
+## Visual Approval Gate
+
+Before any write tool, App Builder must show a graphical blueprint:
+
+- Mermaid diagram of the whole app: user/channel, modules, Data Hub models, agents/subagents, tools, outputs, dashboards, conversations, and integrations.
+- Component table for modules, data structures, agents, inputs, outputs, tools, and operational views.
+- Data flow from input to storage/action to output.
+- Configuration matrix for AI Agent items delegated to `bottasker-ai-agent-architect`.
+- Pending decisions and risks.
+
+Do not create apps, modules, Data Hubs, agents, workflows, dashboards, or channel configs until the user approves this visual blueprint explicitly.
 
 Use known module capabilities from `bt_apps_list_modules`:
 
@@ -61,12 +74,14 @@ Use known module capabilities from `bt_apps_list_modules`:
 - Design module handoffs before writing.
 - Do not let a module specialist create unrelated app-level resources.
 - If the user asks for "crear una app", App Builder remains in control until the app blueprint is approved.
+- When AI Agents are included, pass complete `dataContext` and `moduleContext` to `bottasker-ai-agent-architect`: appId, Data Hub IDs, model IDs, fields, enums, relations, intended permissions, channels, dashboards, and conversation behavior.
+- When Catalogs/Sales Carts are included, pass complete catalog context to `bottasker-catalog-architect`: currency, categories, product types, variants, modifier groups, availability rules, channel visibility, and checkout requirements.
 
 ## Safety Rules
 
 - Do not pass `organization`.
 - Do not overwrite menu groups without first reading the current app.
-- Do not call write tools until the app blueprint is approved.
+- Do not call write tools until the visual app blueprint is approved.
 - Ask for confirmation before destructive changes, large menu rewrites, archive/remove/delete operations, or credential-backed integrations.
 
 ## Expected MCP Tools
