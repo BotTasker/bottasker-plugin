@@ -1,0 +1,29 @@
+{
+  "name": "bottasker-local",
+  "owner": {
+    "name": "BotTasker"
+  },
+  "description": "Local BotTasker plugin marketplace for Claude Code.",
+  "plugins": [
+    {
+      "name": "bottasker-actions",
+      "source": "./plugins/bottasker-actions",
+      "displayName": "BotTasker Actions",
+      "description": "Create and operate BotTasker apps through the BotTasker MCP.",
+      "category": "Developer Tools",
+      "keywords": [
+        "bottasker",
+        "mcp",
+        "apps",
+        "workflows",
+        "automation",
+        "data-hub",
+        "catalogs",
+        "products",
+        "sales-carts",
+        "ai-agents",
+        "dynamic-tools"
+      ]
+    }
+  ]
+}

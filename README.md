@@ -1,18 +1,18 @@
 # BotTasker Actions Plugin
 
-Codex plugin for building and operating BotTasker apps through the BotTasker external MCP.
+Plugin for building and operating BotTasker apps through the BotTasker external MCP.
 
-This repository is intentionally standalone so it can become its own git repository. It contains a local Codex marketplace plus the `bottasker-actions` plugin.
+This repository is intentionally standalone so it can become its own git repository. It contains local marketplaces plus the `bottasker-actions` plugin for Codex and Claude Code.
 
 ## Prerequisites
 
-- BotTasker external MCP reachable at `https://bottasker.ai/mcp`.
-- A BotTasker API key available as `BOTASKER_API_KEY`.
-- Codex installed.
+- BotTasker external MCP reachable at `https://api.bottasker.ai/mcp`.
+- A BotTasker API key.
+- Codex or Claude Code installed.
 
-Do not commit API keys. The plugin reads the API key from the environment through `bearer_token_env_var`.
+Do not commit API keys. Codex reads the API key from `BOTASKER_API_KEY`; Claude Code prompts for it as sensitive plugin configuration.
 
-## Configure Auth
+## Configure Auth For Codex
 
 For Codex Desktop on macOS:
 
@@ -37,7 +37,26 @@ codex plugin add bottasker-actions@bottasker-local
 
 Open a new Codex session after installing so Codex reloads plugin skills and MCP servers.
 
-## Verify
+## Install In Claude Code
+
+Claude Code uses the official plugin marketplace flow. From this repository root:
+
+```bash
+claude plugin marketplace add .
+claude plugin install bottasker-actions@bottasker-local
+```
+
+When Claude Code enables the plugin, enter the BotTasker API key in the sensitive configuration prompt. The key is substituted into the plugin MCP header at runtime and is not stored in this repository.
+
+If you are already inside a Claude Code session, you can use the equivalent slash commands:
+
+```text
+/plugin marketplace add .
+/plugin install bottasker-actions@bottasker-local
+/reload-plugins
+```
+
+## Verify Codex
 
 Check MCP configuration:
 
@@ -51,6 +70,25 @@ In Codex, verify the BotTasker MCP tools:
 Use BotTasker to run bt_context_get_profile.
 Use BotTasker to run bt_apps_list_modules.
 Use BotTasker to run bt_apps_blueprint_plan.
+Use BotTasker to run bt_ai_agent_tools_discover.
+Use BotTasker to run bt_mcp_list_skills.
+```
+
+## Verify Claude Code
+
+Check plugin and MCP registration:
+
+```bash
+claude plugin list
+claude plugin details bottasker-actions@bottasker-local
+claude mcp list
+```
+
+In Claude Code, verify the BotTasker MCP tools:
+
+```text
+Use BotTasker to run bt_context_get_profile.
+Use BotTasker to run bt_apps_list_modules.
 Use BotTasker to run bt_ai_agent_tools_discover.
 Use BotTasker to run bt_mcp_list_skills.
 ```
@@ -83,6 +121,13 @@ python3 /Users/this/.codex/skills/.system/plugin-creator/scripts/validate_plugin
   /Users/this/Documents/projects/bottasker/app/bottasker-actions-plugin/plugins/bottasker-actions
 ```
 
+For Claude Code:
+
+```bash
+claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-actions-plugin
+claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-actions-plugin/plugins/bottasker-actions
+```
+
 ## Included Skills
 
 - `bottasker-router`: entrypoint and workflow router.
@@ -91,3 +136,11 @@ python3 /Users/this/.codex/skills/.system/plugin-creator/scripts/validate_plugin
 - `bottasker-ai-agent-architect`: AI Agents module specialist for agents, subagents, dynamic tools, tool schemas, inputs, and outputs inside an app.
 - `bottasker-automation-engineer`: AI agents, workflows, workers, and tests.
 - `bottasker-ops-builder`: operational modules such as dashboards, boards, catalogs, calendar, files, knowledge, and conversations.
+- `bottasker-catalog-architect`: catalogs, products, variants, properties, modifiers, availability, and sales carts.
+
+## References
+
+- Claude Code MCP: https://code.claude.com/docs/en/mcp
+- Claude Code plugins: https://code.claude.com/docs/en/plugins
+- Claude Code plugin reference: https://code.claude.com/docs/en/plugins-reference
+- Claude Code plugin marketplaces: https://code.claude.com/docs/en/plugin-marketplaces
