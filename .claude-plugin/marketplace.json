@@ -24,6 +24,9 @@
         "dashboards",
         "kpis",
         "reporting",
+        "boards",
+        "kanban",
+        "public-sharing",
         "ai-agents",
         "dynamic-tools"
       ]

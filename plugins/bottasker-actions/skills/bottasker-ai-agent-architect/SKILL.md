@@ -98,7 +98,7 @@ For each input/output/tool item, include:
 - Never include API keys, credential values, tokens, cookies, or authorization headers in plans, configs, or messages.
 - Do not choose app modules here. Module selection belongs to `bottasker-app-builder`.
 - Do not design Data Hub models here. Request `bottasker-data-architect` output as `dataContext`.
-- Do not design dashboards, boards, conversations, catalogs, files, or knowledge here. Request `bottasker-dashboard-architect` output for dashboard/control context and `bottasker-ops-builder` output for other operational module context.
+- Do not design dashboards, boards, conversations, catalogs, files, or knowledge here. Request `bottasker-dashboard-architect` output for dashboard/control context, `bottasker-board-architect` output for board/source/widget/security context, and `bottasker-ops-builder` output for other operational module context.
 
 ## Agent Design Rules
 

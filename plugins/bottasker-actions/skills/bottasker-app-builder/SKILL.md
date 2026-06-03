@@ -23,9 +23,10 @@ Module specialists do not own the full app design. They implement their module i
    - `bottasker-data-architect` for Data Hub, models, relations, records, and Dynamic Tables.
    - `bottasker-catalog-architect` for catalogs, categories, products, variants, modifiers, availability, and sales carts.
    - `bottasker-dashboard-architect` for useful dashboards, KPIs, tracking, control views, widget strategy, and area-specific dashboard sets.
+   - `bottasker-board-architect` for boards, sources, columns, cards, detail views, widgets, button automations, public/restricted access, roles, and security.
    - `bottasker-ai-agent-architect` for AI Agents, subagents, tools, inputs, outputs, and tool configuration.
    - `bottasker-automation-engineer` for workflow graphs, action instances, edges, and tests.
-   - `bottasker-ops-builder` for boards, calendar, files, knowledge, conversations, calls, and WhatsApp templates.
+   - `bottasker-ops-builder` for calendar, files, knowledge, conversations, calls, and WhatsApp templates.
 10. If building from a reusable design, use `bt_apps_create_from_template`.
 11. If packaging an existing app as a starter, use `bt_apps_export_template`.
 
@@ -78,6 +79,7 @@ Use known module capabilities from `bt_apps_list_modules`:
 - When AI Agents are included, pass complete `dataContext` and `moduleContext` to `bottasker-ai-agent-architect`: appId, Data Hub IDs, model IDs, fields, enums, relations, intended permissions, channels, dashboards, and conversation behavior.
 - When Catalogs/Sales Carts are included, pass complete catalog context to `bottasker-catalog-architect`: currency, categories, product types, variants, modifier groups, availability rules, channel visibility, and checkout requirements.
 - When Dashboards are included, pass complete reporting context to `bottasker-dashboard-architect`: appId, audience, decisions to support, Data Hub models/tables, date fields, KPI candidates, status/category/owner dimensions, channels, agents/workflows, and required control loops.
+- When Boards are included, pass complete board context to `bottasker-board-architect`: appId, source module, source ids, group/status field, title/description/display fields, intended columns, detail view needs, button automations, public/restricted access needs, and security constraints.
 
 ## Safety Rules
 
