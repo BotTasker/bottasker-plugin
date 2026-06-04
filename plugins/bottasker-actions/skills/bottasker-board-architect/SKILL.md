@@ -88,7 +88,17 @@ Rules:
 
 ## Detail View And Widgets
 
-Use `bt_boards_update_detail_view_config` with a complete `detailViewConfig`:
+Always design item details from source fields, not from generic widget names.
+
+Required order:
+
+1. Call `bt_boards_get_source_fields` and keep the exact `fields[].name` values.
+2. Optionally call `bt_boards_prepare_detail_view_config` with selected `fields` to get a valid non-mutating draft.
+3. Review the draft against the approved blueprint.
+4. Save with `bt_boards_update_detail_view_config`.
+5. Verify with `bt_boards_get` and open/read one item using `bt_boards_get_item` or `bt_boards_get_board_data`.
+
+Use `bt_boards_update_detail_view_config` with a complete or prepared `detailViewConfig`:
 
 - `version`
 - `settings`: responsive columns, row height, margins.
@@ -97,10 +107,80 @@ Use `bt_boards_update_detail_view_config` with a complete `detailViewConfig`:
 
 Widget rules:
 
-- `field`: use for source fields; include label/format when needed.
-- `text`: use for section labels, instructions, or context.
-- `image`: use for image/file preview when source field supports it.
+- `field`: use for source fields. It must include `field` with the exact source field name returned by `bt_boards_get_source_fields`; never use `"field"` as the value.
+- `text`: use only for section labels, instructions, or context. It must have a meaningful `label`; never save a text widget labeled only `"text"`.
+- `image`: use for image/file preview when source field supports it. It must include `field` with the exact source field name.
 - `button`: use for explicit actions only.
+
+Correct field widget:
+
+```json
+{
+  "id": "field_customer_name",
+  "type": "field",
+  "field": "customerName",
+  "label": "Cliente",
+  "widgetType": "text"
+}
+```
+
+Wrong field widget:
+
+```json
+{
+  "id": "field_1",
+  "type": "field",
+  "label": "field"
+}
+```
+
+The wrong widget renders as an empty block titled `field` because it has no source property binding.
+
+Correct section header:
+
+```json
+{
+  "id": "section_commercial",
+  "type": "text",
+  "label": "Informacion comercial"
+}
+```
+
+Correct layout:
+
+```json
+[
+  { "i": "section_commercial", "x": 0, "y": 0, "w": 12, "h": 1 },
+  { "i": "field_customer_name", "x": 0, "y": 1, "w": 4, "h": 2 }
+]
+```
+
+`layout[].i` must match an existing `widgets[].id` exactly. Do not create layout ids that do not exist in widgets.
+
+Minimal valid detail view:
+
+```json
+{
+  "version": "1.0",
+  "settings": {
+    "colsByBp": { "lg": 12, "md": 12, "sm": 6, "xs": 4 },
+    "rowHeight": 40,
+    "margin": [10, 10]
+  },
+  "layout": [
+    { "i": "section_main", "x": 0, "y": 0, "w": 12, "h": 1 },
+    { "i": "field_title", "x": 0, "y": 1, "w": 6, "h": 2 },
+    { "i": "field_status", "x": 6, "y": 1, "w": 3, "h": 2 }
+  ],
+  "widgets": [
+    { "id": "section_main", "type": "text", "label": "Datos principales" },
+    { "id": "field_title", "type": "field", "field": "title", "label": "Titulo", "widgetType": "text" },
+    { "id": "field_status", "type": "field", "field": "status", "label": "Estado", "widgetType": "tag" }
+  ]
+}
+```
+
+If `bt_boards_update_detail_view_config` returns a validation error, use the exact field names listed in the error and retry. Do not tell the user the board has a temporary problem when the error says a field/widget is invalid.
 
 Button widget action:
 
@@ -172,7 +252,7 @@ Use:
 - `bt_boards_create_from_dynamic_table`, `bt_boards_create_from_data_hub_model`, `bt_boards_update_source_config`
 - `bt_boards_get_source_fields`, `bt_boards_get_available_columns`, `bt_boards_get_board_data`
 - `bt_boards_get_items`, `bt_boards_get_item`, `bt_boards_create_item`, `bt_boards_update_item`, `bt_boards_move_item`, `bt_boards_delete_item`
-- `bt_boards_update_display_config`, `bt_boards_update_column_order`, `bt_boards_update_detail_view_config`
+- `bt_boards_update_display_config`, `bt_boards_update_column_order`, `bt_boards_prepare_detail_view_config`, `bt_boards_update_detail_view_config`
 - `bt_boards_list_invocable_automations`, `bt_boards_list_invocable_automation_triggers`, `bt_boards_get_invocable_automation_trigger_schema`, `bt_boards_invoke_detail_widget_action`
 - `bt_boards_generate_public_link`, `bt_boards_set_public_access_mode`
 - `bt_boards_list_public_roles`, `bt_boards_add_public_role`, `bt_boards_update_public_role`, `bt_boards_delete_public_role`
