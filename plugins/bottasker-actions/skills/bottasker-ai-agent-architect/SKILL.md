@@ -115,6 +115,16 @@ For each input/output/tool item, include:
 - For Data Hub `datetime` fields, agents must output ISO 8601, preferred `YYYY-MM-DDTHH:mm`, for example `2026-05-31T14:30`.
 - For communication tools, confirm channel, audience, and message behavior before execution.
 
+## Primary Inputs And Outputs
+
+When designing agent inputs and outputs, always consider these primary channel families and only select the ones supported by discovered workers/actions:
+
+- WhatsApp Mensaje: inbound WhatsApp text/media messages and outbound WhatsApp replies or messages.
+- WhatsApp Llamadas: inbound WhatsApp calls and outbound voice/conversation behavior when the available workers/actions support calls.
+- Telegram: inbound Telegram messages and outbound Telegram replies or messages.
+- WebChat Mensaje: inbound messages from BotTasker WebChat and outbound WebChat responses.
+- WebChat Llamadas: inbound or active WebChat voice/call sessions and outbound voice/conversation behavior when the available workers/actions support calls.
+
 ## Expected MCP Tools
 
 Core discovery and planning:
