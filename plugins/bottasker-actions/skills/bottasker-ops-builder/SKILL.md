@@ -18,7 +18,7 @@ Use this skill for operational modules after the app and data foundation are kno
    - catalogs/products/categories/variants/sales carts: delegate to `bottasker-catalog-architect`
    - calendar: `bt_calendar_*`
    - files: `bt_files_*`
-   - knowledge: `bt_knowledge_*`
+   - knowledge: `bt_knowledge_*`; use `bt_knowledge_create_document` for text or markdown knowledge and `bt_knowledge_add_web_url` for URLs.
    - conversations/messages/calls: `bt_conversations_*`, `bt_messages_*`, `bt_calls_*`
    - WhatsApp templates: `bt_whatsapp_templates_*`
 5. Preview or run query tools before committing dashboard or reporting structures when tools are available.
@@ -31,6 +31,8 @@ Use this skill for operational modules after the app and data foundation are kno
 - Prefer creating a minimal board or operational resource first, then iterating.
 - Use `bottasker-catalog-architect` for product catalogs, categories, variants, modifier groups, properties, availability, product search, and sales cart behavior.
 - Do not submit WhatsApp templates for approval unless the user explicitly asks.
+- For WhatsApp template packs, use `bt_whatsapp_templates_create_pack` to create business drafts, then ask before submit.
+- Check required credentials before WhatsApp template actions; if unavailable, explain the missing `credentialId` instead of retrying payload shapes.
 - Ask for confirmation before archive/remove/delete tools or broad status changes.
 
 ## Expected MCP Tools

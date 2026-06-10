@@ -18,15 +18,18 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
    - `bt_product_categories_list`
    - `bt_products_list`
    - `bt_sales_carts_list` when cart behavior matters.
-4. Build a catalog blueprint:
+4. Before catalog/product writes:
+   - Use `bt_catalogs_get_create_schema` before `bt_catalogs_create`.
+   - Use `bt_products_get_bulk_upsert_schema` and `bt_products_validate_bulk` before `bt_products_bulk_upsert`.
+5. Build a catalog blueprint:
    - catalog purpose and default currency;
    - category tree;
    - product types;
    - product fields, attributes, options, variants, modifier groups, availability, channel visibility, and media;
    - sales cart behavior and checkout requirements;
    - AI Agent tools needed for product search, presentation, and cart operations.
-5. Show a visual blueprint and ask for approval before writes.
-6. After approval, create/update in order:
+6. Show a visual blueprint and ask for approval before writes.
+7. After approval, create/update in order:
    - catalog;
    - categories;
    - products or bulk upsert;
@@ -170,7 +173,9 @@ For the cart tool, ensure `initialConfig` includes catalog and checkout settings
 ## Operating Rules
 
 - Use existing catalog/category/product records when they match the target app.
+- Prefer native catalogs/products over simulating products in Data Hub when the `catalogs` module is available.
 - Prefer `bt_products_bulk_upsert` for importing many products.
+- Validate bulk products first with `bt_products_validate_bulk`; do not retry blindly after a bulk validation failure.
 - Use stable slugs and IDs for variants/modifier options when possible.
 - Ask before archiving/removing categories, products, catalogs, or changing active cart status.
 - Do not expose credential values or checkout provider secrets.

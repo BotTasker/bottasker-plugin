@@ -21,6 +21,7 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
    - If this is a new app, stop and ask App Builder to create or approve the app first.
 3. Build a plan before writing:
    - Use `bt_ai_agent_blueprint_plan` for the AI Agents module plan only.
+   - Use `bt_ai_agents_get_create_schema` and `bt_ai_agents_validate_create_payload` before `bt_ai_agents_create` unless using `bt_ai_agents_create_simple`.
    - Review discovered workers/actions and call `bt_ai_agent_tool_get_config_schema` for any tool that will be attached to an agent.
    - Call `bt_ai_agent_prepare_item_config` for every planned input, output, subagent tool, and agent item.
    - Call `bt_ai_agent_validate_item_config` for every prepared `initialConfig`.
@@ -30,11 +31,16 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
    - Do not call create/update/add/remove/archive/configuration tools until the user clearly approves the visual blueprint.
    - Valid approval includes "apruebo", "continua", "crealo", "ejecuta el plan", or an equivalent direct approval.
 5. Execute:
+   - Prefer `bt_ai_agents_create_simple` for a single main agent when no custom workspace graph is required.
+   - Use `bt_ai_agents_create_from_blueprint` only when `bt_ai_agent_blueprint_plan.executionPayload` is complete and approved.
    - Create the main AI Agent.
    - Add subagents with `bt_ai_agents_add_item` using `itemType: "agent"`.
    - Add inputs with `bt_ai_agents_add_item` using `itemType: "input"` and a validated `initialConfig`.
    - Add outputs with `bt_ai_agents_add_item` using `itemType: "output"` and a validated `initialConfig`.
    - Add tools to subagents with `bt_ai_agents_add_item` using `itemType: "tool"`, `agentTargetId`, and a validated `initialConfig`.
+   - Use `bt_ai_agents_update_agent_config` for prompt/role/model updates so `equippedTools` are preserved.
+   - Use `bt_ai_agents_list_items` before removing or reconfiguring existing items.
+   - Use `bt_ai_agents_remove_item` only after explicit confirmation.
    - Use `bt_action_instances_update_config` only to repair or update an existing action instance after validation.
 6. Verify:
    - Read back the agent with `bt_ai_agents_get`.

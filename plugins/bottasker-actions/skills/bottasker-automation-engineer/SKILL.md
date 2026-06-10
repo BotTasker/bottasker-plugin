@@ -20,11 +20,13 @@ For complex AI Agent systems with subagents, dynamically discovered tools, tool 
    - `bt_ai_agents_list`
    - `bt_workflows_list`
 4. Create or update AI agents with `bt_ai_agents_*`.
-5. Create workflows with `bt_workflows_create`.
-6. Add nodes with `bt_workflows_add_action`.
-7. Configure action instances with `bt_action_instances_update_config`.
-8. Connect graph edges with `bt_workflows_add_edges`.
-9. Test with `bt_workflows_start_testing`, `bt_workflows_run_trigger_test`, and inspect with `bt_workflow_runs_get_events`.
+5. Before workflow creation, call `bt_workflows_get_create_schema` and `bt_workflows_validate_create_payload`.
+6. Create workflows with explicit `bt_workflows_create` payload: `appId`, `name`, optional `timezone`, `folderPath`, `status`, and `workflowData: {nodes: [], edges: []}`.
+7. Prefer `bt_workflows_create_from_template` for common patterns such as incoming message to order, voucher review, board change notification, or repurchase follow-up.
+8. Add nodes with `bt_workflows_add_action`.
+9. Configure action instances with `bt_action_instances_update_config`.
+10. Connect graph edges with `bt_workflows_add_edges`.
+11. Test with `bt_workflows_start_testing`, `bt_workflows_run_trigger_test`, and inspect with `bt_workflow_runs_get_events`.
 
 ## Design Rules
 

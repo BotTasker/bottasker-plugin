@@ -14,12 +14,14 @@ Module specialists do not own the full app design. They implement their module i
 1. Call `bt_context_get_profile`.
 2. Call `bt_apps_list_modules` to discover allowed modules.
 3. When creating a complete app from natural language, call `bt_apps_blueprint_plan`.
-4. If AI Agents may be needed, call `bt_ai_agent_tools_discover` only as supporting discovery, not as the owner of the app plan.
-5. Call `bt_apps_list` to avoid duplicate apps.
-6. For an existing app, resolve `appId` with `bt_apps_list` or `bt_apps_get`.
-7. Present the app blueprint as a visual design and ask for approval before writes.
-8. Create or update the app with `bt_apps_create`, `bt_apps_update`, or `bt_apps_update_menu`.
-9. Delegate module implementation to specialists after app creation:
+4. Convert approved blueprints into executable stages with `bt_apps_implementation_plan`.
+5. If AI Agents may be needed, call `bt_ai_agent_tools_discover` only as supporting discovery, not as the owner of the app plan.
+6. Call `bt_apps_list` to avoid duplicate apps.
+7. For an existing app, resolve `appId` with `bt_apps_list` or `bt_apps_get`.
+8. Present the app blueprint as a visual design and ask for approval before writes.
+9. Run `bt_apps_run_implementation_plan` with `dryRun: true` before any real execution.
+10. Create or update the app with `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, or approved staged tools from the implementation plan.
+11. Delegate module implementation to specialists after app creation:
    - `bottasker-data-architect` for Data Hub, models, relations, records, and Dynamic Tables.
    - `bottasker-catalog-architect` for catalogs, categories, products, variants, modifiers, availability, and sales carts.
    - `bottasker-dashboard-architect` for useful dashboards, KPIs, tracking, control views, widget strategy, and area-specific dashboard sets.
@@ -27,8 +29,8 @@ Module specialists do not own the full app design. They implement their module i
    - `bottasker-ai-agent-architect` for AI Agents, subagents, tools, inputs, outputs, and tool configuration.
    - `bottasker-automation-engineer` for workflow graphs, action instances, edges, and tests.
    - `bottasker-ops-builder` for calendar, files, knowledge, conversations, calls, and WhatsApp templates.
-10. If building from a reusable design, use `bt_apps_create_from_template`.
-11. If packaging an existing app as a starter, use `bt_apps_export_template`.
+12. If building from a reusable design, use `bt_apps_create_from_template`.
+13. If packaging an existing app as a starter, use `bt_apps_export_template`.
 
 ## App Blueprint Responsibilities
 
@@ -93,3 +95,5 @@ Use known module capabilities from `bt_apps_list_modules`:
 Use `bt_context_get_profile`, `bt_apps_list_modules`, `bt_apps_blueprint_plan`, `bt_apps_list`, `bt_apps_get`, `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, `bt_apps_create_from_template`, and `bt_apps_export_template`.
 
 Use `bt_ai_agent_tools_discover` only when the app blueprint needs to know whether AI Agent tools exist. Detailed agent design belongs to `bottasker-ai-agent-architect`.
+
+For end-to-end builds, use `bt_apps_implementation_plan` and `bt_apps_run_implementation_plan` first in dry-run mode. For WhatsApp commerce demos, use `bt_apps_seed_demo_data`, `bt_whatsapp_templates_create_pack`, and `bt_roles_create_from_template` only after the app/module blueprint is approved.

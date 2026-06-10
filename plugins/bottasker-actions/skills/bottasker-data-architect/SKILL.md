@@ -20,15 +20,18 @@ Use this skill to build durable data structures for BotTasker apps.
    - `bt_dynamic_tables_list`
 5. Create or update the data layer incrementally:
    - hub
-   - models/tables
+   - models/tables; before model creation, call `bt_data_hub_get_model_schema` and `bt_data_hub_validate_create_model_payload`
    - fields
    - relations
+   - record links with `bt_data_hub_link_record`, `bt_data_hub_unlink_record`, and `bt_data_hub_list_record_links`
    - seed records only when useful for verification.
 6. For relation-heavy work, run `bt_data_hub_rebuild_relation_cache` after relation or record changes when appropriate.
 
 ## Modeling Rules
 
 - Prefer stable, explicit field keys.
+- Use `label` for the visible field name and `name` for the technical key. Treat `key` as a legacy alias only.
+- Use `dataHubId` as the canonical Data Hub identifier. Treat `hubId` as a legacy alias only.
 - Use relations instead of duplicated foreign data when records need to stay connected.
 - Add required fields only when the user requirement is clear.
 - For every Data Hub field with `type: "date"`, set or update `description` with the exact agent/API format: `YYYY-MM-DD`, example `2026-05-31`. Tell agents not to send natural language dates such as `31 de mayo de 2026`.

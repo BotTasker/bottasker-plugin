@@ -11,10 +11,11 @@ Use this skill as the first stop for BotTasker work. It decides which narrower B
 
 1. Call `bt_context_get_profile`.
 2. Call `bt_apps_list_modules`.
-3. If the user asks to create a complete app or solution from natural language, route to `bottasker-app-builder` and call `bt_apps_blueprint_plan`.
-4. If the user asks specifically for AI Agents inside an existing or already-approved app, route to `bottasker-ai-agent-architect` and call `bt_ai_agent_tools_discover`.
-5. If the user asks for a module-specific operation, call `bt_mcp_list_skills` and load the relevant MCP skill with `bt_mcp_load_skill`.
-6. If the user mentions an existing app but not an `appId`, call `bt_apps_list` and resolve the app by name. If multiple matches are plausible, ask for the target app.
+3. Call `bt_mcp_find_tools` with the target `moduleKey`, `intent`, and expected `effect` before assuming a concrete tool exists.
+4. If the user asks to create a complete app or solution from natural language, route to `bottasker-app-builder` and call `bt_apps_blueprint_plan`.
+5. If the user asks specifically for AI Agents inside an existing or already-approved app, route to `bottasker-ai-agent-architect` and call `bt_ai_agent_tools_discover`.
+6. If the user asks for a module-specific operation, call `bt_mcp_list_skills` and load the relevant MCP skill with `bt_mcp_load_skill`.
+7. If the user mentions an existing app but not an `appId`, call `bt_apps_list` and resolve the app by name. If multiple matches are plausible, ask for the target app.
 
 ## Plan-First Rule
 
@@ -53,3 +54,5 @@ If there is no explicit approval after the visual blueprint, do not call create,
 Core tools include `bt_context_get_profile`, `bt_apps_list_modules`, `bt_apps_blueprint_plan`, `bt_apps_list`, `bt_apps_get`, `bt_ai_agent_tools_discover`, `bt_ai_agent_blueprint_plan`, `bt_mcp_list_skills`, and `bt_mcp_load_skill`.
 
 For AI Agent item configuration also use `bt_ai_agent_prepare_item_config` and `bt_ai_agent_validate_item_config` before `bt_ai_agents_add_item`.
+
+Use `bt_mcp_find_tools` whenever discovery/listing looks inconsistent. If a module has write permissions but no matching MCP tool, report the `notExposedReason` instead of guessing payloads.
