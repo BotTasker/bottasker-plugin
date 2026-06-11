@@ -38,6 +38,40 @@ For complex AI Agent systems with subagents, dynamically discovered tools, tool 
 - Add agent tools incrementally and test after each major capability.
 - Ask for confirmation before removing agents, workflows, nodes, or edges.
 
+## DataHub Workflow Nodes
+
+For workflow automations, use the DataHub `actionType: "work"` nodes returned by `bt_registry_get_worker_actions`. Do not use the MCP actions `data_hub` or `data_hub_schema_admin` in workflows; those are for AI Agents and schema/admin tool exposure.
+
+Workflow DataHub action keys:
+
+- `on_data_hub_event`: trigger for `record.created`, `record.updated`, `record.deleted`, `record.status_changed`, `record.linked`, and `record.unlinked`.
+- `data_hub_search_records`: find records in a model.
+- `data_hub_get_record`: load one record by `recordId`.
+- `data_hub_create_record`: create a record.
+- `data_hub_update_record`: update an existing record.
+- `data_hub_archive_record`: archive an existing record.
+- `data_hub_delete_record`: delete an existing record.
+- `data_hub_link_records`: create a relation between two records.
+- `data_hub_unlink_records`: remove a relation between two records.
+- `data_hub_list_record_links`: list record relations.
+
+Configuration rules:
+
+- Always configure `dataHub`.
+- Configure `dataHubModel` for `search`, `create`, and `update` nodes when the schema requests it.
+- Use `recordId` for `get`, `update`, `archive`, `delete`, and `list_record_links`.
+- Use `relationId`, `fromRecordId`, and `toRecordId` for `link_records` and `unlink_records`.
+- When schema fields use `data_hub_record_fields`, configure them with the visual field selector; do not ask the user for free-form JSON for `values` or `filters`.
+- For `create`, required model fields are expected in `values`; optional fields can be added only when needed.
+- For `update`, send only the fields to change.
+- Use variables such as `{{1.record.id}}` or prior node outputs for dynamic IDs and values.
+
+Safety rules:
+
+- If the record ID is unknown, add `data_hub_search_records` and/or `data_hub_get_record` before `update`, `archive`, or `delete`.
+- Prefer `data_hub_archive_record` over `data_hub_delete_record`; use delete only when the user explicitly approves destructive removal.
+- For date and datetime fields, normalize values before writing: `YYYY-MM-DD` for `date`, preferred `YYYY-MM-DDTHH:mm` for `datetime`.
+
 ## Expected MCP Tools
 
 Use `bt_ai_agent_tools_discover`, `bt_registry_*`, `bt_ai_agents_*`, `bt_workflows_*`, `bt_action_instances_*`, and `bt_workflow_runs_get_events`.

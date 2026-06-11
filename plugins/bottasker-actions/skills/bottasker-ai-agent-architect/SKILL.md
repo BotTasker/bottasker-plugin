@@ -121,6 +121,26 @@ For each input/output/tool item, include:
 - For Data Hub `datetime` fields, agents must output ISO 8601, preferred `YYYY-MM-DDTHH:mm`, for example `2026-05-31T14:30`.
 - For communication tools, confirm channel, audience, and message behavior before execution.
 
+## DataHub Agent Tools
+
+AI Agents use DataHub MCP actions discovered through `bt_ai_agent_tools_discover`, primarily `data_hub` and, only for approved admin work, `data_hub_schema_admin`. Do not equip workflow-only nodes such as `data_hub_create_record`, `data_hub_update_record`, or other actions with `ignore_in: ["agent"]`; those belong to workflow automations.
+
+For every planned DataHub agent tool:
+
+- Call `bt_ai_agent_tool_get_config_schema` for the exact discovered worker/action.
+- Call `bt_ai_agent_prepare_item_config` and `bt_ai_agent_validate_item_config` before `bt_ai_agents_add_item`.
+- Configure `dataHub`, `globalPermissions`, `modelPermissions`, `includeSensitiveFields`, `restrictRecordsByContext`, and `maxDefaultRows` when those schema fields are present.
+- Use least privilege: grant `read`, `create`, and `update` only for the models and fields the agent actually needs.
+- Grant `manage_schema` only through `data_hub_schema_admin` and only when the approved plan explicitly requires model, field, or relation administration.
+
+Runtime guidance for agent prompts and tool plans:
+
+- Prefer model-specific tools when generated, such as `mcp_data_hub_create_<modelo>_record` and `mcp_data_hub_update_<modelo>_record`, before generic tools like `mcp_data_hub_create_record` or `mcp_data_hub_update_record`.
+- Search before create when stable identifiers exist, such as email, phone, document, sourceRefs, or unique fields, to avoid duplicates.
+- Use `records[].id` or `record.id` for references and relations; never use visible names or titles as foreign keys.
+- Use search/get before update when the agent does not already have the correct `recordId`.
+- Keep sensitive fields hidden unless the approved plan and permissions explicitly require them.
+
 ## Primary Inputs And Outputs
 
 When designing agent inputs and outputs, always consider these primary channel families and only select the ones supported by discovered workers/actions:

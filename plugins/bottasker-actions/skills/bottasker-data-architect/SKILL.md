@@ -53,6 +53,19 @@ When Data Hub will be used by AI Agents, return a `dataContext` that includes:
 
 For a write-only capture agent, prefer `read/create` on target models and avoid `update` unless the approved app flow requires correction/editing.
 
+## Handoff To Automation Engineer
+
+When Data Hub will be used by workflow automations, return a `dataContext` that includes:
+
+- `dataHubId` and Data Hub name.
+- Model IDs/names for every workflow node that will search, create, update, or trigger.
+- Field names, labels, types, required/optional flags, enum/options, date/time formats, sensitive flags, and relation targets.
+- Which DataHub events should trigger workflows: `record.created`, `record.updated`, `record.deleted`, `record.status_changed`, `record.linked`, or `record.unlinked`.
+- Which workflow nodes should be used: `on_data_hub_event`, `data_hub_search_records`, `data_hub_get_record`, `data_hub_create_record`, `data_hub_update_record`, `data_hub_archive_record`, `data_hub_delete_record`, `data_hub_link_records`, `data_hub_unlink_records`, or `data_hub_list_record_links`.
+- Which fields should be written in `values` or `filters`, using technical field names from Data Hub.
+
+For workflows, prefer `data_hub_search_records` or `data_hub_get_record` before updates or destructive actions when the exact `recordId` is not already known. Use `data_hub_archive_record` instead of `data_hub_delete_record` unless the user explicitly approves deletion. Normalize `date` and `datetime` values before writing so automation nodes can pass `values` directly.
+
 ## Expected MCP Tools
 
 Use `bt_data_hub_*`, `bt_dynamic_tables_*`, and `bt_dynamic_records_*` tools. For app discovery use `bt_apps_list` and `bt_apps_get`.

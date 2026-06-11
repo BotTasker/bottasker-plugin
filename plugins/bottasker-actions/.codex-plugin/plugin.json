@@ -1,6 +1,6 @@
 {
   "name": "bottasker-actions",
-  "version": "0.1.1",
+  "version": "0.1.1+codex.20260611062254",
   "description": "Build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
