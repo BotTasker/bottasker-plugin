@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Forms Architect"
+  short_description: "Design, publish, connect, and troubleshoot BotTasker Forms."
+  brand_color: "#2563EB"
+  default_prompt: "Use $bottasker-forms-architect to design, create, publish, connect, or troubleshoot BotTasker Forms."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Knowledge Base Assistant"
+  short_description: "Create, query, troubleshoot, and attach Knowledge Base to BotTasker agents."
+  brand_color: "#2563EB"
+  default_prompt: "Use $bottasker-knowledge-base-assistant to create, configure, or troubleshoot Knowledge Base for a BotTasker AI Agent."
+policy:
+  allow_implicit_invocation: true

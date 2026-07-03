@@ -3,13 +3,13 @@
   "owner": {
     "name": "BotTasker"
   },
-  "description": "Local BotTasker plugin marketplace for Claude Code.",
+  "description": "Local Tasky Assistant plugin marketplace for Claude Code.",
   "plugins": [
     {
-      "name": "bottasker-actions",
-      "source": "./plugins/bottasker-actions",
-      "displayName": "BotTasker Actions",
-      "description": "Create and operate BotTasker apps through the BotTasker MCP.",
+      "name": "bottasker-tasky",
+      "source": "./plugins/bottasker-tasky",
+      "displayName": "Tasky Assistant",
+      "description": "Tasky helps create and operate BotTasker apps through the BotTasker MCP.",
       "category": "Developer Tools",
       "keywords": [
         "bottasker",

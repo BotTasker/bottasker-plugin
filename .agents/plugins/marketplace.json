@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "bottasker-actions",
+      "name": "bottasker-tasky",
       "source": {
         "source": "local",
-        "path": "./plugins/bottasker-actions"
+        "path": "./plugins/bottasker-tasky"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -18,4 +18,3 @@
     }
   ]
 }
-

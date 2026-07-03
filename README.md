@@ -1,8 +1,8 @@
-# BotTasker Actions Plugin
+# Tasky Assistant Plugin
 
-Plugin for building and operating BotTasker apps through the BotTasker external MCP.
+Tasky Assistant plugin for building and operating BotTasker apps through the BotTasker external MCP.
 
-This repository is intentionally standalone so it can become its own git repository. It contains local marketplaces plus the `bottasker-actions` plugin for Codex and Claude Code.
+This repository is intentionally standalone so it can become its own git repository. It contains local marketplaces plus the `bottasker-tasky` plugin for Codex and Claude Code.
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ From this repository root:
 
 ```bash
 codex plugin marketplace add .
-codex plugin add bottasker-actions@bottasker-local
+codex plugin add bottasker-tasky@bottasker-local
 ```
 
 Open a new Codex session after installing so Codex reloads plugin skills and MCP servers.
@@ -43,7 +43,7 @@ Claude Code uses the official plugin marketplace flow. From this repository root
 
 ```bash
 claude plugin marketplace add .
-claude plugin install bottasker-actions@bottasker-local
+claude plugin install bottasker-tasky@bottasker-local
 ```
 
 When Claude Code enables the plugin, enter the BotTasker API key in the sensitive configuration prompt. The key is substituted into the plugin MCP header at runtime and is not stored in this repository.
@@ -52,7 +52,7 @@ If you are already inside a Claude Code session, you can use the equivalent slas
 
 ```text
 /plugin marketplace add .
-/plugin install bottasker-actions@bottasker-local
+/plugin install bottasker-tasky@bottasker-local
 /reload-plugins
 ```
 
@@ -80,7 +80,7 @@ Check plugin and MCP registration:
 
 ```bash
 claude plugin list
-claude plugin details bottasker-actions@bottasker-local
+claude plugin details bottasker-tasky@bottasker-local
 claude mcp list
 ```
 
@@ -118,26 +118,27 @@ Codex should use `bottasker-app-builder` to propose the app structure, module co
 
 ```bash
 python3 /Users/this/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py \
-  /Users/this/Documents/projects/bottasker/app/bottasker-actions-plugin/plugins/bottasker-actions
+  /Users/this/Documents/projects/bottasker/app/bottasker-tasky/plugins/bottasker-tasky
 ```
 
 For Claude Code:
 
 ```bash
-claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-actions-plugin
-claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-actions-plugin/plugins/bottasker-actions
+claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-tasky
+claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-tasky/plugins/bottasker-tasky
 ```
 
 ## Included Skills
 
 - `bottasker-router`: entrypoint and workflow router.
 - `bottasker-app-builder`: complete app design, module selection, specialist handoffs, apps, modules, menus, and templates.
-- `bottasker-data-architect`: Data Hub and Dynamic Tables.
+- `bottasker-data-architect`: Base de datos (Data Hub) and Dynamic Tables.
 - `bottasker-ai-agent-architect`: AI Agents module specialist for agents, subagents, dynamic tools, tool schemas, inputs, and outputs inside an app.
+- `bottasker-knowledge-base-assistant`: Knowledge Base specialist for documents, URL/text sources, semantic queries, ingestion state, and Knowledge Base tools attached to agents.
 - `bottasker-automation-engineer`: AI agents, workflows, workers, and tests.
 - `bottasker-dashboard-architect`: useful dashboards for tracking, control, KPIs, reporting, and area-specific follow-up.
 - `bottasker-board-architect`: boards, data sources, columns, card details, widgets, button automations, public/restricted sharing, roles, users, and security.
-- `bottasker-ops-builder`: operational modules such as calendar, files, knowledge, and conversations.
+- `bottasker-ops-builder`: operational modules such as calendar, files, conversations, calls, and WhatsApp templates.
 - `bottasker-catalog-architect`: catalogs, products, variants, properties, modifiers, availability, and sales carts.
 
 ## References

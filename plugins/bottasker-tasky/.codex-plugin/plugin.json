@@ -1,0 +1,64 @@
+{
+  "name": "bottasker-tasky",
+  "version": "0.1.1+codex.20260702191513",
+  "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
+  "author": {
+    "name": "BotTasker"
+  },
+  "homepage": "https://bottasker.ai",
+  "license": "UNLICENSED",
+  "keywords": [
+    "bottasker",
+    "mcp",
+    "apps",
+    "workflows",
+    "automation",
+    "data-hub",
+    "catalogs",
+    "products",
+    "sales-carts",
+    "dashboards",
+    "kpis",
+    "reporting",
+    "boards",
+    "kanban",
+    "public-sharing",
+    "forms",
+    "submissions",
+    "ai-agents",
+    "knowledge-base",
+    "semantic-search",
+    "dynamic-tools"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Tasky Assistant",
+    "shortDescription": "Create and operate BotTasker apps with Tasky and MCP tools.",
+    "longDescription": "Tasky Assistant gives Codex guided skills for creating apps, Base de datos modules (Data Hub service), catalogs, products, carts, useful dashboards for tracking and control, boards with secure sharing and automation buttons, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
+    "developerName": "BotTasker",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://bottasker.ai",
+    "privacyPolicyURL": "https://bottasker.ai/privacy",
+    "termsOfServiceURL": "https://bottasker.ai/terms",
+    "defaultPrompt": [
+      "Create a BotTasker app with data models and workflows.",
+      "Design a Base de datos (Data Hub) and dashboard in BotTasker.",
+      "Design dashboards for tracking, control, KPIs, and area-specific follow-up in BotTasker.",
+      "Design a BotTasker board with source data, detail widgets, button automations, and secure public or restricted sharing.",
+      "Create a BotTasker form with fields, validations, submissions, and Base de datos (Data Hub) mappings.",
+      "Design a catalog with products, variants, modifiers, availability, and sales carts.",
+      "Build an AI agent with subagents and dynamically discovered tools in BotTasker.",
+      "Create a Knowledge Base and attach it as a tool to a BotTasker AI Agent."
+    ],
+    "brandColor": "#2563EB",
+    "composerIcon": "./assets/bottasker-tasky.svg",
+    "logo": "./assets/bottasker-tasky.svg",
+    "screenshots": []
+  }
+}

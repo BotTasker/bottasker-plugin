@@ -1,8 +1,0 @@
-interface:
-  display_name: "BotTasker Data Architect"
-  short_description: "Design Data Hubs, models, relations, and tables."
-  brand_color: "#2563EB"
-  default_prompt: "Design the Data Hub and records for a BotTasker app."
-policy:
-  allow_implicit_invocation: true
-

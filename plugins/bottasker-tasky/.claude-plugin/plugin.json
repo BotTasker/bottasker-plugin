@@ -1,0 +1,45 @@
+{
+  "name": "bottasker-tasky",
+  "displayName": "Tasky Assistant",
+  "version": "0.1.1",
+  "description": "Tasky helps create and operate BotTasker apps through the BotTasker MCP.",
+  "author": {
+    "name": "BotTasker"
+  },
+  "homepage": "https://bottasker.ai",
+  "license": "UNLICENSED",
+  "keywords": [
+    "bottasker",
+    "mcp",
+    "apps",
+    "workflows",
+    "automation",
+    "data-hub",
+    "catalogs",
+    "products",
+    "sales-carts",
+    "dashboards",
+    "kpis",
+    "reporting",
+    "boards",
+    "kanban",
+    "public-sharing",
+    "forms",
+    "submissions",
+    "ai-agents",
+    "knowledge-base",
+    "semantic-search",
+    "dynamic-tools"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./claude.mcp.json",
+  "userConfig": {
+    "BOTASKER_API_KEY": {
+      "type": "string",
+      "title": "BotTasker API key",
+      "description": "API key used as the Bearer token for https://api.bottasker.ai/mcp.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}
