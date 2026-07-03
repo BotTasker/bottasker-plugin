@@ -80,9 +80,17 @@ When Base de datos (Data Hub) will be used by AI Agents, return a `dataContext` 
 - Base de datos (Data Hub) id/name.
 - Model ids/names and any `uniqueKeys`.
 - Field names, labels, types, required flags, `unique`, enums/options, date/time formats, sensitive flags, and relation targets.
-- Recommended least-privilege permissions per model: `read`, `create`, `update`, or `manage_schema`.
+- Recommended least-privilege permissions per model, explicitly as a matrix for AI Agent DataHub tools: Leer (`read`), Crear (`create`), and Editar (`update`) for each model the agent may access; include `manage_schema` only for approved schema-admin agents.
 - Fields that should be hidden from agents.
 - Which model each agent tool should read or write.
+
+When the user asks to add or configure the Base de datos tool on an AI Agent, the tool is not complete until model access is configured:
+
+- Discover the agent tool with `bt_ai_agent_tools_discover`, get its schema with `bt_ai_agent_tool_get_config_schema`, prepare `initialConfig` with `bt_ai_agent_prepare_item_config`, and validate it with `bt_ai_agent_validate_item_config` before calling `bt_ai_agents_add_item`.
+- For the technical `data_hub` action, `initialConfig` must include `dataHub`, `globalPermissions`, and non-empty `modelPermissions`.
+- Every enabled model in `modelPermissions` must have an explicit permission decision for Leer (`read`), Crear (`create`), and Editar (`update`) according to the approved process. Do not report the tool as configured if the UI would show `0 habilitados` or no enabled model permissions.
+- If the agent already has the Base de datos tool but `modelPermissions` is empty, missing enabled models, or missing per-model permissions, repair the existing action instance with `bt_action_instances_update_config` or prepare/validate a corrected config before saying the tool is ready.
+- Verify with `bt_ai_agents_get`, `bt_ai_agents_list_items`, or `bt_action_instances_get_details` and summarize exactly how many models are enabled and which permissions they have.
 
 For a write-only capture agent, prefer `read/create` on target models and avoid `update` unless the approved app flow requires correction/editing.
 
