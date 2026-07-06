@@ -17,6 +17,16 @@ Use this skill as the first stop for BotTasker work. It decides which narrower B
 6. If the user asks for a module-specific operation, call `bt_mcp_list_skills` and load the relevant MCP skill with `bt_mcp_load_skill`.
 7. If the user mentions an existing app but not an `appId`, call `bt_apps_list` and resolve the app by name. If multiple matches are plausible, ask for the target app.
 
+## Capability Discovery
+
+- Use the user's natural-language intent as the discovery query. Do not rely only on literal names, visible labels, or memory of known tools.
+- Capability discovery has two layers: first select/load the relevant BotTasker skill, then search real MCP tools, workers, actions, and automation nodes. A skill match alone is not proof that a concrete capability exists or does not exist.
+- When calling `bt_mcp_find_tools`, pass a specific `intent` sentence that describes the desired capability and the expected `effect`.
+- When working with AI Agents, call `bt_ai_agent_tools_discover` with `search` set to the user's capability intent, not only with empty filters.
+- Treat semantic matches returned as `semanticTools`, `matchType: "semantic"`, `matchedBy`, or `semanticScore` as real candidates. Inspect the candidate with the relevant schema/configuration tools before saying the capability is unavailable.
+- If keyword discovery and semantic discovery disagree, prefer the discovered candidate as a possibility and validate it. Only report that a capability is missing after discovery returns no usable exact or semantic candidate for the requested module/scope.
+- Do not ask the user for permission to explore available capabilities. If the user asks whether Tasky can do something, run discovery directly and answer from verified skills + tools/nodes.
+
 ## Risk-Based Execution Rule
 
 For simple, low-risk requests, do the work directly after discovery and validation. A request is simple when it targets an existing app/resource, has the required IDs or can resolve them from context, uses non-destructive write tools, has no unresolved human decision, and no external-send/public-access/credential/security impact.
@@ -62,6 +72,13 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 - List relevant existing resources before creating new ones.
 - Ask for explicit confirmation before using remove, delete, archive, submit-for-approval, or broad update tools.
 - Do not expose API keys, credential bodies, tokens, cookies, or authorization headers.
+
+## User-Facing Communication
+
+- Keep tool names, action keys, worker keys, payload fields, service identifiers, IDs, and MCP names internal. Do not show names like `bt_*`, `mcp_*`, `data_hub`, `Data Hub`, `worker`, `payload`, or `schema` in user-facing plans, summaries, risks, questions, or button descriptions.
+- Translate internal work into product language: "crear el tablero", "configurar la Base de datos", "agregar el dashboard", "preparar la vista", "verificar el resultado".
+- In visible plans, describe the outcome and business object, not the tool that will execute it. For example, say "Crear un tablero kanban para Driver agrupado por etapa actual", not "Usar bt_boards_create_from_data_hub_model".
+- If technical identifiers are necessary for execution, use them only inside MCP tool inputs or internal context, not in the message shown to the user.
 
 ## Expected MCP Tools
 

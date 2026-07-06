@@ -35,6 +35,8 @@ Before any write tool, show:
 - Access/security table: public mode, roles, users, global permissions, column permissions, sensitive fields excluded.
 - Pending decisions and risks.
 
+Keep this blueprint user-facing: do not include MCP tool names, action keys, worker keys, payload/schema labels, IDs, `Data Hub`, or `bt_*`/`mcp_*` identifiers. Describe product outcomes such as the tablero, columns, fields, detail view, widgets, and access behavior.
+
 Do not call create, update, move, delete, public link, role, user, file, or automation tools until the user explicitly approves the visual blueprint.
 
 ## Source Design

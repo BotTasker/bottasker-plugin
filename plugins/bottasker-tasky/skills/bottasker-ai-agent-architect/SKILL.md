@@ -13,7 +13,7 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
 
 1. Discover context:
    - Call `bt_context_get_profile`.
-   - Call `bt_ai_agent_tools_discover`.
+   - Call `bt_ai_agent_tools_discover` with `search` set to the user's natural-language capability intent when the request mentions any tool, action, input, output, worker, or business capability. Use an empty search only for broad inventory.
    - Call `bt_mcp_list_skills` and load relevant dynamic skills with `bt_mcp_load_skill`.
 2. Resolve `appId`:
    - If the user names an existing app, call `bt_apps_list` and choose the exact app.
@@ -99,6 +99,12 @@ For each input/output/tool item, include:
 
 - Do not assume the full list of modules, workers, actions, or schemas.
 - Treat `bt_ai_agent_tools_discover` as the source of truth for available agent tools.
+- Treat skill discovery and tool/node discovery as separate layers. `list_solution_skills` can choose the right specialist, but only `bt_ai_agent_tools_discover`, `bt_mcp_find_tools`, and schema/config tools can prove whether a concrete agent tool or node exists.
+- Discovery is hybrid: results may be exact, semantic, or both. Treat `matchType: "semantic"`, `matchedBy: "semantic"`, `matchedBy: "keyword+semantic"`, and `semanticScore` as signals that the tool may satisfy the user's intent even when the literal name does not match.
+- For any user request like "can the agent do X?", first run `bt_ai_agent_tools_discover` with `search` equal to X in natural language. Do not answer "no" only because you do not know a tool name or because a literal search term is absent.
+- Do not ask the user whether to explore available tools. A capability question already authorizes read-only discovery; ask only for missing app/resource/configuration details after discovery finds a plausible candidate.
+- If semantic discovery returns a plausible candidate, inspect its config schema with `bt_ai_agent_tool_get_config_schema` before deciding whether it can be equipped.
+- If no exact result appears but semantic candidates exist, evaluate those candidates and explain the user-facing capability in product language. Only say a capability is unavailable after discovery returns no usable exact or semantic candidate for the agent scope.
 - Treat `bt_ai_agent_tool_get_config_schema` as the source of truth for configuration fields.
 - Treat `bt_ai_agent_prepare_item_config` as the source of truth for draft `initialConfig`.
 - Treat `bt_ai_agent_validate_item_config` as the required gate before `bt_ai_agents_add_item`.

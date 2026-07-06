@@ -46,6 +46,8 @@ Before any write tool, show:
 - Area split when useful: executive, operations, sales, finance, support, agents/workflows, data quality, or custom areas.
 - Pending decisions and assumptions.
 
+Keep this blueprint user-facing: do not include MCP tool names, action keys, worker keys, payload/schema labels, IDs, `Data Hub`, or `bt_*`/`mcp_*` identifiers. Describe product outcomes such as dashboard purpose, widgets, filters, metrics, and source models.
+
 Do not call create, update, duplicate, archive, remove, or broad configuration tools until the user explicitly approves the visual blueprint.
 
 ## Dashboard Types

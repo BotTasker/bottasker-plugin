@@ -56,6 +56,8 @@ Before any write tool, App Builder must show a graphical blueprint:
 - Configuration matrix for AI Agent items delegated to `bottasker-ai-agent-architect`.
 - Pending decisions and risks.
 
+Keep this blueprint user-facing: do not include MCP tool names, action keys, worker keys, payload/schema labels, IDs, `Data Hub`, or `bt_*`/`mcp_*` identifiers. Describe product outcomes and business objects instead.
+
 Do not create apps, modules, Base de datos workspaces (Data Hub service), agents, workflows, dashboards, or channel configs until the user approves this visual blueprint explicitly.
 
 Use known module capabilities from `bt_apps_list_modules`:
