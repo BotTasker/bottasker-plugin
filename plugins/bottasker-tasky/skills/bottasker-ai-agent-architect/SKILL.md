@@ -22,6 +22,7 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
 3. Decide whether this is simple or plan-worthy:
    - If the user asks for a narrow, existing-agent change (for example, add one already existing Knowledge Base/document/tool, update the agent prompt, or attach one validated input/output/tool), do not build a visual blueprint. For Knowledge Base/document/tool work, load or delegate to `bottasker-knowledge-base-assistant`; for form design or form-linked agent behavior, load or delegate to `bottasker-forms-architect`; inspect current items, prepare/validate the config, execute the non-destructive write, verify, and summarize.
    - Use `bt_ai_agent_blueprint_plan` only for new agent systems, multi-component changes, unclear architecture, external communication setup, credential-sensitive tools, broad rewrites, or changes with real risks/pending decisions.
+   - Evaluate whether proactive behavior would create measurable value for sales, collections, appointments, recovery, support, or stalled opportunities. Select the correct mechanism using Proactivity Decision Rules; do not add proactivity by default.
    - Use `bt_ai_agents_get_create_schema` and `bt_ai_agents_validate_create_payload` before `bt_ai_agents_create` unless using `bt_ai_agents_create_simple`.
    - Review discovered workers/actions and call `bt_ai_agent_tool_get_config_schema` for any tool that will be attached to an agent.
    - Call `bt_ai_agent_prepare_item_config` for every planned input, output, subagent tool, and agent item.
@@ -42,11 +43,13 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
    - Add outputs with `bt_ai_agents_add_item` using `itemType: "output"` and a validated `initialConfig`.
    - Add tools to subagents with `bt_ai_agents_add_item` using `itemType: "tool"`, `agentTargetId`, and a validated `initialConfig`.
    - Use `bt_ai_agents_update_agent_config` for prompt/role/model updates so `equippedTools` are preserved.
+   - For native proactive follow-up, set `workspaceConfig.executionSettings.proactiveFollowUp.enabled` in the create payload. When updating an existing agent, read the full workspace first, change only this setting through `bt_ai_agents_update`, and preserve all inputs, agents, outputs, tools, shared instructions, and other execution settings.
    - Use `bt_ai_agents_list_items` before removing or reconfiguring existing items.
    - Use `bt_ai_agents_remove_item` only after explicit confirmation.
    - Use `bt_action_instances_update_config` only to repair or update an existing action instance after validation.
 6. Verify:
    - Read back the agent with `bt_ai_agents_get`.
+   - After creating or updating proactive behavior, verify the saved execution setting and every scheduler/event/channel item involved.
    - Check action instances with `bt_action_instances_get_details` when available.
 
 ## Blueprint Format
@@ -71,6 +74,7 @@ Before broad, risky, or multi-component AI Agent work, show:
 - A Mermaid diagram with the data flow: user/channel -> input -> main agent -> subagents -> tools -> outputs.
 - A component table listing modules, Base de datos models (Data Hub service), agents, subagents, inputs, outputs, tools, and dashboards/ops modules referenced by App Builder.
 - A configuration matrix for every item to be added.
+- When proactivity is relevant, a proactivity row with objective, trigger, required context, delay/cadence, maximum attempts, stop conditions, timezone, channel/audience, tools, escalation, and human control.
 - Pending parameters and risks.
 
 If the change is simple, validated, non-destructive, and affects an existing agent, skip the visual blueprint and execute directly. If the user has not approved a required visual blueprint after seeing it, stop. Do not create the AI Agent, add/remove items, configure action instances, or update existing agents.
@@ -132,6 +136,29 @@ For each input/output/tool item, include:
 - Before creating a new agent, list existing agents in the target app and reuse an agent with the same purpose/name instead of creating duplicates. The MCP create tools are idempotent; if they return `idempotent:true` or `reusedExisting:true`, continue with that agent ID.
 - Before adding subagents, inputs, outputs, or tools to an existing/reused agent, call `bt_ai_agents_list_items` and do not add an item that already exists with the same `itemType`, `workerRegistryId`, `actionKey`, and target agent.
 - After adding or updating an item directly, verify with `bt_ai_agents_get` or `bt_ai_agents_list_items` and answer with a compact before/after summary.
+
+## Proactivity Decision Rules
+
+Treat proactive follow-up and proactive operations as different capabilities. First identify the business signal that should start the action:
+
+| Business signal | Mechanism | Example |
+| --- | --- | --- |
+| The agent asked a question and the same user did not answer | Native proactive follow-up | A silent lead after the agent asks for availability |
+| A date, cron expression, or recurrence is reached | Agent scheduler or scheduled workflow | Appointment reminder or invoice due date |
+| A record, status, or external event changes | Event-triggered workflow | Opportunity becomes stalled or payment becomes overdue |
+| A campaign or audience must be contacted | Communication automation with explicit approval | Re-engagement campaign for inactive customers |
+
+Use native proactive follow-up only when all of these are true:
+
+- `workspaceConfig.executionSettings.proactiveFollowUp.enabled` is `true`.
+- The active human-in-loop interruption expects a response from the same user in the current conversation. It is not a campaign mechanism and must not initiate unrelated outreach or contact someone without a preceding conversational interruption.
+- For each interruption, the agent explicitly decides whether to schedule a follow-up. When enabled for that interruption, use an integer delay from 1 to 1440 minutes, 1 to 5 maximum attempts, an internal reason, and a future wake instruction.
+- Each wake continues the same objective and sends a fresh, natural visible message through the available channel. Never copy, quote, or resend the previous visible message verbatim.
+- Stop when the user responds, the active task or human turn changes, the conversation is no longer waiting for that response, another execution or pending human input takes precedence, the attempt limit is reached, or proactive follow-up is disabled.
+
+For scheduled, event-driven, or campaign proactivity, coordinate with `bottasker-automation-engineer`. Discover the actual scheduler, event trigger, workflow, data, and channel actions before proposing them. Define the objective, trigger, eligibility condition, required context, delay/cadence, timezone, overlap behavior, attempt/rate limits, stop conditions, recipient/audience, outbound channel, tools and permissions, escalation, consent, and human approval. External sends, templates, campaigns, and broad audience contact remain approval-gated.
+
+Do not propose proactivity merely because it is available. Prefer it only when it prevents a concrete loss, delay, missed obligation, or service failure and the result can be observed. If no safe trigger, recipient, stop condition, or delivery channel can be established, keep the solution reactive and report the missing dependency.
 
 ## Workspace Concepts
 
@@ -207,6 +234,7 @@ Core discovery and planning:
 Execution tools:
 
 - `bt_ai_agents_create`
+- `bt_ai_agents_update`
 - `bt_ai_agents_add_item`
 - `bt_ai_agents_get`
 - `bt_action_instances_update_config`
