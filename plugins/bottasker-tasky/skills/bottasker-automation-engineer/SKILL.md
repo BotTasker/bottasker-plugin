@@ -73,6 +73,19 @@ Safety rules:
 - Prefer `data_hub_archive_record` over `data_hub_delete_record`; use delete only when the user explicitly approves destructive removal.
 - For date and datetime fields, normalize values before writing: `YYYY-MM-DD` for `date`, preferred `YYYY-MM-DDTHH:mm` for `datetime`.
 
+## Yango Fleet Workflow Nodes
+
+When a workflow must interact with Yango Fleet:
+
+- Discover `Yango Fleet` through `bt_registry_list_workers` and inspect its current actions with `bt_registry_get_worker_actions` before adding nodes.
+- Use the individual workflow actions, normally `yango_fleet_list_drivers`, `yango_fleet_get_driver`, `yango_fleet_create_driver`, `yango_fleet_update_driver`, `yango_fleet_list_cars`, `yango_fleet_get_car`, `yango_fleet_create_car`, `yango_fleet_update_car`, `yango_fleet_list_work_rules`, `yango_fleet_list_orders`, `yango_fleet_get_order_track`, `yango_fleet_list_park_transactions`, `yango_fleet_list_driver_transactions`, `yango_fleet_list_order_transactions`, `yango_fleet_list_transaction_categories`, `yango_fleet_get_supply_hours`, `yango_fleet_get_blocked_balance`, `yango_fleet_bind_car`, `yango_fleet_unbind_car`, `yango_fleet_create_transaction`, and `yango_fleet_get_transaction_status`. The registry result is authoritative if names change.
+- Configure every node with the validated Custom API credential and fixed `park_id`. Never expose `X-Client-ID` or `X-Api-Key` values in workflow labels, mappings, prompts, or summaries.
+- Map the flat fields exposed by the action schema; do not build raw nested Yango API bodies. Use outputs from list/get nodes to supply exact driver, vehicle, order, category, and transaction IDs to later nodes.
+- Keep list limits and date ranges small. Paginate deliberately and avoid loops without a maximum page/run count.
+- Before update, load the current driver or vehicle when existing values must be preserved. For a v3 balance movement, map only `driver_id`, non-zero signed decimal `importe`, and `descripcion`; do not pass `categoria_id`. After creation, map the returned `id` and integer `version` into a bounded status-check path.
+- Put financially sensitive movements and ambiguous fleet writes behind an explicit approval or review step. Make retries idempotent-aware and never blindly repeat a create or balance operation after a timeout.
+- Test read-only nodes first, then each write path with a controlled record. Verify the final Yango state and inspect workflow events before enabling production traffic.
+
 ## Expected MCP Tools
 
 Use `bt_ai_agent_tools_discover`, `bt_registry_*`, `bt_ai_agents_*`, `bt_workflows_*`, `bt_action_instances_*`, and `bt_workflow_runs_get_events`.

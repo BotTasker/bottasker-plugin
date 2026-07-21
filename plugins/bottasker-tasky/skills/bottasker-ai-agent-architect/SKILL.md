@@ -179,6 +179,87 @@ Do not propose proactivity merely because it is available. Prefer it only when i
 - Carrito: use as a tool when the agent builds or updates a transaction: get/create active cart, add/remove items, apply customer data, set status, or prepare checkout. Configure catalog/cart scope, required checkout fields, currency, customer identity, and validation behavior. Always respect cart tool failures; do not confirm a sale if the cart rejects an item.
 - Archivos: use as input/tool/output when the agent receives, reads, generates, stores, or shares documents/images/audio. If the agent must use files, documents, images, audio, or other assets that live in the BotTasker Files module, it must have the Archivos/Files tool equipped and validated; Base de datos (DataHub), Knowledge, or channel tools may reference file IDs or URLs, but they do not grant general access to browse/read/manage the Files module. Configure allowed file types, storage target, parsing/OCR/transcription behavior when available, size limits, and whether files become knowledge, evidence, or record attachments.
 
+## Yango Fleet Agent Tool
+
+Use this guidance whenever the user mentions Yango Fleet, Yango park/fleet, fleet drivers, fleet vehicles, Yandex Fleet, or asks an agent to consult or manage a Yango fleet.
+
+### Discovery And Configuration
+
+- Discover the agent tool with `bt_ai_agent_tools_discover` using a natural-language search that includes `Yango Fleet` and the intended operation. Do not assume an unavailable tool from this guide; the discovered worker/action and schema remain the source of truth.
+- For AI Agents, equip the single `Yango Fleet` tool action. Its internal action key is normally `yango_fleet`, while its runtime tools use the `mcp_yango_fleet_` prefix. Do not equip the individual workflow-only actions to an agent.
+- Read the configuration schema, prepare it, validate it, add it to the intended agent, and verify the saved action instance.
+- Configure `connection` with a Custom API credential containing the headers `X-Client-ID` and `X-Api-Key`. Configure `park_id` with the fixed park identifier. Never place either secret header value in prompts, plans, messages, logs, or visible summaries.
+- All operation switches are enabled by default when the node is added. Apply least privilege: leave enabled only the operations the agent actually needs, especially for write or financial actions. Preserve the user's explicit selections when updating an existing node.
+
+### Tool Selection Guide
+
+Choose the narrowest operation that answers the request:
+
+- Drivers: `list_drivers` searches/paginates drivers; `get_driver` loads one complete profile by `driver_id`; `create_driver` creates a profile; `update_driver` changes an existing profile.
+- Vehicles: `list_cars` searches/paginates vehicles; `get_car` loads one vehicle by `car_id`; `create_car` registers a vehicle; `update_car` changes an existing vehicle.
+- Driver setup: `list_work_rules` discovers valid work-rule IDs before creating or updating a driver; `bind_car` assigns a car to a driver; `unbind_car` removes that assignment without deleting either record.
+- Orders: `list_orders` searches trips by period, driver, car, order, or status; `get_order_track` returns sampled GPS points for one order.
+- Transactions: `list_park_transactions` reads park movements; `list_driver_transactions` reads one driver's movements; `list_order_transactions` reads movements for one order; `list_transaction_categories` discovers valid categories.
+- Driver finance/operations: `get_supply_hours` returns online time for a driver and period; `get_blocked_balance` returns balance and blocked amount.
+- Balance writes: `create_transaction` creates a driver credit or charge; `get_transaction_status` verifies whether that asynchronous movement completed, is pending, or failed.
+
+### Recommended Sequences
+
+- Search then detail: call a list operation with a small limit, select the exact ID, then call the matching get operation only if full details are necessary.
+- Create driver: search for duplicates by phone/license when possible, call `list_work_rules`, create the driver, then read it back. Bind a vehicle separately only when requested.
+- Update driver or vehicle: obtain the current record first because Yango updates may require preserving existing values; change only what the user requested and verify afterward.
+- Create balance movement: confirm the exact driver, amount, sign, currency context, and description; call `create_transaction`, then use the returned transaction `id` and `version` with `get_transaction_status` using bounded retries. The v3 create operation uses transaction `data.kind=other` internally and does not accept `categoria_id`.
+- Order investigation: call `list_orders` with dates and the narrowest known filter; request `get_order_track` only for the selected order.
+
+### Exact Parameter Contract
+
+Use only parameters exposed by the discovered schema. Never rename them, translate enum values, substitute labels for IDs, or send fields from one operation to another.
+
+- `list_drivers`: all inputs are optional: `texto`, `limite` (1-50, default 10), `offset` (default 0), `detalle`, `driver_id`, `estado_laboral`, `estado_actual`, and `orden`. `estado_laboral` is `working`, `not_working`, or `fired`; `estado_actual` is `offline`, `busy`, `free`, `in_order_free`, or `in_order_busy`.
+- `get_driver`: requires `driver_id`; optional `detalle` is `resumen` or `completo`.
+- `create_driver`: requires `nombre`, `apellido`, `telefono`, `fecha_nacimiento`, `licencia_numero`, `licencia_pais`, `licencia_emision`, `licencia_vencimiento`, `conduce_desde`, `regla_trabajo_id`, and `fecha_ingreso`. Optional fields include `segundo_nombre`, `email`, `direccion`, `limite_saldo`, `car_id`, and `comentario`.
+- `update_driver`: requires `driver_id`; all change fields are optional. Load the profile first and preserve current values needed by Yango. `estado_laboral` is `working`, `not_working`, or `fired`.
+- `list_cars`: all inputs are optional: `texto`, `limite` (1-50, default 10), `offset`, `detalle`, `car_id`, `estado`, `categoria`, and `es_alquiler`. Omitting `es_alquiler` means both; `false` is a real filter, not omission.
+- `get_car`: requires `car_id`; optional `detalle` is `resumen` or `completo`.
+- `create_car`: requires `marca`, `modelo`, `color`, `anio`, `transmision`, `placa`, `certificado_registro`, `indicativo`, and `estado`. Optional fields include `vin`, `categorias`, `comodidades`, `comentario`, `combustible`, `es_del_parque`, and `kilometraje`.
+- `update_car`: requires `car_id`; other vehicle fields are changes. Load the current car first so required existing values are not accidentally removed.
+- `list_work_rules`: takes no agent input; `park_id` comes from node configuration.
+- `list_orders`: inputs are optional: `desde`, `hasta`, `detalle`, `order_id`, `driver_id`, `car_id`, `estado`, `limite` (1-50, default 10), and `cursor`. Use the exact cursor returned by the preceding page.
+- `get_order_track`: requires `order_id`; optional `limite_puntos` is 1-200 (default 50) and `detalle`. In summary mode long tracks are sampled while preserving first and last points.
+- `list_park_transactions`: optional `desde`, `hasta`, `detalle`, `categoria_id`, `limite` (1-100, default 20), and `cursor`. `categoria_id` filters existing movements only.
+- `list_driver_transactions`: requires `driver_id`; optional `desde`, `hasta`, `detalle`, `limite` (1-100, default 20), and `cursor`.
+- `list_order_transactions`: requires `order_id`; optional `desde`, `hasta`, `detalle`, and local result `limite` (1-200, default 50). This endpoint has no official cursor.
+- `list_transaction_categories`: optional booleans `solo_habilitadas` and `solo_creables`. Use it to inspect/filter existing transaction categories; do not pass its IDs to the v3 `create_transaction` operation.
+- `get_supply_hours`: requires `driver_id`, `desde`, and `hasta`.
+- `get_blocked_balance`: requires `driver_id`.
+- `bind_car` and `unbind_car`: each requires exact `driver_id` and `car_id` values.
+- `create_transaction`: requires `driver_id`, `importe`, and `descripcion`. `importe` is a non-zero decimal string with up to 4 decimal places: positive credits, negative debits; no currency symbol or thousands separator. `descripcion` is 1-256 characters. Do not send `categoria_id`; the node supplies `version: 1` and `data.kind: other` for a new v3 movement.
+- `get_transaction_status`: requires the same `driver_id`, the transaction `transaccion_id` returned as `id`, and integer `version` returned by creation. Do not substitute `event_id` for `transaccion_id`.
+
+Global formats:
+
+- `driver_id`, `car_id`, `order_id`, `regla_trabajo_id`, and `categoria_id` are opaque IDs. Copy them exactly from tool results.
+- Driver dates use `YYYY-MM-DD` exactly. `licencia_pais` is a three-letter lowercase country code such as `per`. `telefono` uses E.164, such as `+51999999999`.
+- Period fields `desde` and `hasta` use ISO 8601 with a timezone, such as `2026-07-01T00:00:00-05:00`; `hasta` must not precede `desde`.
+- Vehicle `transmision` is `mechanical`, `automatic`, `robotic`, or `variator`; `combustible` is `petrol`, `methane`, `propane`, or `electricity`; statuses and category/amenity codes must remain untranslated.
+
+### Limits And Token Economy
+
+- Prefer flat Spanish parameters exposed by the tool. Do not construct raw nested Yango request bodies.
+- Use `detalle: "resumen"` by default. Use `detalle: "completo"` only when the user needs fields absent from the compact result.
+- Start list calls with `limite` between 3 and 10. Increase only when needed. Continue with `siguiente_offset`/`offset` or `cursor_siguiente`/`cursor` instead of requesting an unbounded result.
+- Always add date filters for orders or transactions when the user provides or implies a period. If no period is known and the query could be broad, ask for the smallest useful range.
+- For order tracks, start with `limite_puntos` of 25 or 50; the tool preserves the beginning and end while sampling long routes.
+- Summarize results for the user instead of repeating raw JSON. State pagination when more results exist and ask whether to continue only when additional pages are useful.
+
+### Safety And Error Handling
+
+- Treat `create_driver`, `update_driver`, `create_car`, `update_car`, `bind_car`, and `unbind_car` as external writes. Ensure the target and requested change are unambiguous; do not repeat a write automatically after an uncertain timeout.
+- Treat `create_transaction` as financially sensitive. Require explicit user intent for the exact driver, amount, positive/negative sign, and reason before execution. Never infer a missing sign or silently convert a charge into a credit.
+- Do not claim success from the request alone. Read back created/updated records where available, and always verify balance movements with `get_transaction_status`.
+- If a tool returns `success: false`, report the concise message, preserve non-secret context, and correct inputs only when the error is actionable. Never expose credentials or raw authorization headers.
+- IDs are authoritative. Do not use a visible driver name, license plate, order label, short order number, category label, or event ID where an exact ID is required.
+
 ## Base de datos (DataHub) Agent Tools
 
 AI Agents use Base de datos (DataHub) MCP actions discovered through `bt_ai_agent_tools_discover`, primarily `data_hub` and, only for approved admin work, `data_hub_schema_admin`. Do not equip workflow-only nodes such as `data_hub_create_record`, `data_hub_update_record`, or other actions with `ignore_in: ["agent"]`; those belong to workflow automations.
