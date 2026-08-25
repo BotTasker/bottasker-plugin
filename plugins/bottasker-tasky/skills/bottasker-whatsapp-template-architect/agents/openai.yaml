@@ -1,0 +1,8 @@
+interface:
+  display_name: "BotTasker WhatsApp Template Architect"
+  short_description: "Design and create Meta-compatible WhatsApp templates with every supported header, variable, button, and authentication variation."
+  brand_color: "#2563EB"
+  default_prompt: "Design, validate, and create a Meta-compatible WhatsApp Business template in BotTasker."
+policy:
+  allow_implicit_invocation: true
+

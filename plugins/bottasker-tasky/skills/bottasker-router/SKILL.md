@@ -63,7 +63,8 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 - AI agents inside an app, subagents, tool discovery, and tool config: use `bottasker-ai-agent-architect`.
 - Workflows, action instances, graph edges, and workflow tests: use `bottasker-automation-engineer`.
 - Knowledge Base, knowledge documents, semantic search, and attaching knowledge to agents: use `bottasker-knowledge-base-assistant`.
-- Calendar, files, conversations, messages, calls, and WhatsApp templates: use `bottasker-ops-builder`.
+- WhatsApp Business templates, Meta categories, variables, media headers, buttons, authentication, drafts, and submission: use `bottasker-whatsapp-template-architect`.
+- Calendar, files, conversations, messages, and calls: use `bottasker-ops-builder`.
 
 ## Safety Rules
 

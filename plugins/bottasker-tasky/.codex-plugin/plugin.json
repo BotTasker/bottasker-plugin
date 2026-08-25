@@ -28,6 +28,7 @@
     "ai-agents",
     "knowledge-base",
     "semantic-search",
+    "whatsapp-templates",
     "dynamic-tools"
   ],
   "skills": "./skills/",
@@ -35,7 +36,7 @@
   "interface": {
     "displayName": "Tasky Assistant",
     "shortDescription": "Create and operate BotTasker apps with Tasky and MCP tools.",
-    "longDescription": "Tasky Assistant gives Codex guided skills for creating apps, Base de datos modules (Data Hub service), catalogs, products, carts, useful dashboards for tracking and control, boards with secure sharing and automation buttons, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
+    "longDescription": "Tasky Assistant gives Codex guided skills for creating apps, Base de datos modules (Data Hub service), catalogs, products, carts, useful dashboards for tracking and control, boards with secure sharing and automation buttons, Meta-compatible WhatsApp templates, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
     "developerName": "BotTasker",
     "category": "Developer Tools",
     "capabilities": [

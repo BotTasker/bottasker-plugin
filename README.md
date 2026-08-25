@@ -138,7 +138,8 @@ claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-ta
 - `bottasker-automation-engineer`: AI agents, workflows, workers, and tests.
 - `bottasker-dashboard-architect`: useful dashboards for tracking, control, KPIs, reporting, and area-specific follow-up.
 - `bottasker-board-architect`: boards, data sources, columns, card details, widgets, button automations, public/restricted sharing, roles, users, and security.
-- `bottasker-ops-builder`: operational modules such as calendar, files, conversations, calls, and WhatsApp templates.
+- `bottasker-whatsapp-template-architect`: Meta-compatible WhatsApp templates covering marketing, utility, authentication, variables, media/location headers, buttons, drafts, and controlled submission.
+- `bottasker-ops-builder`: operational modules such as calendar, files, conversations, and calls.
 - `bottasker-catalog-architect`: catalogs, products, variants, properties, modifiers, availability, and sales carts.
 
 ## References

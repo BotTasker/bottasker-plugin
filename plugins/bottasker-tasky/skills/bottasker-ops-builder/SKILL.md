@@ -21,7 +21,7 @@ Use this skill for operational modules after the app and data foundation are kno
    - files: `bt_files_*`
    - knowledge: delegate to `bottasker-knowledge-base-assistant` for Knowledge Base documents, queries, ingestion state, and agent attachments.
    - conversations/messages/calls: `bt_conversations_*`, `bt_messages_*`, `bt_calls_*`
-   - WhatsApp templates: `bt_whatsapp_templates_*`
+   - WhatsApp templates: delegate to `bottasker-whatsapp-template-architect` for classification, content, components, examples, media, buttons, draft creation, and Meta submission.
 5. Preview or run query tools before committing dashboard or reporting structures when tools are available.
 
 ## Operating Rules
@@ -33,9 +33,7 @@ Use this skill for operational modules after the app and data foundation are kno
 - Prefer creating a minimal board or operational resource first, then iterating.
 - Use `bottasker-catalog-architect` for product catalogs, categories, variants, modifier groups, properties, availability, product search, and sales cart behavior.
 - Use `bottasker-knowledge-base-assistant` for Knowledge Base creation, querying, troubleshooting, and adding Knowledge Base tools to AI Agents.
-- Do not submit WhatsApp templates for approval unless the user explicitly asks.
-- For WhatsApp template packs, use `bt_whatsapp_templates_create_pack` to create business drafts, then ask before submit.
-- Check required credentials before WhatsApp template actions; if unavailable, explain the missing `credentialId` instead of retrying payload shapes.
+- Use `bottasker-whatsapp-template-architect` for every WhatsApp template request. It owns Meta rules and the exact tool contracts.
 - Ask for confirmation before archive/remove/delete tools or broad status changes.
 
 ## Expected MCP Tools

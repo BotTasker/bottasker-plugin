@@ -45,7 +45,8 @@ Roles and permissions are not a default pillar for this skill right now. Only in
    - `bottasker-ai-agent-architect` for AI Agents, subagents, tools, inputs, outputs, and tool configuration.
    - `bottasker-knowledge-base-assistant` for Knowledge Base documents, semantic retrieval, ingestion state, and Knowledge Base tools attached to agents.
    - `bottasker-automation-engineer` for workflow graphs, action instances, edges, and tests.
-   - `bottasker-ops-builder` for calendar, files, conversations, calls, and WhatsApp templates.
+   - `bottasker-whatsapp-template-architect` for WhatsApp template classification, components, media samples, variables, buttons, drafts, and Meta submission.
+   - `bottasker-ops-builder` for calendar, files, conversations, and calls.
 13. If building from a reusable design, use `bt_apps_create_from_template`.
 14. If packaging an existing app as a starter, use `bt_apps_export_template`.
 
