@@ -14,7 +14,8 @@
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
       },
-      "category": "Developer Tools"
+      "category": "Developer Tools",
+      "description": "Operate BotTasker apps and per-user board column push/sound alerts through MCP."
     }
   ]
 }

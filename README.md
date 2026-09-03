@@ -137,7 +137,9 @@ claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-ta
 - `bottasker-knowledge-base-assistant`: Knowledge Base specialist for documents, URL/text sources, semantic queries, ingestion state, and Knowledge Base tools attached to agents.
 - `bottasker-automation-engineer`: AI agents, workflows, workers, and tests.
 - `bottasker-dashboard-architect`: useful dashboards for tracking, control, KPIs, reporting, and area-specific follow-up.
-- `bottasker-board-architect`: boards, data sources, columns, card details, widgets, button automations, public/restricted sharing, roles, users, and security.
+- `bottasker-board-architect`: boards, data sources, columns, per-user push/sound alerts, card details, widgets, button automations, public/restricted sharing, roles, users, and security.
+
+Tasky, Codex, and Claude can inspect and manage the authenticated user's board-column alerts through `bt_boards_get_column_alerts`, `bt_boards_configure_column_alert`, and `bt_boards_remove_column_alert`. The browser remains responsible for granting notification permission and registering its Firebase installation; MCP clients never receive Firebase installation identifiers.
 - `bottasker-whatsapp-template-architect`: Meta-compatible WhatsApp templates covering marketing, utility, authentication, variables, media/location headers, buttons, drafts, and controlled submission.
 - `bottasker-ops-builder`: operational modules such as calendar, files, conversations, and calls.
 - `bottasker-catalog-architect`: catalogs, products, variants, properties, modifiers, availability, and sales carts.

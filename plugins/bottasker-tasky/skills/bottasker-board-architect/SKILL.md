@@ -1,11 +1,11 @@
 ---
 name: bottasker-board-architect
-description: Use when the user wants to design, create, configure, share, secure, or operate BotTasker boards, kanban/pipeline views, board data sources, item detail views, board widgets, public board links, restricted access, board roles, board users, or button widgets that invoke automations.
+description: Use when the user wants to design, create, configure, share, secure, or operate BotTasker boards, kanban/pipeline views, column push or sound alerts, board data sources, item detail views, board widgets, public board links, restricted access, board roles, board users, or button widgets that invoke automations.
 ---
 
 # BotTasker Board Architect
 
-Use this skill as the specialist for the BotTasker `boards` module. It owns board source design, columns, card fields, detail views, widgets, button automations, public/restricted access, permissions, file fields, and operational safety.
+Use this skill as the specialist for the BotTasker `boards` module. It owns board source design, columns, per-user column alerts, card fields, detail views, widgets, button automations, public/restricted access, permissions, file fields, and operational safety.
 
 If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here after App Builder selects boards as part of the approved app blueprint.
 
@@ -201,6 +201,21 @@ Before configuring a button:
 3. Call `bt_boards_get_invocable_automation_trigger_schema`.
 4. Map each required trigger input from item fields or static values.
 
+## Column Entry And Exit Alerts
+
+Users can subscribe independently to changes in each column. Before configuring an alert, call `bt_boards_get_board_data` to resolve the exact `boardId` and `columnId`, then call `bt_boards_get_column_alerts` to preserve the user's current choices.
+
+Use `bt_boards_configure_column_alert` to select any combination of:
+
+- push when a ticket enters the column;
+- push when a ticket exits the column;
+- in-app sound when a ticket enters;
+- in-app sound when a ticket exits.
+
+Entry and exit sounds can be different. Supported tone IDs are `chime`, `crystal`, `pulse`, `soft-pop`, `double-tap`, and `soft-bell`. Push delivery still requires the user to grant notification permission in a supported browser; never claim push is active merely because the preference was saved. Use `bt_boards_remove_column_alert` when the user asks to disable the entire column subscription.
+
+These preferences belong to the authenticated user. Never attempt to configure another user's subscription, pass `organization`, expose Firebase installation IDs, or manipulate push registration records. Board, column, app, user, and organization deletion cleanup is automatic.
+
 ## Public Link And Security
 
 Use public sharing only after explicit approval.
@@ -253,6 +268,7 @@ Use:
 - `bt_boards_list`, `bt_boards_get`, `bt_boards_create`, `bt_boards_update`, `bt_boards_remove`
 - `bt_boards_create_from_dynamic_table`, `bt_boards_create_from_data_hub_model`, `bt_boards_update_source_config`
 - `bt_boards_get_source_fields`, `bt_boards_get_available_columns`, `bt_boards_get_board_data`
+- `bt_boards_get_column_alerts`, `bt_boards_configure_column_alert`, `bt_boards_remove_column_alert`
 - `bt_boards_get_items`, `bt_boards_get_item`, `bt_boards_create_item`, `bt_boards_update_item`, `bt_boards_move_item`, `bt_boards_delete_item`
 - `bt_boards_update_display_config`, `bt_boards_update_column_order`, `bt_boards_prepare_detail_view_config`, `bt_boards_update_detail_view_config`
 - `bt_boards_list_invocable_automations`, `bt_boards_list_invocable_automation_triggers`, `bt_boards_get_invocable_automation_trigger_schema`, `bt_boards_invoke_detail_widget_action`

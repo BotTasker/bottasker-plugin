@@ -9,7 +9,7 @@
       "name": "bottasker-tasky",
       "source": "./plugins/bottasker-tasky",
       "displayName": "Tasky Assistant",
-      "description": "Tasky helps create and operate BotTasker apps through the BotTasker MCP.",
+      "description": "Tasky helps create and operate BotTasker apps, including per-user board column alerts, through the BotTasker MCP.",
       "category": "Developer Tools",
       "keywords": [
         "bottasker",
@@ -26,6 +26,8 @@
         "reporting",
         "boards",
         "kanban",
+        "notifications",
+        "column-alerts",
         "public-sharing",
         "ai-agents",
         "dynamic-tools"
