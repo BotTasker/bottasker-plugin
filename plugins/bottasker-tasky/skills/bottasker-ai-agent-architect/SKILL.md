@@ -127,6 +127,8 @@ For each input/output/tool item, include:
 - Add tools incrementally and configure them with the exact schema returned by MCP.
 - Never add an input/output/tool with empty config when the schema has required fields.
 - Inputs are triggers/channels such as Telegram or WhatsApp; configure credentials, auto conversation registration, transcription, scheduler/timezone, filters, and human handoff options when present in schema.
+- For WhatsApp, Telegram, and WebChat inputs, enabling automatic conversation registration also gives every subagent the contextual `manage_conversation_tags` runtime tool. The tool lists, creates/reuses, assigns, and removes labels only on the verified current conversation; it does not need to be added as a workspace item.
+- When the business process uses labels for routing, qualification, urgency, lifecycle, or handoff, include explicit prompt guidance describing which label names to apply/remove and at what moment. Do not invent label IDs or colors; the runtime resolves names in the app-scoped catalog and assigns a default color to newly created labels.
 - Outputs are external responses or delivery actions; confirm channel, recipient/audience, message/template behavior, and communication risk.
 - For tools that write data, map every required parameter to either user input, model IDs created earlier, app context, or a fixed approved value.
 - For Base de datos (Data Hub) MCP tools, configuring model access is mandatory: set least-privilege `globalPermissions` and non-empty `modelPermissions` for every selected model, explicitly deciding `read` (Leer), `create` (Crear), and `update` (Editar) per model. Do not grant `update` or `manage_schema` unless the approved plan requires it.

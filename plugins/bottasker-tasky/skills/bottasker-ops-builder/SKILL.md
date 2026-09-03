@@ -35,7 +35,11 @@ Use this skill for operational modules after the app and data foundation are kno
 - Use `bottasker-knowledge-base-assistant` for Knowledge Base creation, querying, troubleshooting, and adding Knowledge Base tools to AI Agents.
 - Use `bottasker-whatsapp-template-architect` for every WhatsApp template request. It owns Meta rules and the exact tool contracts.
 - Ask for confirmation before archive/remove/delete tools or broad status changes.
+- Treat conversation tags as app-scoped labels with a reusable catalog. List the catalog before filtering or removing a tag; adding by name creates or reuses the label and assigns its generated color automatically when it is new.
+- Filter conversations with tag IDs, not visible names. Multiple tag IDs use OR semantics: a conversation matches when it has at least one selected label.
+- Use `bt_conversations_get_tags` before changing a conversation when its current labels are unknown. Use `bt_conversations_add_tags` with `names` to create/reuse and assign labels, and `bt_conversations_remove_tag` to unassign them. `bt_conversations_add_tag` remains only as the legacy single-label alias. Removing a label from a conversation does not delete it from the app catalog.
+- AI Agents that receive WhatsApp, Telegram, or WebChat input with automatic conversation registration enabled receive `manage_conversation_tags` at runtime. This tool is already bound to the current conversation; never ask for or invent an internal conversation ID.
 
 ## Expected MCP Tools
 
-Use operational module tools plus `bt_apps_list`, `bt_apps_get`, `bt_mcp_list_skills`, and `bt_mcp_load_skill` for discovery.
+Use operational module tools plus `bt_conversation_tags_list`, `bt_conversations_get_tags`, `bt_conversations_add_tags`, `bt_conversations_remove_tag`, `bt_apps_list`, `bt_apps_get`, `bt_mcp_list_skills`, and `bt_mcp_load_skill` for discovery.

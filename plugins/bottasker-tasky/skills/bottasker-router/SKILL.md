@@ -64,7 +64,7 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 - Workflows, action instances, graph edges, and workflow tests: use `bottasker-automation-engineer`.
 - Knowledge Base, knowledge documents, semantic search, and attaching knowledge to agents: use `bottasker-knowledge-base-assistant`.
 - WhatsApp Business templates, Meta categories, variables, media headers, buttons, authentication, drafts, and submission: use `bottasker-whatsapp-template-architect`.
-- Calendar, files, conversations, messages, and calls: use `bottasker-ops-builder`.
+- Calendar, files, conversations, conversation tags/labels, messages, and calls: use `bottasker-ops-builder`.
 
 ## Safety Rules
 
