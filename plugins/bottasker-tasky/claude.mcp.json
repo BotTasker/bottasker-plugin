@@ -1,11 +1,8 @@
 {
   "mcpServers": {
-    "bottasker": {
+    "bottasker-tasky": {
       "type": "http",
-      "url": "https://api.bottasker.ai/mcp",
-      "headers": {
-        "Authorization": "Bearer ${user_config.BOTASKER_API_KEY}"
-      }
+      "url": "https://api.bottasker.ai/mcp"
     }
   }
 }

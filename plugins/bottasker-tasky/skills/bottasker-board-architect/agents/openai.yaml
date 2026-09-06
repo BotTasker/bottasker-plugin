@@ -1,7 +1,7 @@
 interface:
   display_name: "BotTasker Board Architect"
-  short_description: "Design boards, sources, card details, widgets, button automations, sharing, roles, and security."
+  short_description: "Design boards, column alerts, card details, widgets, sharing, roles, and security."
   brand_color: "#2563EB"
-  default_prompt: "Design a BotTasker board with data source, columns, detail view, widgets, automations, and secure sharing."
+  default_prompt: "Design a BotTasker board with data source, columns, per-user alerts, detail view, widgets, automations, and secure sharing."
 policy:
   allow_implicit_invocation: true

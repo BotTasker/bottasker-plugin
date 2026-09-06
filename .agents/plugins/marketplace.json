@@ -1,7 +1,7 @@
 {
-  "name": "bottasker-local",
+  "name": "bottasker-tasky",
   "interface": {
-    "displayName": "BotTasker Local"
+    "displayName": "BotTasker Tasky"
   },
   "plugins": [
     {
@@ -15,7 +15,7 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools",
-      "description": "Operate BotTasker apps and per-user board column push/sound alerts through MCP."
+      "description": "Tasky by BotTasker: skills and OAuth MCP access for building and operating BotTasker apps."
     }
   ]
 }

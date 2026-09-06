@@ -1,0 +1,18 @@
+{
+  "name": "Tasky by BotTasker",
+  "developer": "BotTasker",
+  "category": "Developer Tools",
+  "shortDescription": "Build and operate BotTasker apps from Codex and Claude Code.",
+  "description": "Tasky combines guided skills with the hosted BotTasker MCP to create and operate apps, data models, workflows, dashboards, boards, forms, catalogs, AI agents, knowledge bases and communication modules. Users connect through OAuth and keep their existing BotTasker roles and organization boundaries.",
+  "website": "https://bottasker.ai",
+  "support": "https://bottasker.ai/contact",
+  "privacyPolicy": "https://bottasker.ai/privacy",
+  "termsOfService": "https://bottasker.ai/terms",
+  "mcpServer": "https://api.bottasker.ai/mcp",
+  "starterPrompts": [
+    "Muéstrame las apps disponibles en mi cuenta de BotTasker.",
+    "Diseña una app de seguimiento de ventas con tablero, Base de datos y dashboard.",
+    "Crea un borrador de plantilla de WhatsApp para confirmar una cita.",
+    "Revisa este proceso y propón qué pasos conviene automatizar."
+  ]
+}

@@ -1,8 +1,7 @@
 {
   "mcpServers": {
-    "bottasker": {
-      "url": "https://api.bottasker.ai/mcp",
-      "bearer_token_env_var": "BOTASKER_API_KEY"
+    "bottasker-tasky": {
+      "url": "https://api.bottasker.ai/mcp"
     }
   }
 }

@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Process Designer"
+  short_description: "Design processes and orchestrate their implementation."
+  brand_color: "#2563EB"
+  default_prompt: "Use $bottasker-process-designer to define this process, map its needs to current BotTasker capabilities, and prepare its implementation."
+policy:
+  allow_implicit_invocation: true

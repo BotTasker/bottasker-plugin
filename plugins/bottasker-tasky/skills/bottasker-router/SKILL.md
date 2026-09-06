@@ -16,6 +16,7 @@ Use this skill as the first stop for BotTasker work. It decides which narrower B
 5. If the user asks specifically for AI Agents inside an existing or already-approved app, route to `bottasker-ai-agent-architect` and call `bt_ai_agent_tools_discover`.
 6. If the user asks for a module-specific operation, call `bt_mcp_list_skills` and load the relevant MCP skill with `bt_mcp_load_skill`.
 7. If the user mentions an existing app but not an `appId`, call `bt_apps_list` and resolve the app by name. If multiple matches are plausible, ask for the target app.
+8. For sign-in, revoked access, missing scopes, or connection failures, use `bottasker-connection-guide`, preserve the exact error category, and retry the same configured environment after reauthentication. Never infer that local is offline from an OAuth error or invent a hosted plugin as a fallback.
 
 ## Capability Discovery
 
@@ -62,17 +63,21 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 - Forms, public/private intake forms, submissions, form fields, connector mappings, and form publishing: use `bottasker-forms-architect`.
 - AI agents inside an app, subagents, tool discovery, and tool config: use `bottasker-ai-agent-architect`.
 - Workflows, action instances, graph edges, and workflow tests: use `bottasker-automation-engineer`.
+- Business process discovery, visual process maps, assumptions, validation, and process documentation: use `bottasker-process-designer`.
 - Knowledge Base, knowledge documents, semantic search, and attaching knowledge to agents: use `bottasker-knowledge-base-assistant`.
 - WhatsApp Business templates, Meta categories, variables, media headers, buttons, authentication, drafts, and submission: use `bottasker-whatsapp-template-architect`.
 - Calendar, files, conversations, conversation tags/labels, messages, and calls: use `bottasker-ops-builder`.
+- OAuth connection, organization selection, permission elevation, reauthorization, and revocation: use `bottasker-connection-guide`.
 
 ## Safety Rules
 
-- Never send `organization` from user input. BotTasker MCP resolves organization from the API key.
+- Never send `organization` from user input. BotTasker MCP resolves organization from the authenticated OAuth grant or explicitly configured legacy API key.
 - Use explicit `appId` for app-scoped work.
 - List relevant existing resources before creating new ones.
 - Ask for explicit confirmation before using remove, delete, archive, submit-for-approval, or broad update tools.
 - Do not expose API keys, credential bodies, tokens, cookies, or authorization headers.
+- Never turn a failed or ambiguous tool result into feedback, progress, or a simulated success. Preserve the structured error, retry only after a concrete correction, and verify successful writes with a read-back when one is available.
+- Do not silently fall back from OAuth to an API key. Legacy API-key authentication is used only when the client was explicitly configured for it.
 
 ## User-Facing Communication
 

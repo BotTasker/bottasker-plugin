@@ -1,6 +1,6 @@
 ---
 name: bottasker-ai-agent-architect
-description: "Use when the user wants Codex to design or create AI Agents inside an existing or approved BotTasker app: agents, subagents, dynamic tools, tool configuration, inputs, and outputs."
+description: "Use when the user wants Codex to design or create AI Agents inside an existing or approved BotTasker app: agents, subagents, dynamic tools, conversational channel wiring, tool configuration, inputs, and outputs."
 ---
 
 # BotTasker AI Agent Architect
@@ -23,6 +23,7 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
    - If the user asks for a narrow, existing-agent change (for example, add one already existing Knowledge Base/document/tool, update the agent prompt, or attach one validated input/output/tool), do not build a visual blueprint. For Knowledge Base/document/tool work, load or delegate to `bottasker-knowledge-base-assistant`; for form design or form-linked agent behavior, load or delegate to `bottasker-forms-architect`; inspect current items, prepare/validate the config, execute the non-destructive write, verify, and summarize.
    - Use `bt_ai_agent_blueprint_plan` only for new agent systems, multi-component changes, unclear architecture, external communication setup, credential-sensitive tools, broad rewrites, or changes with real risks/pending decisions.
    - Evaluate whether proactive behavior would create measurable value for sales, collections, appointments, recovery, support, or stalled opportunities. Select the correct mechanism using Proactivity Decision Rules; do not add proactivity by default.
+   - For every conversational channel, define and validate its channel contract: inbound message input, same-channel standard response output, and the channel Actions tool only when rich, additional, or proactive sends are required. Treat each item as a separate workspace item.
    - Use `bt_ai_agents_get_create_schema` and `bt_ai_agents_validate_create_payload` before `bt_ai_agents_create` unless using `bt_ai_agents_create_simple`.
    - Review discovered workers/actions and call `bt_ai_agent_tool_get_config_schema` for any tool that will be attached to an agent.
    - Call `bt_ai_agent_prepare_item_config` for every planned input, output, subagent tool, and agent item.
@@ -126,10 +127,11 @@ For each input/output/tool item, include:
 - Give each subagent clear inputs, outputs, and allowed tools.
 - Add tools incrementally and configure them with the exact schema returned by MCP.
 - Never add an input/output/tool with empty config when the schema has required fields.
-- Inputs are triggers/channels such as Telegram or WhatsApp; configure credentials, auto conversation registration, transcription, scheduler/timezone, filters, and human handoff options when present in schema.
+- Inputs are inbound triggers such as an incoming WhatsApp, Telegram, WebChat, Instagram, or Messenger message. Configure credentials, automatic conversation registration, transcription, scheduler/timezone, filters, and human handoff options when present in schema. A channel Actions tool is never the inbound input.
 - For WhatsApp, Telegram, and WebChat inputs, enabling automatic conversation registration also gives every subagent the contextual `manage_conversation_tags` runtime tool. The tool lists, creates/reuses, assigns, and removes labels only on the verified current conversation; it does not need to be added as a workspace item.
 - When the business process uses labels for routing, qualification, urgency, lifecycle, or handoff, include explicit prompt guidance describing which label names to apply/remove and at what moment. Do not invent label IDs or colors; the runtime resolves names in the app-scoped catalog and assigns a default color to newly created labels.
-- Outputs are external responses or delivery actions; confirm channel, recipient/audience, message/template behavior, and communication risk.
+- A conversational output is the standard response action for the same channel that received the message. Pair each production message input with its matching response output unless the approved design is explicitly receive-only. A channel Actions tool does not replace this response output.
+- Agents may have multiple inputs and multiple outputs. Validate every input/output pair independently and keep credentials, recipient context, and conversation identity isolated by channel.
 - For tools that write data, map every required parameter to either user input, model IDs created earlier, app context, or a fixed approved value.
 - For Base de datos (Data Hub) MCP tools, configuring model access is mandatory: set least-privilege `globalPermissions` and non-empty `modelPermissions` for every selected model, explicitly deciding `read` (Leer), `create` (Crear), and `update` (Editar) per model. Do not grant `update` or `manage_schema` unless the approved plan requires it.
 - For Base de datos (Data Hub) `date` fields, agents must output `YYYY-MM-DD` exactly, for example `2026-05-31`; convert natural language dates before tool calls.
@@ -171,9 +173,11 @@ Do not propose proactivity merely because it is available. Prefer it only when i
 
 ## Tool Family Guide
 
-- WhatsApp Actions: use as inputs for inbound WhatsApp messages/calls and as outputs/tools for replies, templates, notifications, or WhatsApp actions. Configure the WhatsApp account/credential, phone number, templates when needed, conversation registration, human handoff, media handling, and risk controls. Use when the agent must receive or respond through WhatsApp, not just store WhatsApp data.
-- Telegram Actions: use as inputs for inbound Telegram messages and as outputs/tools for Telegram replies, notifications, or Telegram actions. Configure the Telegram bot/credential, chat targeting, conversation registration, media handling, and risk controls. Use when the agent must receive or respond through Telegram.
-- To send images, documents, audio, or other media through WhatsApp, Telegram, or any channel, the agent must have that channel's Actions worker equipped with the specific media/document send tool enabled and validated. File/knowledge/storage tools can create, read, or store media, but they do not deliver it unless the matching channel action tool is attached as an output or tool.
+- Channel Actions are optional agent tools, not message inputs and not standard response outputs. Attach the matching Actions worker only when the agent must make additional or proactive sends or send capabilities beyond the direct text response, such as images, documents, audio, video, locations, buttons, interactive content, or templates.
+- The user-facing name normally follows `Acciones de <canal>` or `<Channel> Actions`, but internal `actionKey` values vary. Discover the exact worker/action instead of deriving an action key from the display name.
+- For WhatsApp rich sends, attach the discovered WhatsApp Actions tool and enable only the required operations in its schema, such as image, document, audio, video, location, template, buttons, interactive options, or carousel. A WhatsApp template requires the WhatsApp Actions tool; `whatsapp_response` alone is the ordinary conversational reply.
+- Apply the same separation to Telegram, WebChat, Instagram, Messenger, and any future chat channel: inbound action as `input`, matching response action as `output`, and matching Actions action as `tool` only when its extra capabilities are needed. Inspect the discovered schema and enable the narrowest operation set.
+- File, Knowledge, Base de datos, or storage tools can create, read, or store media and metadata, but they do not deliver media to a chat channel. Delivery requires that channel's discovered Actions tool.
 - Base de datos (DataHub): use as a tool for durable structured data: create/read/update records, validate fields, and maintain process state. Configure the Base de datos (Data Hub), global permissions, allowed models, field mappings, and a per-model permission matrix. For every model the agent can access, explicitly set Leer (`read`), Crear (`create`), and Editar (`update`) according to the approved process. Use least privilege: read/create for capture, update only when the approved process requires editing. Dates must be normalized before tool calls. Adding the tool is incomplete until the UI would show at least one enabled model instead of `0 habilitados`.
 - Calendario: use as a tool/input/output when the agent schedules appointments, checks availability, creates events, updates meetings, or sends reminders. Configure calendar/resource, timezone, availability windows, required attendee fields, conflict behavior, and confirmation rules.
 - Base de Conocimiento: use as a retrieval tool when the agent must answer from manuals, policies, FAQs, documents, or internal instructions. For this tool family, load or delegate to `bottasker-knowledge-base-assistant`. If an agent must use knowledge bases from the Base de Conocimiento module, it must have the `Base de conocimiento (knowledge)` tool equipped and validated; creating or uploading knowledge documents alone does not let the agent retrieve them. Configure the selected `knowledge_documents` value, retrieval limits when supported, citation/fallback behavior when supported, and fallback behavior when no source is found. Do not use it for transactional state; use Base de datos (DataHub) for records.
@@ -291,15 +295,32 @@ Runtime guidance for agent prompts and tool plans:
 - Use search/get before update when the agent does not already have the correct `recordId`.
 - Keep sensitive fields hidden unless the approved plan and permissions explicitly require them.
 
-## Primary Inputs And Outputs
+## Conversational Channel Contract
 
-When designing agent inputs and outputs, always consider these primary channel families and only select the ones supported by discovered workers/actions:
+Use this current mapping as a design aid, but only create entries returned by `bt_ai_agent_tools_discover`; discovered `workerRegistryId`, `actionKey`, schemas, and `ignore_in` constraints are authoritative.
 
-- WhatsApp Mensaje: inbound WhatsApp text/media messages and outbound WhatsApp replies or messages.
-- WhatsApp Llamadas: inbound WhatsApp calls and outbound voice/conversation behavior when the available workers/actions support calls.
-- Telegram: inbound Telegram messages and outbound Telegram replies or messages.
-- WebChat Mensaje: inbound messages from BotTasker WebChat and outbound WebChat responses.
-- WebChat Llamadas: inbound or active WebChat voice/call sessions and outbound voice/conversation behavior when the available workers/actions support calls.
+| Channel | Required inbound input | Standard response output | Optional rich/action tool |
+| --- | --- | --- | --- |
+| WhatsApp | `on_message_whatsapp` | `whatsapp_response` | `whatsapp` |
+| Telegram | `on_message_telegram` | `telegram_response` | `telegram` |
+| WebChat | `on_webchat_message` | `webchat_response` | `webchatactions` |
+| Instagram | `on_message_instagram` | `instagram_response` | `instagram` |
+| Messenger | `on_message_messenger` | `messenger_response` | `messenger` |
+
+For each conversational channel:
+
+1. Add the incoming-message action as an `input` so the channel can start the agent.
+2. Add the matching same-channel response action as an `output` so the agent's final answer returns through the originating channel.
+3. Add the channel Actions action as a `tool` only when the use case requires rich media, templates, buttons, locations, additional sends, or proactive sends. Enable only the required capabilities returned by its config schema.
+4. Prepare, validate, attach, and verify every selected role separately. Do not report a conversational channel as complete when its input lacks its matching response output, unless the user explicitly approved a receive-only design.
+
+An agent may expose several channel contracts at once. Do not reuse one channel's response output for another channel, and do not assume that credentials or conversation identifiers are interchangeable.
+
+When the production channel is WhatsApp, Telegram, Instagram, or Messenger, offer WebChat as an optional testing channel before execution: ask whether the user wants to add WebChat input plus WebChat response to test the same agent without using the production channel. Do not add it automatically, do not replace the production contract, and add WebChat Actions only if rich-message testing requires it.
+
+BotTasker's browser test channel is **WebChat**. If the user says **WeChat**, interpret it as WebChat only when the surrounding context clearly refers to BotTasker's browser chat; otherwise verify the intended external channel and its discovered support instead of silently renaming it.
+
+Message and call contracts are separate. WhatsApp or WebChat call inputs/outputs may be added only when discovery confirms call support and the approved solution actually requires voice calls.
 
 ## Expected MCP Tools
 

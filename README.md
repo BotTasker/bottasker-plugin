@@ -2,59 +2,80 @@
 
 Tasky Assistant plugin for building and operating BotTasker apps through the BotTasker external MCP.
 
-This repository is intentionally standalone so it can become its own git repository. It contains local marketplaces plus the `bottasker-tasky` plugin for Codex and Claude Code.
+This repository contains the shared Tasky skills plus the platform-specific manifests for Codex and Claude Code. The local marketplaces are for beta testing; production releases are submitted to the official OpenAI and Anthropic plugin catalogs.
 
 ## Prerequisites
 
 - BotTasker external MCP reachable at `https://api.bottasker.ai/mcp`.
-- A BotTasker API key.
 - Codex or Claude Code installed.
 
-Do not commit API keys. Codex reads the API key from `BOTASKER_API_KEY`; Claude Code prompts for it as sensitive plugin configuration.
-
-## Configure Auth For Codex
-
-For Codex Desktop on macOS:
-
-```bash
-launchctl setenv BOTASKER_API_KEY "<your-bottasker-api-key>"
-```
-
-For a shell session:
-
-```bash
-export BOTASKER_API_KEY="<your-bottasker-api-key>"
-```
+Tasky authenticates through the client's native OAuth 2.1 flow. No API key or environment variable is required for an end user.
 
 ## Install In Codex
 
-From this repository root:
+For public releases, find **Tasky by BotTasker** in the built-in plugin catalog and select **Install**. This repository always keeps the public plugin connected to `https://api.bottasker.ai/mcp`. For beta testing against production from this repository root:
 
 ```bash
 codex plugin marketplace add .
-codex plugin add bottasker-tasky@bottasker-local
+codex plugin add bottasker-tasky@bottasker-tasky
 ```
 
-Open a new Codex session after installing so Codex reloads plugin skills and MCP servers.
+Open a new Codex session after installing so Codex reloads plugin skills and the MCP server. Codex opens BotTasker in the browser when authentication is required.
 
 ## Install In Claude Code
 
-Claude Code uses the official plugin marketplace flow. From this repository root:
+For public releases, open `/plugin`, find **Tasky by BotTasker** in the public marketplace, and install it. For beta testing against production from this repository root:
 
 ```bash
 claude plugin marketplace add .
-claude plugin install bottasker-tasky@bottasker-local
+claude plugin install bottasker-tasky@bottasker-tasky
 ```
 
-When Claude Code enables the plugin, enter the BotTasker API key in the sensitive configuration prompt. The key is substituted into the plugin MCP header at runtime and is not stored in this repository.
+When Claude Code enables the plugin, open `/mcp` if the browser sign-in does not start automatically. Claude Code stores and refreshes the OAuth tokens.
 
 If you are already inside a Claude Code session, you can use the equivalent slash commands:
 
 ```text
 /plugin marketplace add .
-/plugin install bottasker-tasky@bottasker-local
+/plugin install bottasker-tasky@bottasker-tasky
 /reload-plugins
 ```
+
+## Switch Between Local And Production
+
+The canonical plugin and every file intended for GitHub always use the production MCP URL. The environment helper generates a separate, Git-ignored plugin for `localhost`, so local testing can never accidentally change the public endpoint.
+
+BotTasker local services must be available at:
+
+- API and MCP: `http://localhost:3200`
+- Web and OAuth consent: `https://localhost:5185`
+
+Select and install the local environment in both Codex and Claude Code:
+
+```bash
+node scripts/use-environment.mjs local --install
+```
+
+Switch both clients back to the production endpoint:
+
+```bash
+node scripts/use-environment.mjs production --install
+```
+
+Target only one client when needed:
+
+```bash
+node scripts/use-environment.mjs local --install --client=codex
+node scripts/use-environment.mjs local --install --client=claude
+```
+
+Inspect the current installations and confirm that the canonical plugin still points to production:
+
+```bash
+node scripts/use-environment.mjs status
+```
+
+The generated local marketplace lives under `.tasky-runtime/` and is excluded from Git. Local and production use different plugin and MCP server identifiers, preventing OAuth tokens and cached skills from being mixed.
 
 ## Verify Codex
 
@@ -62,6 +83,7 @@ Check MCP configuration:
 
 ```bash
 codex mcp list
+codex mcp login bottasker-tasky
 ```
 
 In Codex, verify the BotTasker MCP tools:
@@ -131,6 +153,7 @@ claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-ta
 ## Included Skills
 
 - `bottasker-router`: entrypoint and workflow router.
+- `bottasker-connection-guide`: OAuth sign-in, organization selection, scope elevation, explicit errors, reauthorization, and revocation.
 - `bottasker-app-builder`: complete app design, module selection, specialist handoffs, apps, modules, menus, and templates.
 - `bottasker-data-architect`: Base de datos (Data Hub) and Dynamic Tables.
 - `bottasker-ai-agent-architect`: AI Agents module specialist for agents, subagents, dynamic tools, tool schemas, inputs, and outputs inside an app.

@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Connection Guide"
+  short_description: "Connect, reauthorize, revoke, and diagnose Tasky OAuth access."
+  brand_color: "#2563EB"
+  default_prompt: "Help me connect Tasky to BotTasker or resolve an authentication or permission error without using API keys."
+policy:
+  allow_implicit_invocation: true

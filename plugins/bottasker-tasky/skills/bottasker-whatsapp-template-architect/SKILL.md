@@ -25,6 +25,17 @@ Use this skill as Tasky's specialist for WhatsApp Business templates. It owns cl
 
 Creating a draft is a low-risk reversible write and may be done directly once its content is unambiguous. Submitting it for Meta review always requires explicit approval.
 
+## Error, Retry, And Fallback Policy
+
+- Treat every tool result with `success: false` as an explicit error. Never relabel it as feedback, a warning, a completed call, or a successful draft/submission.
+- Read the returned `message`, structured details, validation issues, input contract, and retry hint. Retry only when there is a concrete correction to apply and the retry remains within the user's authorized scope.
+- Keep errors available to the implementation trace so a later step can diagnose and correct them. In the user-facing response, state the real product-level error and the blocked stage without exposing credentials, tokens, raw payloads, or private identifiers.
+- Use progress feedback only for real intermediate work that is still running and only when it helps the user understand a meaningful wait. Progress text must never replace, hide, or downgrade an error.
+- Do not invent a generic fallback that claims a credential was resolved, media was uploaded, a draft was created, a template was submitted, Meta accepted it, or progress was saved. Report those outcomes only from a verified successful result or read-back.
+- If a recoverable error remains after controlled retries, stop that operation and report the unresolved error, what was not applied, and the specific prerequisite or correction needed to continue.
+- If the result is ambiguous or cannot be verified, report the state as unknown and read it back. If read-back also fails, surface that verification error instead of assuming success.
+- Meta rejection, rate limits, permission errors, invalid components, missing examples, unavailable catalogs/Flows, and credential failures are operational errors, not fallback scenarios. Preserve their real status and remediation details.
+
 ## Category Decision
 
 Choose the category from the message's purpose, not from the user's preferred approval outcome.
