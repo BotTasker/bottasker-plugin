@@ -43,39 +43,79 @@ If you are already inside a Claude Code session, you can use the equivalent slas
 
 ## Switch Between Local And Production
 
-The canonical plugin and every file intended for GitHub always use the production MCP URL. The environment helper generates a separate, Git-ignored plugin for `localhost`, so local testing can never accidentally change the public endpoint.
-
-BotTasker local services must be available at:
-
-- API and MCP: `http://localhost:3200`
-- Web and OAuth consent: `https://localhost:5185`
-
-Select and install the local environment in both Codex and Claude Code:
+Run the environment selector from this repository root (Node.js 22 or later):
 
 ```bash
-node scripts/use-environment.mjs local --install
+node scripts/use-environment.mjs
 ```
 
-Switch both clients back to the production endpoint:
+The Spanish terminal menu lets you inspect the current installation or choose **Local** / **PROD**, then select **Codex**, **Claude Code**, or **both**. Only installed CLIs available in `PATH` are offered; both is the default when both are available. Choosing the environment and client applies the change without another confirmation. `0`, `q`, Ctrl+C, or EOF at either prompt cancels without changing installations. Without an interactive terminal, running without arguments only prints help.
+
+The canonical plugin and files intended for GitHub always use `https://api.bottasker.ai/mcp`. Local uses a separate generated plugin with the same skills and a distinct plugin/MCP identifier:
+
+| Environment | Plugin and MCP server | Endpoint |
+| --- | --- | --- |
+| PROD | `bottasker-tasky` | `https://api.bottasker.ai/mcp` |
+| Local | `bottasker-tasky-local` | `http://localhost:3200/mcp` |
+
+For Local, the API must run on `http://localhost:3200` and the web/OAuth consent page on `https://localhost:5185`. The helper checks API health, OAuth resource and issuer/endpoints, the unauthenticated MCP challenge, and the consent page before changing an installation. Self-signed TLS is accepted only for the fixed local consent-page check. An unreachable local server or invalid metadata stops the change; it never falls back to PROD.
+
+Direct commands remain available:
 
 ```bash
+# Apply Local to both clients.
+node scripts/use-environment.mjs local --install --client=all
+
+# Apply PROD to both clients (prod is an alias for production).
+node scripts/use-environment.mjs prod --install
 node scripts/use-environment.mjs production --install
-```
 
-Target only one client when needed:
-
-```bash
+# Change one client only.
 node scripts/use-environment.mjs local --install --client=codex
-node scripts/use-environment.mjs local --install --client=claude
+node scripts/use-environment.mjs prod --install --client=claude
+
+# Read actual installed manifests, enablement and MCP configuration.
+node scripts/use-environment.mjs status
+node scripts/use-environment.mjs status --client=codex
+node scripts/use-environment.mjs status --client=claude
+
+node scripts/use-environment.mjs --help
 ```
 
-Inspect the current installations and confirm that the canonical plugin still points to production:
+Without `--install`, `local` generates a runtime and `prod` validates the production plugin; neither changes a client's installation. Generated runtimes live in `.tasky-runtime/builds/`. The earlier `.tasky-runtime/local/` installation remains supported. These directories are excluded from Git. New builds do not overwrite an existing installation's source.
+
+### Verification and authentication
+
+Status shows environment, URL, version, enablement and scope for each selected client. It reports conflicting variants, missing installations and inspection errors. Codex also checks the effective MCP URL against the installed plugin. **Installation verified does not mean OAuth authenticated**: tokens remain managed by the client, separately for each server identifier. The helper neither copies tokens nor logs out. Reauthentication may still be needed if a client invalidates an installation's grant.
+
+After a change:
+
+- Codex: open a new session and use the native **Authenticate** action, or `codex mcp login bottasker-tasky-local` for Local / `codex mcp login bottasker-tasky` for PROD.
+- Claude Code: run `/reload-plugins` or open a new session, then use `/mcp` to authenticate the matching Tasky server if necessary.
+- Run the read-only `bt_context_get_profile` tool and verify the expected organization. Confirm the MCP endpoint with `status`; a profile alone may not distinguish two environments containing the same organization.
+
+An already open conversation can retain its previous tools until it is reloaded. Authentication errors do not trigger an automatic environment change.
+
+### Failure recovery
+
+The helper operates only on Tasky plugins and Tasky marketplaces owned by this repository. Claude changes use `--scope user`, preserve plugin data, and reject Tasky installations in project/local/managed scopes rather than removing them. Foreign marketplaces using the same names are reported without modification. Other plugins remain untouched.
+
+Before replacing Tasky, the helper snapshots its **installed payload**, version and enabled state in `.tasky-runtime/recovery/`. If installation or verification fails, it reinstalls that snapshot and verifies the restored state. A recovered marketplace points to the retained snapshot; the next successful switch returns it to the normal source. Do not delete a runtime/recovery directory while a client marketplace still uses it.
+
+Installations use the native CLIs. Since the current Codex CLI has no plugin enable/disable command, restoring a disabled plugin (or enabling a selected disabled plugin) updates only that Tasky plugin's explicit `enabled` boolean in Codex's user config. An unrecognized config layout is reported as an error rather than rewritten.
+
+If restoration also fails, the output reports the current known state, retained snapshot path and recovery commands. If state cannot be inspected, it is reported as unknown. With both clients selected, a failure in one does not undo a successful change in the other. Any failed client produces exit code `1`; full success produces `0`.
+
+An exclusive `.tasky-runtime/environment.lock` prevents concurrent switches. If a process is interrupted after changes begin, inspect both clients with `status` and use the retained recovery snapshot as needed. Remove only the lock file after verifying that its recorded process has stopped, then rerun the selector. Snapshot directories are retained for recovery and are never committed.
+
+### Environment-selector tests
 
 ```bash
-node scripts/use-environment.mjs status
+node --test scripts/environment/environment.test.mjs
+node scripts/validate-plugin.mjs
 ```
 
-The generated local marketplace lives under `.tasky-runtime/` and is excluded from Git. Local and production use different plugin and MCP server identifiers, preventing OAuth tokens and cached skills from being mixed.
+Tests use simulated CLIs and temporary directories. They do not access real client credentials or change your installations. CI runs these tests alongside plugin validation. For manual acceptance, use Local → PROD → Local in each client, reload/authenticate through the client, and check the read-only profile and configured endpoint after each switch.
 
 ## Verify Codex
 
@@ -102,7 +142,7 @@ Check plugin and MCP registration:
 
 ```bash
 claude plugin list
-claude plugin details bottasker-tasky@bottasker-local
+claude plugin details bottasker-tasky@bottasker-tasky
 claude mcp list
 ```
 
