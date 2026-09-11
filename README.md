@@ -11,6 +11,8 @@ This repository contains the shared Tasky skills plus the platform-specific mani
 
 Tasky authenticates through the client's native OAuth 2.1 flow. No API key or environment variable is required for an end user.
 
+Access tokens are intentionally short-lived. Codex and Claude Code retain the rotating refresh token and renew access automatically; reaching the access-token expiry must not open a new browser login. Interactive authentication is required only for the initial connection, explicit scope elevation, revocation, or a terminal refresh-token failure. A pending browser consent is not yet an authenticated connection and must be completed before its temporary authorization request expires.
+
 ## Install In Codex
 
 For public releases, find **Tasky by BotTasker** in the built-in plugin catalog and select **Install**. This repository always keeps the public plugin connected to `https://api.bottasker.ai/mcp`. For beta testing against production from this repository root:
