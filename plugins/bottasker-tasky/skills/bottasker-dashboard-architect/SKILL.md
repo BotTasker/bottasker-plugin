@@ -29,6 +29,7 @@ Dashboards must help the user follow up, control, and decide. Avoid vanity dashb
    - `bt_data_hub_list_models`
    - `bt_data_hub_list_fields`
    - dashboard source/field discovery tools when available, for example `bt_dashboards_list_sources` or `bt_dashboards_list_available_fields`.
+   - When the dashboard reports on customer communication, discover the native `Conversaciones` provider and follow the exact contract in **Native Conversations Source** below. Do not model conversations as Base de datos records merely to make them reportable.
 4. Read existing dashboards before writing:
    - `bt_dashboards_list`
    - `bt_dashboards_get` when modifying or duplicating.
@@ -111,6 +112,53 @@ Before proposing a widget, identify:
 - whether data quality is sufficient.
 
 If the required source field does not exist, hand off to `bottasker-data-architect` before creating the dashboard.
+
+## Native Conversations Source
+
+BotTasker dashboards can query conversations and messages directly from the current app. Use this native provider for inbox, support, channel, assignment, tag, message-volume, delivery, and activity reporting.
+
+### Source contract
+
+- Provider shown to the user: `Conversaciones`; internal `providerKey`: `conversations`.
+- Source shown to the user: `Centro de conversaciones`; internal `sourceId`: `communication`.
+- Dataset `conversations`: one row per conversation.
+- Dataset `messages`: one row per message, without exposing message bodies or previews.
+- The query must always be scoped to the resolved `appId`. Never copy a source identifier from another app or send an organization supplied by the user.
+- Discover providers, sources, datasets, and fields through the dashboard discovery tools before composing a widget. Treat the contract below as configuration guidance, not proof that the module or permission is available in the current app.
+
+### Conversation fields
+
+- Dimensions and filters: `channel`, `status`, `priority`, `assigneeId`, `teamId`, `workflowId`, `tagIds`, and `replyRoutingStatus`.
+- Numeric measures: `messageCount` and `unreadCount` support `sum`, `avg`, `min`, and `max` in addition to record `count`.
+- Time fields: `createdAt`, `updatedAt`, and `lastMessageAt`.
+- Tag values must use the real tag IDs returned by field discovery. Use `tags_any`, `tags_all`, `tags_none`, or `untagged` only with the discovered tag field; grouped tag results represent tag appearances rather than unique conversations.
+- Known selectable values include channels `whatsapp`, `instagram`, `messenger`, `telegram`, `webchat`, and `chatwoot`; statuses `open`, `pending`, `resolved`, `closed`, and `snoozed`; and priorities `low`, `normal`, `high`, and `urgent`. Prefer the live discovery result if it differs.
+
+### Message fields
+
+- Dimensions and filters: `channelKey`, `direction`, `status`, `senderType`, `contentType`, and `conversationId`.
+- Time fields: `createdAt` and `updatedAt`.
+- Messages expose no numeric business field, so use `count` as their measure.
+- Known values include direction `in`/`out`; delivery status `queued`, `sent`, `delivered`, `read`, and `failed`; sender type `customer`, `human_agent`, `ai_agent`, and `system`; and content type `text`, `image`, `file`, and `event`.
+- Never request or display `content.text`, message previews, credentials, or other private content. A message table may identify the message and show discovered metadata only.
+
+### Query and widget mapping
+
+- KPI uses `metric` mode.
+- Bar, donut, and funnel comparisons use `grouped` mode with one discovered dimension.
+- Line and area trends use `timeseries` mode with `hour`, `day`, `week`, or `month` grain.
+- Conversation/message activity heatmaps use `timeseries` with `timeGrain: hour`.
+- Investigation views use `table` mode with explicit discovered fields, sorting, and pagination. Conversation and message drill-downs must use their matching drill-down type.
+- Supported ranges are `today`, `yesterday`, `this_week`, `last_7_days`, `last_30_days`, `last_90_days`, `this_month`, and `custom`. Custom ranges cannot exceed 366 days. Use the user's business timezone; default to `UTC` only when no app/user timezone is available.
+- General filters support `equals`, `not_equals`, `in`, `not_in`, `contains`, `gt`, `gte`, `lt`, `lte`, and `exists` when compatible with the discovered field type.
+
+### Verification standard
+
+1. Preview the complete widget configuration and require a successful result with the expected dataset shape.
+2. Save or update the dashboard, read it back, and confirm that the stored source, dataset, fields, filters, timezone, and range match the previewed configuration.
+3. Run the saved widget from the dashboard and verify its effective `appliedRange`, status, and visible result. A populated configuration-modal preview alone is not acceptance evidence: the dashboard-level date selector can override the widget range and legitimately produce a different or empty result.
+4. Exercise the relevant drill-down and confirm that it stays within the same app and source dataset without revealing private message content.
+5. If the result is `stale`, refresh it and verify the new `generatedAt` and effective range. Do not report success from a cached, stale, ambiguous, or empty result unless an independently verified source count proves that zero is correct for that exact range and filters.
 
 ## Multi-Dashboard Strategy
 

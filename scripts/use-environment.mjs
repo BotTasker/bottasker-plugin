@@ -1,267 +1,175 @@
 import fs from 'node:fs'
-import http from 'node:http'
-import https from 'node:https'
 import path from 'node:path'
 import process from 'node:process'
-import { spawnSync } from 'node:child_process'
+import { createInterface } from 'node:readline/promises'
 import { fileURLToPath } from 'node:url'
+import { buildLocalPlugin, environments, verifyCanonicalProduction, verifyLocalServices } from './environment/runtime.mjs'
+import { createClient, createRunner, describeState, label, switchClient } from './environment/clients.mjs'
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const canonicalPlugin = path.join(root, 'plugins', 'bottasker-tasky')
-const runtimeRoot = path.join(root, '.tasky-runtime', 'local')
-const localPluginName = 'bottasker-tasky-local'
-const productionPluginName = 'bottasker-tasky'
-const localMarketplaceName = 'bottasker-tasky-local'
-const productionMarketplaceName = 'bottasker-tasky'
-const localMcpUrl = 'http://localhost:3200/mcp'
-const productionMcpUrl = 'https://api.bottasker.ai/mcp'
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+export const help = `Selector de entorno de Tasky
 
-const environment = process.argv[2]
-const install = process.argv.includes('--install')
-const clientArg = process.argv.find((value) => value.startsWith('--client='))
-const client = clientArg ? clientArg.split('=')[1] : 'all'
+Uso: node scripts/use-environment.mjs [local|prod|production|status] [--install] [--client=codex|claude|all]
 
-if (!['local', 'production', 'status'].includes(environment || '')) {
-  process.stderr.write('Usage: node scripts/use-environment.mjs <local|production|status> [--install] [--client=codex|claude|all]\n')
-  process.exit(1)
-}
-if (!['codex', 'claude', 'all'].includes(client)) {
-  process.stderr.write('Invalid --client value. Use codex, claude, or all.\n')
-  process.exit(1)
-}
+Sin argumentos: menú interactivo en español (requiere terminal).
+local / prod / production: prepara el entorno; --install aplica el cambio.
+status: consulta instalaciones reales, sin modificar nada; respeta --client.
+--client: codex, claude o all (predeterminado).
+--help: muestra esta ayuda.
 
-const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'))
-const writeJson = (file, value) => {
-  fs.mkdirSync(path.dirname(file), { recursive: true })
-  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`)
-}
+Ejemplos:
+  node scripts/use-environment.mjs
+  node scripts/use-environment.mjs local --install --client=all
+  node scripts/use-environment.mjs prod --install --client=codex
+  node scripts/use-environment.mjs status --client=claude
 
-const command = (bin, args, { allowFailure = false, capture = false } = {}) => {
-  const result = spawnSync(bin, args, {
-    cwd: root,
-    encoding: 'utf8',
-    stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
-  })
-  if (result.error) throw result.error
-  if (result.status !== 0 && !allowFailure) {
-    throw new Error(`${bin} ${args.join(' ')} failed with exit code ${result.status}`)
+PROD: ${environments.production.url}
+Local: ${environments.local.url}
+OAuth local: https://localhost:5185/oauth/mcp/authorize
+Cada entorno usa su propio identificador y OAuth nativo. El cambio de instalación
+no actualiza automáticamente una conversación abierta ni verifica su autenticación.`
+
+export function parseArgs(args) {
+  if (!args.length) return { interactive: true }
+  if (args.length === 1 && ['--help', '-h'].includes(args[0])) return { help: true }
+  let environment
+  let client = 'all'
+  let install = false
+  let clientSet = false
+  for (const arg of args) {
+    if (arg === '--install' && !install) install = true
+    else if (arg.startsWith('--client=') && !clientSet) { client = arg.slice('--client='.length); clientSet = true }
+    else if (['local', 'prod', 'production', 'status'].includes(arg) && !environment) environment = arg === 'prod' ? 'production' : arg
+    else throw new Error(`Argumento no válido o repetido: ${arg}`)
   }
-  return result
+  if (!environment) throw new Error('Indica local, prod, production o status')
+  if (!['codex', 'claude', 'all'].includes(client)) throw new Error('--client debe ser codex, claude o all')
+  if (environment === 'status' && install) throw new Error('status no admite --install')
+  return { environment, client, install }
 }
 
-const jsonCommand = (bin, args) => {
-  const result = command(bin, args, { capture: true })
-  return JSON.parse(result.stdout)
-}
+const selectedClients = (client) => client === 'all' ? ['codex', 'claude'] : [client]
 
-const request = (url, { insecure = false } = {}) => new Promise((resolve, reject) => {
-  const parsed = new URL(url)
-  const transport = parsed.protocol === 'https:' ? https : http
-  const req = transport.request(parsed, {
-    method: 'GET',
-    rejectUnauthorized: !insecure,
-    timeout: 5000,
-  }, (res) => {
-    let body = ''
-    res.setEncoding('utf8')
-    res.on('data', (chunk) => { body += chunk })
-    res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body }))
-  })
-  req.on('timeout', () => req.destroy(new Error(`Timeout connecting to ${url}`)))
-  req.on('error', reject)
-  req.end()
-})
-
-const verifyCanonicalProduction = () => {
-  const codex = readJson(path.join(canonicalPlugin, '.mcp.json'))
-  const claude = readJson(path.join(canonicalPlugin, 'claude.mcp.json'))
-  const codexServer = codex.mcpServers?.['bottasker-tasky']
-  const claudeServer = claude.mcpServers?.['bottasker-tasky']
-  if (codexServer?.url !== productionMcpUrl || claudeServer?.url !== productionMcpUrl) {
-    throw new Error(`The canonical plugin must keep the production MCP URL: ${productionMcpUrl}`)
+export async function menu(adapters, ask, write) {
+  const available = []
+  for (const adapter of adapters) {
+    try { if (adapter.available()) available.push(adapter) } catch (error) { write(`${label(adapter.name)}: ${error.message}`) }
+  }
+  if (!available.length) throw new Error('No se encontró Codex ni Claude Code disponible en PATH')
+  while (true) {
+    write('\nTasky — selector de entorno\n1. Consultar estado\n2. Cambiar a Local\n3. Cambiar a PROD\n0. Cancelar')
+    const answer = (await ask('Elige una opción: '))?.trim()
+    if (answer == null || ['0', 'q', ''].includes(answer)) return null
+    if (!['1', '2', '3'].includes(answer)) { write('Opción no válida.'); continue }
+    const choices = available.length === 2 ? [
+      { name: 'all', label: 'Ambos (predeterminado)' },
+      ...available.map((a) => ({ name: a.name, label: label(a.name) })),
+    ] : available.map((a) => ({ name: a.name, label: label(a.name) }))
+    let client
+    while (!client) {
+      write(choices.map((c, i) => `${i + 1}. ${c.label}`).join('\n') + '\n0. Cancelar')
+      const choice = (await ask('Cliente [1]: '))?.trim()
+      if (choice == null || ['0', 'q'].includes(choice)) return null
+      client = choices[Number(choice || '1') - 1]?.name
+      if (!client) write('Opción no válida.')
+    }
+    if (answer === '1') {
+      for (const adapter of available.filter((a) => client === 'all' || a.name === client)) {
+        try { write(describeState(adapter.name, adapter.inspect())) } catch (error) { write(`${label(adapter.name)}: error de inspección: ${error.message}`) }
+      }
+      continue
+    }
+    return { environment: answer === '2' ? 'local' : 'production', client, install: true }
   }
 }
 
-const verifyLocalServices = async () => {
-  const health = await request('http://localhost:3200/health')
-  if (health.status !== 200) throw new Error(`Local API health returned ${health.status}`)
-
-  const protectedResource = await request('http://localhost:3200/.well-known/oauth-protected-resource/mcp')
-  if (protectedResource.status !== 200) throw new Error(`OAuth protected-resource metadata returned ${protectedResource.status}`)
-  const metadata = JSON.parse(protectedResource.body)
-  if (metadata.resource !== localMcpUrl) throw new Error(`OAuth resource is ${metadata.resource}; expected ${localMcpUrl}`)
-
-  const authorizationServer = await request('http://localhost:3200/.well-known/oauth-authorization-server')
-  if (authorizationServer.status !== 200) throw new Error(`OAuth authorization-server metadata returned ${authorizationServer.status}`)
-
-  const mcp = await request(localMcpUrl)
-  if (mcp.status !== 401 || !mcp.headers['www-authenticate']) {
-    throw new Error('Local MCP must return 401 with WWW-Authenticate when no token is provided')
-  }
-
-  const consent = await request('https://localhost:5185/oauth/mcp/authorize', { insecure: true })
-  if (consent.status !== 200) throw new Error(`Local OAuth consent page returned ${consent.status}`)
-
-  process.stdout.write('Local BotTasker API, OAuth discovery, MCP challenge, and consent UI are ready.\n')
-}
-
-const timestamp = () => new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)
-
-const buildLocalPlugin = () => {
-  verifyCanonicalProduction()
-  fs.rmSync(runtimeRoot, { recursive: true, force: true })
-  const pluginTarget = path.join(runtimeRoot, 'plugins', localPluginName)
-  fs.mkdirSync(path.dirname(pluginTarget), { recursive: true })
-  fs.cpSync(canonicalPlugin, pluginTarget, {
-    recursive: true,
-    filter: (source) => path.basename(source) !== '.DS_Store',
-  })
-
-  const codexManifestPath = path.join(pluginTarget, '.codex-plugin', 'plugin.json')
-  const claudeManifestPath = path.join(pluginTarget, '.claude-plugin', 'plugin.json')
-  const codexManifest = readJson(codexManifestPath)
-  const claudeManifest = readJson(claudeManifestPath)
-  const localVersion = `${String(codexManifest.version).split('+')[0]}+local.${timestamp()}`
-
-  codexManifest.name = localPluginName
-  codexManifest.version = localVersion
-  codexManifest.description = `${codexManifest.description} Local development environment.`
-  codexManifest.interface = {
-    ...codexManifest.interface,
-    displayName: 'Tasky by BotTasker (Local)',
-    shortDescription: 'Test Tasky against the BotTasker server running on this Mac.',
-  }
-
-  claudeManifest.name = localPluginName
-  claudeManifest.displayName = 'Tasky by BotTasker (Local)'
-  claudeManifest.version = localVersion
-  claudeManifest.description = `${claudeManifest.description} Local development environment.`
-
-  writeJson(codexManifestPath, codexManifest)
-  writeJson(claudeManifestPath, claudeManifest)
-  writeJson(path.join(pluginTarget, '.mcp.json'), {
-    mcpServers: {
-      'bottasker-tasky-local': { url: localMcpUrl },
+function promptSession(input, output) {
+  const rl = createInterface({ input, output })
+  const controller = new AbortController()
+  rl.on('SIGINT', () => { controller.abort(); rl.close() })
+  rl.on('close', () => controller.abort())
+  return {
+    async ask(question) {
+      if (controller.signal.aborted) return null
+      try { return await rl.question(question, { signal: controller.signal }) } catch (error) {
+        if (controller.signal.aborted) return null
+        throw error
+      }
     },
-  })
-  writeJson(path.join(pluginTarget, 'claude.mcp.json'), {
-    mcpServers: {
-      'bottasker-tasky-local': { type: 'http', url: localMcpUrl },
-    },
-  })
-
-  writeJson(path.join(runtimeRoot, '.agents', 'plugins', 'marketplace.json'), {
-    name: localMarketplaceName,
-    interface: { displayName: 'BotTasker Tasky Local' },
-    plugins: [{
-      name: localPluginName,
-      source: { source: 'local', path: `./plugins/${localPluginName}` },
-      policy: { installation: 'AVAILABLE', authentication: 'ON_INSTALL' },
-      category: 'Developer Tools',
-      description: 'Tasky connected to the BotTasker MCP running on localhost:3200.',
-    }],
-  })
-  writeJson(path.join(runtimeRoot, '.claude-plugin', 'marketplace.json'), {
-    name: localMarketplaceName,
-    owner: { name: 'BotTasker' },
-    description: 'Generated local-only Tasky marketplace. Never commit this directory.',
-    plugins: [{
-      name: localPluginName,
-      source: `./plugins/${localPluginName}`,
-      displayName: 'Tasky by BotTasker (Local)',
-      description: 'Tasky connected to the BotTasker MCP running on localhost:3200.',
-      category: 'Developer Tools',
-      keywords: ['bottasker', 'tasky', 'mcp', 'local-development'],
-    }],
-  })
-
-  process.stdout.write(`Generated local Tasky runtime at ${runtimeRoot}\n`)
-}
-
-const installCodex = (target) => {
-  const state = jsonCommand('codex', ['plugin', 'list', '--json'])
-  const knownTaskyIds = new Set([
-    `${productionPluginName}@${productionMarketplaceName}`,
-    `${localPluginName}@${localMarketplaceName}`,
-    `${productionPluginName}@${localMarketplaceName}`,
-    `${localPluginName}@${productionMarketplaceName}`,
-  ])
-  for (const pluginId of knownTaskyIds) {
-    const installed = state.installed.some((item) => item.pluginId === pluginId)
-    command('codex', ['plugin', 'remove', pluginId], {
-      allowFailure: !installed,
-      capture: !installed,
-    })
+    close() { rl.close() },
   }
-
-  for (const marketplaceName of [productionMarketplaceName, localMarketplaceName]) {
-    command('codex', ['plugin', 'marketplace', 'remove', marketplaceName], {
-      allowFailure: true,
-      capture: true,
-    })
-  }
-
-  const marketplaceRoot = target === 'local' ? runtimeRoot : root
-  const selector = target === 'local'
-    ? `${localPluginName}@${localMarketplaceName}`
-    : `${productionPluginName}@${productionMarketplaceName}`
-  command('codex', ['plugin', 'marketplace', 'add', marketplaceRoot])
-  command('codex', ['plugin', 'add', selector])
 }
 
-const installClaude = (target) => {
-  const state = jsonCommand('claude', ['plugin', 'list', '--json'])
-  const ids = new Set([
-    `${productionPluginName}@${productionMarketplaceName}`,
-    `${localPluginName}@${localMarketplaceName}`,
-  ])
-  for (const plugin of state.filter((item) => ids.has(item.id))) {
-    command('claude', ['plugin', 'uninstall', plugin.id, '--scope', plugin.scope || 'user', '--yes'])
-  }
-
-  for (const marketplaceName of [productionMarketplaceName, localMarketplaceName]) {
-    command('claude', ['plugin', 'marketplace', 'remove', marketplaceName], {
-      allowFailure: true,
-      capture: true,
-    })
-  }
-
-  const marketplaceRoot = target === 'local' ? runtimeRoot : root
-  const selector = target === 'local'
-    ? `${localPluginName}@${localMarketplaceName}`
-    : `${productionPluginName}@${productionMarketplaceName}`
-  command('claude', ['plugin', 'marketplace', 'add', marketplaceRoot, '--scope', 'user'])
-  command('claude', ['plugin', 'install', selector, '--scope', 'user'])
+export async function main(args = process.argv.slice(2), {
+  root = repositoryRoot,
+  input = process.stdin,
+  output = process.stdout,
+  run = createRunner(root),
+  clients = Object.fromEntries(['codex', 'claude'].map((name) => [name, createClient(name, root, run)])),
+  verifyLocal = verifyLocalServices,
+  ask,
+} = {}) {
+  const write = (message) => output.write(`${message}\n`)
+  let unlock
+  try {
+    let options = parseArgs(args)
+    if (options.help || (options.interactive && (!input.isTTY || !output.isTTY))) { write(help); return 0 }
+    if (options.interactive) {
+      const prompt = ask ? { ask, close() {} } : promptSession(input, output)
+      try { options = await menu(Object.values(clients), prompt.ask, write) } finally { prompt.close() }
+      if (!options) { write('Cancelado. No se modificaron instalaciones.'); return 0 }
+    }
+    const targets = selectedClients(options.client).map((name) => clients[name])
+    if (options.environment === 'status') {
+      let failed = false
+      for (const adapter of targets) {
+        try {
+          if (!adapter.available()) throw new Error('Cliente no disponible en PATH')
+          const state = adapter.inspect()
+          write(describeState(adapter.name, state))
+          adapter.assertManaged(state)
+          if (state.items.filter((p) => p.enabled).length > 1) failed = true
+        } catch (error) { failed = true; write(`${label(adapter.name)}: error de inspección: ${error.message}`) }
+      }
+      return failed ? 1 : 0
+    }
+    // Complete the shared preflight before creating a runtime or changing either client.
+    if (options.install) {
+      for (const adapter of targets) {
+        if (!adapter.available()) throw new Error(`${label(adapter.name)} no está disponible en PATH; no se modificaron instalaciones`)
+        adapter.checkCommands()
+      }
+    }
+    verifyCanonicalProduction(root)
+    run(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')])
+    if (options.environment === 'local') {
+      write('Comprobando API, OAuth y consentimiento local…')
+      await verifyLocal()
+    }
+    const runtimeRoot = path.join(root, '.tasky-runtime')
+    fs.mkdirSync(runtimeRoot, { recursive: true })
+    const lock = path.join(runtimeRoot, 'environment.lock')
+    try { fs.writeFileSync(lock, `${process.pid}\n`, { flag: 'wx' }) } catch (error) {
+      if (error.code !== 'EEXIST') throw error
+      throw new Error(`Ya hay un cambio en curso o un bloqueo pendiente: ${lock}. Si el proceso indicado terminó, elimina únicamente ese archivo y reintenta`)
+    }
+    unlock = () => fs.rmSync(lock)
+    const targetRoot = options.environment === 'local' ? buildLocalPlugin(root) : root
+    if (!options.install) {
+      write(`Entorno ${environments[options.environment].label} preparado en ${targetRoot}. No se cambió ninguna instalación.`)
+      write(`Para aplicarlo: node scripts/use-environment.mjs ${options.environment} --install --client=${options.client}`)
+      return 0
+    }
+    const results = []
+    for (const adapter of targets) results.push(switchClient(root, adapter, options.environment, targetRoot, write))
+    write('La instalación y OAuth se verifican por separado. Tras recargar, consulta el perfil para confirmar organización y entorno.')
+    return results.every((r) => r.ok) ? 0 : 1
+  } catch (error) {
+    write(`ERROR: ${error.message}`)
+    return 1
+  } finally { unlock?.() }
 }
 
-const showStatus = () => {
-  verifyCanonicalProduction()
-  process.stdout.write(`Canonical/GitHub MCP: ${productionMcpUrl}\n`)
-  process.stdout.write(`Generated local MCP: ${localMcpUrl}\n`)
-  command('codex', ['plugin', 'list'])
-  command('claude', ['plugin', 'list'])
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  process.exitCode = await main()
 }
-
-if (environment === 'status') {
-  showStatus()
-  process.exit(0)
-}
-
-if (environment === 'local') {
-  await verifyLocalServices()
-  buildLocalPlugin()
-} else {
-  verifyCanonicalProduction()
-}
-
-if (install) {
-  if (client === 'all' || client === 'codex') installCodex(environment)
-  if (client === 'all' || client === 'claude') installClaude(environment)
-}
-
-const serverName = environment === 'local' ? 'bottasker-tasky-local' : 'bottasker-tasky'
-process.stdout.write(`\nSelected environment: ${environment}\n`)
-process.stdout.write(`MCP URL: ${environment === 'local' ? localMcpUrl : productionMcpUrl}\n`)
-if (!install) process.stdout.write(`Run again with --install to install it in Codex and Claude Code.\n`)
-process.stdout.write(`Open a new client session. In Codex run: codex mcp login ${serverName}\n`)
-process.stdout.write('In Claude Code open /mcp and authenticate the matching Tasky server.\n')
