@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+- Distinguished expired pending consent from expiry of an authenticated access token.
+- Required Codex and Claude Code to rely on native automatic refresh before requesting interactive authentication.
+- Required Tasky to wait for native login completion and verify an MCP call before continuing BotTasker-dependent work.
+- Prevented restart or new-conversation guidance from being used as the normal OAuth refresh path.
+
 ## 0.2.0
 
 - Replaced manual API-key configuration with the hosted OAuth-enabled BotTasker MCP.
