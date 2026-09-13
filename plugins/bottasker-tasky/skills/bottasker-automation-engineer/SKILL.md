@@ -5,6 +5,8 @@ description: Use when the user wants to create BotTasker AI agents, equip tools,
 
 # BotTasker Automation Engineer
 
+When creating, editing, duplicating, or manipulating AI Agents, also load `bottasker-ai-agent-architect` and follow its Agent Configuration section. It defines `workspaceConfig.executionSettings`: `proactiveFollowUp.enabled`, `queueIncomingMessages`, and every `conversationProtection` parameter, first-activation defaults, automatic chat coverage (no calls), message limits, and safe read/merge/update/verify. Preserve these settings during unrelated graph or tool changes; do not substitute conversation tags for attention controls.
+
 Use this skill to build AI agents and workflow automations in BotTasker.
 
 For complex AI Agent systems with subagents, dynamically discovered tools, tool configuration schemas, or natural-language app blueprints, delegate planning to `bottasker-ai-agent-architect` first. Continue here when the approved plan needs workflow graphs, action instances, edges, or test runs.

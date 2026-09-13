@@ -1,6 +1,6 @@
 ---
 name: bottasker-ai-agent-architect
-description: "Use when the user wants Codex to design or create AI Agents inside an existing or approved BotTasker app: agents, subagents, dynamic tools, conversational channel wiring, tool configuration, inputs, and outputs."
+description: "Use when the user wants to design, create, edit, duplicate or manage AI Agents in an existing or approved BotTasker app: conversation protection, message limits, follow-up, incoming message grouping, subagents, tools, inputs and outputs."
 ---
 
 # BotTasker AI Agent Architect
@@ -44,7 +44,7 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
    - Add outputs with `bt_ai_agents_add_item` using `itemType: "output"` and a validated `initialConfig`.
    - Add tools to subagents with `bt_ai_agents_add_item` using `itemType: "tool"`, `agentTargetId`, and a validated `initialConfig`.
    - Use `bt_ai_agents_update_agent_config` for prompt/role/model updates so `equippedTools` are preserved.
-   - For native proactive follow-up, set `workspaceConfig.executionSettings.proactiveFollowUp.enabled` in the create payload. When updating an existing agent, read the full workspace first, change only this setting through `bt_ai_agents_update`, and preserve all inputs, agents, outputs, tools, shared instructions, and other execution settings.
+   - For agent-wide settings, follow Agent Configuration below, including conversation protection, incoming message grouping, and proactive follow-up. Read the full workspace before changing settings through `bt_ai_agents_update`; preserve all unrelated configuration.
    - Use `bt_ai_agents_list_items` before removing or reconfiguring existing items.
    - Use `bt_ai_agents_remove_item` only after explicit confirmation.
    - Use `bt_action_instances_update_config` only to repair or update an existing action instance after validation.
@@ -140,6 +140,43 @@ For each input/output/tool item, include:
 - Before creating a new agent, list existing agents in the target app and reuse an agent with the same purpose/name instead of creating duplicates. The MCP create tools are idempotent; if they return `idempotent:true` or `reusedExisting:true`, continue with that agent ID.
 - Before adding subagents, inputs, outputs, or tools to an existing/reused agent, call `bt_ai_agents_list_items` and do not add an item that already exists with the same `itemType`, `workerRegistryId`, `actionKey`, and target agent.
 - After adding or updating an item directly, verify with `bt_ai_agents_get` or `bt_ai_agents_list_items` and answer with a compact before/after summary.
+
+## Agent Configuration
+
+These settings belong to `workspaceConfig.executionSettings` on the main AI Agent workspace, not to a subagent's prompt, `config`, input credentials, or dynamic conversation tags. Load this guidance for creating, editing, duplicating, or otherwise manipulating agents. Explain choices in everyday language; show internal property names only when the user asks for technical details.
+
+| Parameter (relative to executionSettings) | User-facing meaning and behavior |
+| --- | --- |
+| `proactiveFollowUp.enabled` | “Recordar si no responden”: allows reminders when the agent is waiting for the same person's answer. Defaults to false. This does not schedule a campaign; follow Proactivity Decision Rules below. |
+| `queueIncomingMessages` | “Juntar mensajes seguidos”: when true, messages arriving while the agent is working are collected for the ongoing conversation instead of starting independent work for each arrival. Defaults to false; do not change it just because protection is enabled. |
+| `conversationProtection.enabled` | “Protección de conversaciones”: enables automatic detection and message limits for all supported connected chat inputs. Defaults to false until activation is requested. Messages always arrive and remain visible; only the agent's automatic attention pauses. |
+| `conversationProtection.mode` | `observe` = “Solo registrar”: record detected exchanges without pausing for detection. `protect` = “Pausar atención”: also pause when detection finds sufficient evidence. Message limits can pause in BOTH modes. |
+| `conversationProtection.sensitivity` | `conservative` = “Más prudente”: needs more coinciding signals, reducing mistaken pauses. `balanced` = “Más sensible”: detects more cases, including repeated courtesy exchanges, but may pause a real person by mistake. Neither option can reliably identify every AI. |
+| `conversationProtection.pauseMinutes` | Duration of an automatic pause, in whole minutes, from 5 to 10080. 1440 means one day. When it ends, only new messages can receive attention; messages received during the pause are not replayed. A still-reached message limit can cause another pause. |
+| `conversationProtection.maxPerTenMinutes` | Maximum incoming messages admitted for attention per conversation in a rolling 10-minute window; integer 0–1000. 0 means unlimited. The next message beyond the limit pauses automatic attention. Counts admitted messages, not the number of generated replies. |
+| `conversationProtection.maxPerDay` | Equivalent limit over a rolling 24-hour window; integer 0–10000. 0 means unlimited. Either limit may trigger a pause; they do not reset at midnight. |
+| `conversationProtection.configured` | Internal first-activation marker. Write true when explicitly configuring protection; retain it on later edits and when disabling. Do not ask users to choose it. It prevents their saved settings, including explicit zero limits, being replaced by the first-activation preset. |
+
+First activation requested by the user uses this preset unless they specify other values:
+
+```json
+{"enabled":true,"configured":true,"mode":"protect","sensitivity":"balanced","pauseMinutes":1440,"maxPerTenMinutes":3,"maxPerDay":15}
+```
+
+This preset is NOT an instruction to activate protection on all agents. An agent with no settings remains disabled. The legacy inactive baseline is `enabled:false`, `mode:"observe"`, `sensitivity:"conservative"`, `pauseMinutes:1440`, and both limits 0, without `configured:true`. On its first activation replace that untouched baseline with the preset. For partial or customized settings, fill missing values from the preset and preserve saved choices, including explicit 0. On reactivation of a previously configured agent retain all saved values. Never use a truthiness fallback that turns a saved 0 into 3 or 15.
+
+Channels are identified automatically from incoming messages; do not add a `channels` selector or write the obsolete `conversationProtection.channels` field. Supported chat channels include Webchat, WhatsApp, Telegram, Messenger, Instagram, email (Gmail/Outlook), Slack, and Chatwoot. Voice and real-time calls are excluded, including voice modality and call transcripts. Scope is isolated by organization, app, channel, account and conversation; this is not a shared quota across all contacts or agents.
+
+The detector uses rules over repeated exchanges and reply timing, without calling a classification model. One greeting, one bot disclosure, or a few fast messages are not proof that someone is an AI. Do not promise perfect detection or suggest testing by spending credits on live agent conversations without authorization.
+
+Safe create/edit procedure:
+
+1. Discover the current create schema; use `bt_ai_agents_create` with a validated full workspace if settings must be included at creation. `bt_ai_agents_create_simple` does not accept executionSettings: if used, read back the created/reused agent and update its full workspace separately.
+2. Before editing, use `bt_ai_agents_get` with the correct `id` and `appId`. Merge only requested settings into the returned `workspaceConfig.executionSettings`, preserving other execution settings, `proactiveFollowUp` properties, inputs, agents/subagents, equippedTools, outputs, shared instructions and unknown workspace properties. Remove only obsolete protection `channels` when editing that section.
+3. Send the complete merged `workspaceConfig` through `bt_ai_agents_update` using its discovered input schema. Do not send a partial workspace that deletes its graph. `bt_ai_agents_update_agent_config` edits a node's prompt/role/model, not these workspace settings.
+4. Read back with `bt_ai_agents_get` and verify every requested value plus preservation of the existing graph and other settings. An unrelated prompt/tool edit must not reset or activate protection. Cloning an agent preserves these choices unless the user requests different settings.
+
+Administration: in **Conversaciones → Atención del agente → Ignoradas por el agente**, users can find paused conversations; the robot icon before Enviar opens attention controls/history. Ignored state is the protected system attribute `agentAttention`, not a dynamic tag. Never try to pause or resume by adding/removing tags or by generic conversation CRUD. Discover an authorized attention-management tool if available; otherwise guide the user to these controls, without inventing a tool or writing protected fields. Manual reactivation clears the message quota and starts with future messages. Disabling protection stops new automatic detection and limits but does not reactivate existing pauses. Excluding a conversation from detection does not bypass message limits or lift an existing pause. Marking a false positive records feedback; it does not retrain a model, change rules, or reactivate attention by itself.
 
 ## Proactivity Decision Rules
 
