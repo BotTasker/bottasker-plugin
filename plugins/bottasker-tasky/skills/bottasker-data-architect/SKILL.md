@@ -101,7 +101,8 @@ When Base de datos (Data Hub) will be used by workflow automations, return a `da
 - `dataHubId` and Base de datos (Data Hub) name.
 - Model IDs/names for every workflow node that will search, create, update, or trigger.
 - Field names, labels, types, required/optional flags, enum/options, date/time formats, sensitive flags, and relation targets.
-- Which Base de datos (DataHub) events should trigger workflows: `record.created`, `record.updated`, `record.deleted`, `record.status_changed`, `record.linked`, or `record.unlinked`.
+- Which Base de datos (DataHub) events should trigger workflows: `record.created`, `record.updated`, `record.deleted`, `record.linked`, or `record.unlinked`. The current UI no longer offers `record.status_changed` for new configurations.
+- For `record.updated`, whether to filter by one property; if so, include its field ID, technical name, type, desired operator, and exact select/multiselect option values or other comparison target in `dataContext`. The Automation Engineer configures `updatedFieldCondition` for the workflow trigger.
 - Which workflow nodes should be used: `on_data_hub_event`, `data_hub_search_records`, `data_hub_get_record`, `data_hub_create_record`, `data_hub_update_record`, `data_hub_archive_record`, `data_hub_delete_record`, `data_hub_link_records`, `data_hub_unlink_records`, or `data_hub_list_record_links`.
 - Which fields should be written in `values` or `filters`, using technical field names from Base de datos (Data Hub).
 

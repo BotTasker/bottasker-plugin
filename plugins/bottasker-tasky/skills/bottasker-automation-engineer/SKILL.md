@@ -47,7 +47,7 @@ For workflow automations, use the Base de datos (DataHub) `actionType: "work"` n
 
 Workflow Base de datos (DataHub) action keys:
 
-- `on_data_hub_event`: trigger for `record.created`, `record.updated`, `record.deleted`, `record.status_changed`, `record.linked`, and `record.unlinked`.
+- `on_data_hub_event`: trigger for `record.created`, `record.updated`, `record.deleted`, `record.linked`, and `record.unlinked`. `record.status_changed` is absent from the current configuration UI; preserve it only when reading an existing workflow that already uses it.
 - `data_hub_search_records`: find records in a model.
 - `data_hub_get_record`: load one record by `recordId`.
 - `data_hub_create_record`: create a record.
@@ -68,6 +68,15 @@ Configuration rules:
 - For `create`, required model fields are expected in `values`; optional fields can be added only when needed.
 - For `update`, send only the fields to change.
 - Use variables such as `{{1.record.id}}` or prior node outputs for dynamic IDs and values.
+
+### Filtrar «Ficha actualizada» por propiedad
+
+- Configure `dataHub` with the Base de datos ID, `model` with the model ID, and `events` with an array that includes `record.updated`. The optional `updatedFieldCondition` applies only to that event in workflows. Leave it absent to retain the existing unfiltered behavior. It does not apply to AI Agent inputs or to the other selected events.
+- Before setting the condition, read the selected model's fields with `bt_data_hub_list_fields` and check the current worker schema. Use the field's ID for `fieldId`, its technical `name` for `fieldName`, valid operators for its type (or `triggerOperators` when returned), and option `value` strings for select or multiselect targets. Do not use the display label as an ID or target value. If the field is unavailable or its type/options changed, refresh the metadata before configuring it.
+- Store one condition as `updatedFieldCondition: { fieldId, fieldName, operator, target, targetTo? }`. `targetTo` is needed only for `between`; operators `is_true`, `is_false`, `is_empty`, and `is_not_empty` need no target. Example for a select property: `{ "fieldId": "<field-id>", "fieldName": "priority", "operator": "in", "target": ["high", "urgent"] }`. Include this object in the action instance config alongside `dataHub`, `model`, and `events`; preserve unrelated config when editing an existing instance.
+- Text, textarea, email, phone, and URL: `equals`, `not_equals`, `contains`. Number: `equals`, `not_equals`, `gt`, `gte`, `lt`, `lte`, `between` with finite numeric targets. Date and datetime: `equals`, `before`, `after`, `between` with valid `YYYY-MM-DD` or datetime strings, respectively. `between` uses ordered inclusive bounds.
+- Boolean: `is_true` or `is_false`. Select: `in` or `not_in` with an array of one or more configured option values. Multiselect and tags: `contains_any` or `contains_all` with a nonempty string array. Reference: `in` or `not_in` with a nonempty array of record IDs. Location: `contains` checks the address text. Every field type also supports `is_empty` and `is_not_empty`; file, JSON, and array types currently offer these empty-state operators only.
+- The workflow starts only when that property actually changes and its new value matches. Updating another property, saving the same value, or leaving the condition invalid does not start it. A change can start the workflow even if the previous value also matched. Verify the action instance configuration and test a matching and a nonmatching update before relying on the filter.
 
 Safety rules:
 
