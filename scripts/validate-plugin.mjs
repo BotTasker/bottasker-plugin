@@ -14,6 +14,7 @@ const codexManifest = readJson(path.join(plugin, '.codex-plugin', 'plugin.json')
 const claudeManifest = readJson(path.join(plugin, '.claude-plugin', 'plugin.json'))
 const codexMcp = readJson(path.join(plugin, '.mcp.json'))
 const claudeMcp = readJson(path.join(plugin, 'claude.mcp.json'))
+const changelog = fs.readFileSync(path.join(plugin, 'CHANGELOG.md'), 'utf8')
 
 for (const requiredFile of ['LICENSE', 'README.md', 'submission/listing.json']) {
   if (!fs.existsSync(path.join(root, requiredFile))) fail(`missing ${requiredFile}`)
@@ -23,6 +24,10 @@ if (!fs.existsSync(path.join(plugin, 'README.md'))) fail('plugin README.md is mi
 
 if (codexManifest.name !== claudeManifest.name) fail('manifest names differ')
 if (codexManifest.version !== claudeManifest.version) fail('manifest versions differ')
+const changelogVersion = changelog.match(/^##\s+(\d+\.\d+\.\d+)\s*$/m)?.[1]
+if (changelogVersion !== codexManifest.version) {
+  fail(`latest changelog version ${changelogVersion || '<missing>'} does not match manifest ${codexManifest.version}`)
+}
 if (codexManifest.license !== 'Apache-2.0' || claudeManifest.license !== 'Apache-2.0') fail('license metadata must match LICENSE')
 if (claudeManifest.userConfig) fail('Claude userConfig must not be required for OAuth')
 

@@ -40,6 +40,21 @@ Use this skill for operational modules after the app and data foundation are kno
 - Use `bt_conversations_get_tags` before changing a conversation when its current labels are unknown. Use `bt_conversations_add_tags` with `names` to create/reuse and assign labels, and `bt_conversations_remove_tag` to unassign them. `bt_conversations_add_tag` remains only as the legacy single-label alias. Removing a label from a conversation does not delete it from the app catalog.
 - AI Agents that receive WhatsApp, Telegram, or WebChat input with automatic conversation registration enabled receive `manage_conversation_tags` at runtime. This tool is already bound to the current conversation; never ask for or invent an internal conversation ID.
 
+## Conversation Read Capabilities
+
+Use the Conversaciones worker when an agent or workflow must inspect customer conversations without changing them. This capability is always scoped to the current organization and `appId`; never ask the user for organization scope and never try to override either scope through tool input. The app role needs both `conversations:read` and `messages:read`.
+
+For AI Agents, discover and equip the single `conversation_tools` action. It exposes these runtime tools:
+
+- `conversations_find`: search by phone, `chat_id`, `contact_id`, `contact_handle`, or `contact_record_id`, with optional channel and a limit of 1-20.
+- `conversations_get`: load a safe conversation summary from an exact `conversation_id`.
+- `conversations_get_activity`: return total, inbound, outbound, and unread counts plus first/last activity and the latest customer, human-agent, and AI-agent message dates.
+- `conversations_get_recent_messages`: load 1-100 recent messages in chronological order, optionally filtered by direction, sender type, or an exclusive ISO 8601 `before` cursor.
+
+When the exact conversation ID is unknown, call `conversations_find` first. Phone lookup normalizes common formats and checks stored WhatsApp aliases. If the result says `ambiguous: true`, present the candidates or narrow by channel and ask the user/agent context to choose; never select a candidate automatically. Use the returned `nextBefore` only when `hasMore` is true. Returned messages intentionally omit raw external payloads, internal metadata, and attachment URLs; do not claim those fields are unavailable in the underlying channel, only that this read tool does not expose them.
+
+For deterministic workflows, use the corresponding work actions `find_conversations`, `get_conversation`, `get_conversation_activity`, and `get_recent_messages`. Do not attach those workflow-only actions to an AI Agent, and do not add the agent-only `conversation_tools` action to a workflow.
+
 ## Expected MCP Tools
 
 Use operational module tools plus `bt_conversation_tags_list`, `bt_conversations_get_tags`, `bt_conversations_add_tags`, `bt_conversations_remove_tag`, `bt_apps_list`, `bt_apps_get`, `bt_mcp_list_skills`, and `bt_mcp_load_skill` for discovery.

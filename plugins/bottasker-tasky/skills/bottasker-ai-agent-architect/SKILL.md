@@ -221,6 +221,21 @@ Do not propose proactivity merely because it is available. Prefer it only when i
 - Carrito: use as a tool when the agent builds or updates a transaction: get/create active cart, add/remove items, apply customer data, set status, or prepare checkout. Configure catalog/cart scope, required checkout fields, currency, customer identity, and validation behavior. Always respect cart tool failures; do not confirm a sale if the cart rejects an item.
 - Archivos: use as input/tool/output when the agent receives, reads, generates, stores, or shares documents/images/audio. If the agent must use files, documents, images, audio, or other assets that live in the BotTasker Files module, it must have the Archivos/Files tool equipped and validated; Base de datos (DataHub), Knowledge, or channel tools may reference file IDs or URLs, but they do not grant general access to browse/read/manage the Files module. Configure allowed file types, storage target, parsing/OCR/transcription behavior when available, size limits, and whether files become knowledge, evidence, or record attachments.
 
+## Conversations Agent Tool
+
+When an AI Agent must inspect past customer conversations, discover and equip the single Conversaciones tool action whose action key is `conversation_tools`. Do not equip the workflow-only actions `find_conversations`, `get_conversation`, `get_conversation_activity`, or `get_recent_messages`; discovery marks those with `ignore_in: ["agent"]`.
+
+Prepare and validate the tool config before adding it. All four capabilities are enabled by default through `enable_find_conversations`, `enable_get_conversation`, `enable_get_conversation_activity`, and `enable_get_recent_messages`. Apply least privilege by disabling capabilities the agent does not need, then read back the saved item. The tool requires no organization or app selector: it inherits both from the trusted action instance and rejects execution without an app scope.
+
+Runtime tools and safe usage:
+
+- `conversations_find` searches by identifier and returns a candidate list ordered by most recent activity. Use it before get/activity/messages when `conversation_id` is unknown.
+- `conversations_get` returns a safe summary for an exact conversation.
+- `conversations_get_activity` returns message counts and first/latest timestamps, including latest customer, human-agent, and AI-agent activity.
+- `conversations_get_recent_messages` returns chronological messages with `limit` 1-100, optional `direction`, `sender_type`, and ISO 8601 `before`; continue only with `nextBefore` when `hasMore` is true.
+
+If `conversations_find` returns `ambiguous: true`, do not infer the intended conversation. Narrow the search by channel or ask for a choice using safe candidate fields. Treat all capabilities as read-only. Raw provider payloads, internal metadata, and attachment URLs are deliberately removed from results and must not be reconstructed or requested through invented parameters.
+
 ## Yango Fleet Agent Tool
 
 Use this guidance whenever the user mentions Yango Fleet, Yango park/fleet, fleet drivers, fleet vehicles, Yandex Fleet, or asks an agent to consult or manage a Yango fleet.
