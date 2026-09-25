@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- Taught Tasky how to discover, configure, preserve, and verify optional human response timing on WhatsApp, Telegram, WebChat, Instagram, and Messenger Response outputs.
+- Documented the dynamic content-based delay, configurable cap, best-effort typing indicators, and cancellation of obsolete delayed responses.
+
 ## 0.2.2
 
 - Added app-scoped conversation lookup, activity, and recent-message guidance for AI Agents and workflows.

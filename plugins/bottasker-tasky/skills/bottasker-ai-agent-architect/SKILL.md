@@ -358,10 +358,23 @@ Use this current mapping as a design aid, but only create entries returned by `b
 | Instagram | `on_message_instagram` | `instagram_response` | `instagram` |
 | Messenger | `on_message_messenger` | `messenger_response` | `messenger` |
 
+### Human Response Timing
+
+Current Response outputs for WhatsApp, Telegram, WebChat, Instagram, and Messenger may expose an optional human response simulation. This setting belongs to the Response action instance, not to `workspaceConfig.executionSettings`, an agent prompt, an input, or a channel Actions tool.
+
+- Treat the discovered Response schema as authoritative. Configure this feature only when the schema exposes `simulate_human_response_delay` and `human_response_max_delay_seconds`; do not invent these fields on an older backend.
+- `simulate_human_response_delay` maps to “Simular tiempo de respuesta humano”. It defaults to `false`; enable it only when the user explicitly asks for human-like response timing or approves it as part of the agent design.
+- `human_response_max_delay_seconds` maps to “Tiempo máximo de respuesta (segundos)”. Use the discovered validation limits; the current supported range is 3–45 seconds and the default cap is 30 seconds. If the user asks to enable simulation without choosing a cap, keep the schema default instead of asking an unnecessary question.
+- The runtime calculates each delay from customer-visible text or captions, adds small timing variation, applies a short minimum for media-only responses, and never exceeds the configured cap. Describe it as a fast human typing simulation, not as an exact promise of delivery time.
+- Typing indicators are best effort and provider-dependent. Do not claim that every client will render them, and do not add or expose an internal typing tool to the agent workspace.
+- A newer incoming message can cancel an obsolete delayed response; the active execution recalculates timing from its own outgoing content. Do not implement this behavior with workflow waits, prompt instructions, schedulers, or duplicated Actions nodes.
+- When updating an existing Response, read its current action-instance config first, merge only these requested fields, preserve credentials and all unrelated send-capability flags, validate the resulting config, update it through `bt_action_instances_update_config`, and verify it with `bt_action_instances_get_details` or an agent workspace read-back.
+- Configure the setting separately on each channel Response that should use it. A Response shared by multiple inputs/accounts of the same channel shares this timing configuration while continuing to inherit credentials from the input that received the message.
+
 For each conversational channel:
 
 1. Add the incoming-message action as an `input`, then read back the workspace. Current backends create one Response for the first input and reuse it for additional accounts of that channel; do not add another output.
-2. Discover the Response schema. Text is already enabled by the presence of Response and has no switch. Configure only the additional sending capabilities required by the user and verify the saved action instance.
+2. Discover the Response schema. Text is already enabled by the presence of Response and has no switch. Configure only the additional sending capabilities and human response timing requested by the user, then verify the saved action instance.
 3. On older backends, add the missing same-channel Response and equip Actions for capabilities that output cannot expose. Preserve existing configurations without a requested migration.
 4. Verify that every input references the shared channel Response, that each input retains its own connection, and that capabilities and scope are correct. Do not report a channel complete when an input lacks a usable matching output, unless the user requested receive-only operation.
 
