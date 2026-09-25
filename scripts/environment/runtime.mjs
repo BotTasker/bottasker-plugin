@@ -47,6 +47,9 @@ export const verifyCanonicalProduction = (root) => {
   if (codexServer?.url !== productionMcpUrl || claudeServer?.url !== productionMcpUrl) {
     throw new Error(`The canonical plugin must keep the production MCP URL: ${productionMcpUrl}`)
   }
+  if (codexServer.type !== 'http' || codexServer.oauth_resource !== productionMcpUrl) {
+    throw new Error('The canonical Codex MCP must declare the HTTP transport and OAuth resource')
+  }
 }
 
 export const verifyLocalServices = async (fetch = request) => {
@@ -123,7 +126,11 @@ export const buildLocalPlugin = (root) => {
   fs.rmSync(path.join(pluginTarget, '.app.json'), { force: true })
   writeJson(path.join(pluginTarget, '.mcp.json'), {
     mcpServers: {
-      'bottasker-tasky-local': { url: localMcpUrl },
+      'bottasker-tasky-local': {
+        type: 'http',
+        url: localMcpUrl,
+        oauth_resource: localMcpUrl,
+      },
     },
   })
   writeJson(path.join(pluginTarget, 'claude.mcp.json'), {

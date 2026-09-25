@@ -2,7 +2,7 @@
 
 Tasky combines BotTasker skills with the hosted MCP at `https://api.bottasker.ai/mcp` for Codex and Claude Code.
 
-In Codex, the production plugin is also linked to the registered Tasky App. This lets Codex show and manage the connected BotTasker account while the plugin continues to provide its bundled skills and MCP tools. Generated local-development variants intentionally omit that production App link.
+During private development, the Codex package loads the hosted BotTasker MCP directly. The registered Tasky App will be linked only after it is eligible for the current Codex account; linking an ineligible private App can hide the otherwise valid bundled MCP server from the plugin UI.
 
 After installing from the client plugin catalog, sign in to BotTasker, select an organization, and approve **Trabajo seguro**. No repository clone, terminal setup, environment variable, or API key is required.
 

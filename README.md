@@ -1,47 +1,118 @@
-# Tasky Assistant Plugin
+# Tasky by BotTasker
 
-Tasky Assistant plugin for building and operating BotTasker apps through the BotTasker external MCP.
+Installable BotTasker plugin for Codex and Claude Code. It bundles 14 Tasky skills and connects them to the hosted BotTasker MCP so an authenticated user can design, create, inspect, and operate BotTasker apps.
 
-This repository contains the shared Tasky skills plus the platform-specific manifests for Codex and Claude Code. The local marketplaces are for beta testing; production releases are submitted to the official OpenAI and Anthropic plugin catalogs.
+> **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
-## Prerequisites
+## Install from GitHub
 
-- BotTasker external MCP reachable at `https://api.bottasker.ai/mcp`.
-- Codex or Claude Code installed.
+### Codex
+
+Run these commands exactly:
+
+```bash
+codex plugin marketplace add BotTasker/bottasker-plugin --ref main
+codex plugin add bottasker-tasky@bottasker-tasky
+```
+
+Then completely restart Codex and start a new task. When Codex requests authentication, complete the BotTasker OAuth flow in the browser and select the organization you want to use.
+
+Verify the installation:
+
+```bash
+codex plugin list
+codex mcp list
+```
+
+The expected plugin and MCP server name is `bottasker-tasky`. If authentication is still pending, run:
+
+```bash
+codex mcp login bottasker-tasky
+```
+
+### Claude Code
+
+```bash
+claude plugin marketplace add BotTasker/bottasker-plugin
+claude plugin install bottasker-tasky@bottasker-tasky
+```
+
+Start a new Claude Code session after installation. Use `/mcp` if browser authentication does not start automatically.
+
+### Ask an LLM to install it
+
+Give the assistant this instruction:
+
+```text
+Install Tasky by BotTasker from https://github.com/BotTasker/bottasker-plugin.
+Use the repository as a plugin marketplace, then install
+bottasker-tasky@bottasker-tasky. Do not clone or copy plugin files manually
+unless the native marketplace command is unavailable. Verify that both the
+plugin and the bottasker-tasky MCP server are enabled, then ask me to complete
+OAuth if authentication is required. Start a new task/session before using it.
+```
+
+The assistant should use the native commands for the active client. It must not request a BotTasker API key, edit user configuration by hand, claim authentication succeeded before verification, or execute destructive BotTasker tools without explicit approval.
+
+## Machine-readable installation facts
+
+| Field | Canonical value |
+| --- | --- |
+| Repository | `https://github.com/BotTasker/bottasker-plugin` |
+| Default branch | `main` |
+| Marketplace manifest | `.agents/plugins/marketplace.json` |
+| Marketplace name | `bottasker-tasky` |
+| Plugin name | `bottasker-tasky` |
+| Codex install target | `bottasker-tasky@bottasker-tasky` |
+| Plugin source directory | `plugins/bottasker-tasky` |
+| MCP server name | `bottasker-tasky` |
+| MCP endpoint | `https://api.bottasker.ai/mcp` |
+| Authentication | Native OAuth 2.1; no API key |
+
+Do not infer alternative names or endpoints. The repository root is the marketplace root; the plugin itself lives under `plugins/bottasker-tasky`.
+
+## Update an existing GitHub installation
+
+```bash
+codex plugin marketplace upgrade bottasker-tasky
+codex plugin add bottasker-tasky@bottasker-tasky
+```
+
+Restart Codex and open a new task after updating so it loads the refreshed skills and MCP declaration.
+
+## Availability options
+
+Pushing this repository and its marketplace manifest to the public `main` branch makes Tasky installable from GitHub with the commands above. It does **not** automatically add Tasky to the universal plugin directory.
+
+To publish it in the public directory, submit it through the OpenAI Platform as a **With MCP** plugin. Public submission requires a stable HTTPS MCP endpoint, verified developer or business identity, listing assets, tool annotations, test cases, and review approval. Until that process is complete, describe Tasky as “installable from GitHub,” not as “available in the built-in catalog.”
+
+## Prerequisites and authentication
+
+- Codex or Claude Code with plugin marketplace support.
+- Network access to `https://api.bottasker.ai/mcp`.
+- A BotTasker account and access to at least one organization.
 
 Tasky authenticates through the client's native OAuth 2.1 flow. No API key or environment variable is required for an end user.
 
 Access tokens are intentionally short-lived. Codex and Claude Code retain the rotating refresh token and renew access automatically; reaching the access-token expiry must not open a new browser login. Interactive authentication is required only for the initial connection, explicit scope elevation, revocation, or a terminal refresh-token failure. A pending browser consent is not yet an authenticated connection and must be completed before its temporary authorization request expires.
 
-## Install In Codex
+## Install from a local checkout
 
-For public releases, find **Tasky by BotTasker** in the built-in plugin catalog and select **Install**. This repository always keeps the public plugin connected to `https://api.bottasker.ai/mcp`. For beta testing against production from this repository root:
+The GitHub flow above is the normal installation path. For development from an existing local checkout of this repository:
 
 ```bash
 codex plugin marketplace add .
 codex plugin add bottasker-tasky@bottasker-tasky
 ```
 
-Open a new Codex session after installing so Codex reloads plugin skills and the MCP server. Codex opens BotTasker in the browser when authentication is required.
-
-## Install In Claude Code
-
-For public releases, open `/plugin`, find **Tasky by BotTasker** in the public marketplace, and install it. For beta testing against production from this repository root:
+For Claude Code, use:
 
 ```bash
 claude plugin marketplace add .
 claude plugin install bottasker-tasky@bottasker-tasky
 ```
 
-When Claude Code enables the plugin, open `/mcp` if the browser sign-in does not start automatically. Claude Code stores and refreshes the OAuth tokens.
-
-If you are already inside a Claude Code session, you can use the equivalent slash commands:
-
-```text
-/plugin marketplace add .
-/plugin install bottasker-tasky@bottasker-tasky
-/reload-plugins
-```
+Open a new session after installing. An already open conversation can retain its previous tools.
 
 ## Switch Between Local And Production
 
@@ -211,6 +282,8 @@ Tasky, Codex, and Claude can inspect and manage the authenticated user's board-c
 
 ## References
 
+- OpenAI plugin packaging and GitHub marketplaces: https://developers.openai.com/plugins/build/plugins
+- OpenAI public plugin submission: https://developers.openai.com/plugins/deploy/submission
 - Claude Code MCP: https://code.claude.com/docs/en/mcp
 - Claude Code plugins: https://code.claude.com/docs/en/plugins
 - Claude Code plugin reference: https://code.claude.com/docs/en/plugins-reference

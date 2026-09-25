@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.7
+
+- Removed the ineligible private App mapping from the active Codex package so it cannot suppress the bundled MCP server.
+- Kept the hosted BotTasker MCP and all 14 Tasky skills as the development package runtime surface.
+- Deferred connected-account UI until the registered Tasky App is eligible for the current Codex account.
+
+## 0.2.6
+
+- Made the private registered Tasky App an optional dependency during development.
+- Preserved the bundled MCP server when the registered App is not yet eligible or available to the current Codex account.
+
+## 0.2.5
+
+- Declared the Codex MCP transport and OAuth resource explicitly so Tasky is surfaced as an authenticated plugin server.
+- Kept the registered App mapping, hosted MCP endpoint, and bundled skills in the same plugin package.
+
 ## 0.2.4
 
 - Linked the Codex plugin to the registered Tasky App so Codex can manage and display connected BotTasker accounts.

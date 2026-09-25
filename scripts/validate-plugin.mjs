@@ -12,7 +12,6 @@ const fail = (message) => {
 
 const codexManifest = readJson(path.join(plugin, '.codex-plugin', 'plugin.json'))
 const claudeManifest = readJson(path.join(plugin, '.claude-plugin', 'plugin.json'))
-const appManifest = readJson(path.join(plugin, '.app.json'))
 const codexMcp = readJson(path.join(plugin, '.mcp.json'))
 const claudeMcp = readJson(path.join(plugin, 'claude.mcp.json'))
 const changelog = fs.readFileSync(path.join(plugin, 'CHANGELOG.md'), 'utf8')
@@ -25,11 +24,9 @@ if (!fs.existsSync(path.join(plugin, 'README.md'))) fail('plugin README.md is mi
 
 if (codexManifest.name !== claudeManifest.name) fail('manifest names differ')
 if (codexManifest.version !== claudeManifest.version) fail('manifest versions differ')
-if (codexManifest.apps !== './.app.json') fail('Codex manifest must reference ./.app.json')
-const appId = appManifest.apps?.['bottasker-tasky']?.id
-if (typeof appId !== 'string' || !/^(?:asdk_app_|connector_|templated_apps_)[A-Za-z0-9_-]+$/.test(appId)) {
-  fail('bottasker-tasky App ID is missing or invalid')
-}
+if (codexManifest.apps !== undefined) fail('Codex manifest must not reference a private App while it is ineligible')
+if (fs.existsSync(path.join(plugin, '.app.json'))) fail('private .app.json must stay out of the active development package')
+if (codexManifest.mcpServers !== './.mcp.json') fail('Codex manifest must reference ./.mcp.json')
 const changelogVersion = changelog.match(/^##\s+(\d+\.\d+\.\d+)\s*$/m)?.[1]
 if (changelogVersion !== codexManifest.version) {
   fail(`latest changelog version ${changelogVersion || '<missing>'} does not match manifest ${codexManifest.version}`)
@@ -62,6 +59,9 @@ for (const [label, server] of [
   if (server?.url !== 'https://api.bottasker.ai/mcp') fail(`${label} MCP URL is not canonical`)
   if (server?.headers || server?.bearer_token_env_var) fail(`${label} MCP config contains manual credentials`)
 }
+const codexServer = codexMcp.mcpServers?.['bottasker-tasky']
+if (codexServer?.type !== 'http') fail('Codex MCP transport must be http')
+if (codexServer?.oauth_resource !== 'https://api.bottasker.ai/mcp') fail('Codex MCP OAuth resource is not canonical')
 
 for (const [label, config] of [['Codex', codexMcp], ['Claude', claudeMcp]]) {
   const serverNames = Object.keys(config.mcpServers || {})

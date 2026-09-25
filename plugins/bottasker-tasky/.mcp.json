@@ -1,7 +1,9 @@
 {
   "mcpServers": {
     "bottasker-tasky": {
-      "url": "https://api.bottasker.ai/mcp"
+      "type": "http",
+      "url": "https://api.bottasker.ai/mcp",
+      "oauth_resource": "https://api.bottasker.ai/mcp"
     }
   }
 }
