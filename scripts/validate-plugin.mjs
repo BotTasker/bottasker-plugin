@@ -12,6 +12,7 @@ const fail = (message) => {
 
 const codexManifest = readJson(path.join(plugin, '.codex-plugin', 'plugin.json'))
 const claudeManifest = readJson(path.join(plugin, '.claude-plugin', 'plugin.json'))
+const appManifest = readJson(path.join(plugin, '.app.json'))
 const codexMcp = readJson(path.join(plugin, '.mcp.json'))
 const claudeMcp = readJson(path.join(plugin, 'claude.mcp.json'))
 const changelog = fs.readFileSync(path.join(plugin, 'CHANGELOG.md'), 'utf8')
@@ -24,6 +25,11 @@ if (!fs.existsSync(path.join(plugin, 'README.md'))) fail('plugin README.md is mi
 
 if (codexManifest.name !== claudeManifest.name) fail('manifest names differ')
 if (codexManifest.version !== claudeManifest.version) fail('manifest versions differ')
+if (codexManifest.apps !== './.app.json') fail('Codex manifest must reference ./.app.json')
+const appId = appManifest.apps?.['bottasker-tasky']?.id
+if (typeof appId !== 'string' || !/^(?:asdk_app_|connector_|templated_apps_)[A-Za-z0-9_-]+$/.test(appId)) {
+  fail('bottasker-tasky App ID is missing or invalid')
+}
 const changelogVersion = changelog.match(/^##\s+(\d+\.\d+\.\d+)\s*$/m)?.[1]
 if (changelogVersion !== codexManifest.version) {
   fail(`latest changelog version ${changelogVersion || '<missing>'} does not match manifest ${codexManifest.version}`)

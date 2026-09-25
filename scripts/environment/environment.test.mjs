@@ -185,6 +185,8 @@ test('preparation preserves installations and canonical files', async (t) => {
     assert.deepEqual(Object.keys(readJson(path.join(generated, file)).mcpServers), ['bottasker-tasky-local'])
     assert.equal(readJson(path.join(generated, file)).mcpServers['bottasker-tasky-local'].url, environments.local.url)
   }
+  assert.equal(readJson(path.join(generated, '.codex-plugin/plugin.json')).apps, undefined)
+  assert.equal(fs.existsSync(path.join(generated, '.app.json')), false)
   assert.deepEqual(fs.readdirSync(path.join(generated, 'skills')), fs.readdirSync(path.join(f.root, 'plugins/bottasker-tasky/skills')))
 })
 

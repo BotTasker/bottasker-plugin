@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4
+
+- Linked the Codex plugin to the registered Tasky App so Codex can manage and display connected BotTasker accounts.
+- Kept the bundled MCP server and all Tasky skills available alongside the registered App.
+- Prevented generated local-development plugins from inheriting the production App registration.
+
 ## 0.2.3
 
 - Taught Tasky how to discover, configure, preserve, and verify optional human response timing on WhatsApp, Telegram, WebChat, Instagram, and Messenger Response outputs.

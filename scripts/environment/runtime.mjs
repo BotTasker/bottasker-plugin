@@ -106,6 +106,7 @@ export const buildLocalPlugin = (root) => {
   codexManifest.name = localPluginName
   codexManifest.version = localVersion
   codexManifest.description = `${codexManifest.description} Local development environment.`
+  delete codexManifest.apps
   codexManifest.interface = {
     ...codexManifest.interface,
     displayName: 'Tasky by BotTasker (Local)',
@@ -119,6 +120,7 @@ export const buildLocalPlugin = (root) => {
 
   writeJson(codexManifestPath, codexManifest)
   writeJson(claudeManifestPath, claudeManifest)
+  fs.rmSync(path.join(pluginTarget, '.app.json'), { force: true })
   writeJson(path.join(pluginTarget, '.mcp.json'), {
     mcpServers: {
       'bottasker-tasky-local': { url: localMcpUrl },
