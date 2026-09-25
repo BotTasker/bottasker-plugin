@@ -84,6 +84,21 @@ Safety rules:
 - Prefer `data_hub_archive_record` over `data_hub_delete_record`; use delete only when the user explicitly approves destructive removal.
 - For date and datetime fields, normalize values before writing: `YYYY-MM-DD` for `date`, preferred `YYYY-MM-DDTHH:mm` for `datetime`.
 
+## Conversation Read Workflow Nodes
+
+Discover the `Conversaciones` worker (`conversations-manager`) and use its read-only workflow actions when an automation needs customer-conversation context:
+
+- `find_conversations`: requires `identifier`; accepts `identifier_type` (`auto`, `phone`, `chat_id`, `contact_id`, `contact_handle`, or `contact_record_id`), optional `channel`, and `limit` 1-20.
+- `get_conversation`: requires `conversation_id` and returns a safe conversation summary.
+- `get_conversation_activity`: requires `conversation_id` and returns total/inbound/outbound/unread counts plus first and latest activity dates.
+- `get_recent_messages`: requires `conversation_id`; accepts `limit` 1-100, optional `direction`, `sender_type`, and an exclusive ISO 8601 `before` cursor. Messages are returned oldest-to-newest within the page.
+
+When the conversation ID is not already present in workflow input, place `find_conversations` first. If its output is ambiguous, branch to an explicit selection/review step or add a narrower channel/identifier condition; never map the first candidate automatically. Map the selected candidate ID into later nodes. For pagination, continue only when `hasMore` is true and map `nextBefore` into the next `before` input; every loop must have a hard page/run limit.
+
+These nodes inherit organization and `appId` from the workflow action instance and reject missing app scope. Do not map organization/app values from event payloads or user-controlled variables. The app role needs `conversations:read` and `messages:read`. The nodes are read-only and their message output excludes provider raw payloads, internal metadata, and attachment URLs.
+
+Do not use the agent-only `conversation_tools` action in workflows. It has `actionType: "mcp_bt"` and `ignore_in: ["workflow"]`; the four actions above use `actionType: "work"` and are the deterministic workflow surface.
+
 ## Yango Fleet Workflow Nodes
 
 When a workflow must interact with Yango Fleet:

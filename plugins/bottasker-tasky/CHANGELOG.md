@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- Added app-scoped conversation lookup, activity, and recent-message guidance for AI Agents and workflows.
+- Documented ambiguity handling, pagination, sanitization, and the separation between agent tools and workflow nodes.
+- Required every Tasky capability, skill, prompt, instruction, or agent-metadata change to increment the plugin patch version for Codex and Claude Code and to synchronize the internal DeepAgent prompts.
+
 ## 0.2.1
 
 - Distinguished expired pending consent from expiry of an authenticated access token.
