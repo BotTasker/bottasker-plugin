@@ -1,11 +1,11 @@
 ---
 name: bottasker-dashboard-architect
-description: Use when the user wants to design, create, improve, duplicate, or operate BotTasker dashboards for tracking, control, KPIs, operational monitoring, executive views, area-specific reporting, or data-backed decision making.
+description: Use when the user wants to design, create, improve, duplicate, share, secure, or operate BotTasker dashboards for tracking, control, KPIs, operational monitoring, executive views, area-specific reporting, public access, or data-backed decision making.
 ---
 
 # BotTasker Dashboard Architect
 
-Use this skill as the specialist for BotTasker dashboards. It owns dashboard strategy, useful KPI selection, source mapping, widget design, filters, layouts, area-specific views, and verification.
+Use this skill as the specialist for BotTasker dashboards. It owns dashboard strategy, useful KPI selection, source mapping, widget design, filters, layouts, area-specific views, public/restricted sharing, and verification.
 
 If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here after App Builder selects dashboards as part of the approved app blueprint.
 
@@ -33,7 +33,7 @@ Dashboards must help the user follow up, control, and decide. Avoid vanity dashb
 4. Read existing dashboards before writing:
    - `bt_dashboards_list`
    - `bt_dashboards_get` when modifying or duplicating.
-5. Build a dashboard blueprint with purpose, audience, KPIs, source models, filters, widgets, layout, risks, and pending questions.
+5. Build a dashboard blueprint with purpose, audience, KPIs, source models, filters, widgets, layout, public-access needs, risks, and pending questions.
 6. Show a visual blueprint and ask for approval before create/update/archive tools.
 7. After approval, create/update dashboards, preview/run widgets where available, then verify with read tools.
 
@@ -44,12 +44,13 @@ Before any write tool, show:
 - Mermaid diagram: source data -> transformations/filters -> dashboard views -> decisions/actions.
 - Dashboard catalog table: dashboard name, audience, purpose, refresh expectation, data sources, risks.
 - Widget matrix: widget title, question answered, source model/table, metric, dimensions, filters, chart type, drill-down target.
+- Access/security table when sharing is requested: intended audience, public or restricted mode, external-user handling, sensitive information, revocation owner, and verification plan.
 - Area split when useful: executive, operations, sales, finance, support, agents/workflows, data quality, or custom areas.
 - Pending decisions and assumptions.
 
 Keep this blueprint user-facing: do not include MCP tool names, action keys, worker keys, payload/schema labels, IDs, `Data Hub`, or `bt_*`/`mcp_*` identifiers. Describe product outcomes such as dashboard purpose, widgets, filters, metrics, and source models.
 
-Do not call create, update, duplicate, archive, remove, or broad configuration tools until the user explicitly approves the visual blueprint.
+Do not call create, update, duplicate, archive, remove, public-link, access-mode, or broad configuration tools until the user explicitly approves the visual blueprint. Public sharing always requires explicit approval even when the dashboard already exists.
 
 ## Dashboard Types
 
@@ -160,6 +161,51 @@ BotTasker dashboards can query conversations and messages directly from the curr
 4. Exercise the relevant drill-down and confirm that it stays within the same app and source dataset without revealing private message content.
 5. If the result is `stale`, refresh it and verify the new `generatedAt` and effective range. Do not report success from a cached, stale, ambiguous, or empty result unless an independently verified source count proves that zero is correct for that exact range and filters.
 
+## Public Dashboard Access
+
+Dashboards can be shared with people who are not signed in and do not have a BotTasker account. The public view is read-only: visitors may change the dashboard date range and refresh its data, but they cannot edit the dashboard, change widgets, or open internal modules and actions.
+
+Public sharing is a security-sensitive operation. Before enabling it:
+
+1. Read the exact dashboard and confirm its `appId` and intended audience.
+2. Review every visible title, metric, dimension, table field, filter, and empty/error state for confidential or identifying information.
+3. Explain the two access modes and ask the user to choose one explicitly.
+4. Confirm who owns future access reviews and link revocation.
+5. Obtain explicit approval before generating a link or changing its access mode.
+
+Access modes:
+
+- `public`: anyone who possesses the opaque link can open the dashboard without signing in. Treat the URL as a secret even though no access code is required.
+- `restricted`: the link opens a six-digit access-code challenge. Each allowed external person has an individual entry and code; successful verification creates a temporary browser session for that person. These entries do not create BotTasker user accounts.
+
+Restricted-access workflow:
+
+1. Set the dashboard to restricted mode.
+2. Add each external person with at least a name or email and preserve the returned code securely.
+3. Send the URL and code through separate trusted channels when the data is sensitive.
+4. Use update only for the person's label/contact data; do not imply that editing the entry rotates its code.
+5. Revoke a person to invalidate their current session without deleting the entry. Restore only after confirming access should resume. Delete the entry when access must be removed permanently.
+
+Link lifecycle:
+
+- Generating a new public link replaces the previous token and starts a new public-access configuration. Do not regenerate casually because the old link stops working and the prior restricted-user list is not carried forward.
+- Revoking the dashboard link disables external access and invalidates restricted sessions without deleting the dashboard.
+- Changing from restricted to public removes the code challenge for anyone holding the link. Treat that change as a new exposure decision and require explicit approval.
+- Never expose the link token, access codes, session tokens, query definitions, source credentials, tenant identifiers, or internal actions in a public summary or plan.
+
+### Execution And Verification
+
+Discover current dashboard public-access management capabilities before acting. If management tools are available, read the current settings first, apply only the approved change, and read them back. If no management tool is exposed, guide the user through Dashboard -> Compartir, explain the exact choices above, and do not claim that Tasky generated, changed, or revoked the link.
+
+Verify sharing end to end:
+
+1. Open the URL in an unauthenticated/incognito session and confirm no BotTasker login is required.
+2. Confirm the public page uses the readable light presentation, scrolls through the complete layout, and exposes only read-only controls.
+3. Confirm the date range and dashboard/widget refresh operations work without leaking authenticated-only navigation or actions.
+4. For restricted mode, reject an invalid code, accept the intended person's code, and confirm the session can load widget data.
+5. Revoke a test person or the whole link and confirm the existing session can no longer load the dashboard.
+6. Report the final mode, intended audience, verification result, and revocation owner without repeating secrets.
+
 ## Multi-Dashboard Strategy
 
 Create several dashboards when roles, decisions, or data cadence differ:
@@ -203,6 +249,7 @@ AI automation app:
 - Prefer read/preview/run tools before saving complex widget configs.
 - If dashboard schemas expose available fields, use exact field keys and enum values.
 - Ask before archive/delete/remove or replacing a dashboard layout.
+- Ask for explicit approval before generating, regenerating, revoking, or changing the mode of a public dashboard link, and before revoking or permanently deleting an allowed external person.
 - Do not expose credentials, tokens, API keys, raw secrets, or private message contents in dashboards.
 - Keep dashboards app-scoped with `appId`.
 
@@ -221,5 +268,7 @@ Use dashboard tools when available:
 - `bt_dashboards_run_widget`
 - `bt_dashboards_list_sources`
 - `bt_dashboards_list_available_fields`
+
+For public sharing, use `bt_mcp_find_tools` with the `dashboards` module and the exact sharing or access-management intent. Use only tools returned by live discovery; if none are exposed, provide the verified UI workflow from **Public Dashboard Access** instead of inventing a tool or simulating success.
 
 For app and source context use `bt_apps_list`, `bt_apps_get`, `bt_apps_list_modules`, `bt_data_hub_*`, `bt_dynamic_tables_*`, `bt_catalogs_*`, `bt_sales_carts_*`, `bt_conversations_*`, `bt_ai_agents_*`, and `bt_workflows_*` read tools as needed.
