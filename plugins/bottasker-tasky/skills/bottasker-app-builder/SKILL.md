@@ -17,7 +17,7 @@ The five required pillars are:
 
 1. Data model: define how information will be stored, including business objects, fields, status values, relations, required data, ownership references, timestamps, and whether the structure belongs in Base de datos (Data Hub), Dynamic Tables, Catalogs, Conversations, Calendar, Files, or another module.
 2. Data intake: define how information enters the app, including forms, AI agents, conversations, manual records, imports, workflows, integrations, catalog carts, calendar bookings, or other intake channels. Each intake path must map to the data model or to a concrete process action.
-3. Tracking and control: define how users will follow the app's process through dashboards, boards, status views, KPI widgets, filters, alerts, and operational summaries. Tracking views must answer what is happening, what is blocked, what needs action, and what changed over time.
+3. Tracking and control: define how users will follow the app's process through dashboards, boards, status views, KPI widgets, filters, alerts, and operational summaries. For each board, distinguish its permanent source scope from personal interactive filters. Tracking views must answer what is happening, what is blocked, what needs action, and what changed over time.
 4. Operational lifecycle: define how each case, record, request, lead, order, task, appointment, or conversation moves through the process. Include stages, transitions, handoffs, approvals if needed, deadlines, automation triggers, exception paths, and completion criteria.
 5. Daily work surfaces: define the screens and views users need to work every day without friction, including menu structure, primary lists, record detail views, quick actions, search, filters, buttons, forms, history/context, dashboards, boards, and conversation surfaces.
 
@@ -76,7 +76,7 @@ Before any write tool, App Builder must show a graphical blueprint:
 - Component table for modules, data structures, intake paths, agents, inputs, outputs, tools, tracking views, and daily work surfaces.
 - Data flow from intake to storage/action to tracking/output.
 - Operational lifecycle showing statuses, transitions, handoffs, automation points, exceptions, and completion.
-- Tracking plan for dashboards, boards, KPIs, status views, filters, and alerts.
+- Tracking plan for dashboards, boards, KPIs, status views, permanent board scopes, personal filters, and alerts.
 - Daily UX plan for menu groups, primary screens, detail views, quick actions, searches, filters, and context/history.
 - Configuration matrix for AI Agent items delegated to `bottasker-ai-agent-architect`.
 - Pending decisions and risks.
@@ -117,7 +117,7 @@ Use known module capabilities from `bt_apps_list_modules`:
 - When AI Agents are included, pass complete `dataContext` and `moduleContext` to `bottasker-ai-agent-architect`: appId, Base de datos (Data Hub) IDs, model IDs, fields, enums, relations, intended permissions, channels, dashboards, and conversation behavior.
 - When Catalogs/Sales Carts are included, pass complete catalog context to `bottasker-catalog-architect`: currency, categories, product types, variants, modifier groups, availability rules, channel visibility, and checkout requirements.
 - When Dashboards are included, pass complete reporting context to `bottasker-dashboard-architect`: appId, audience, decisions to support, Base de datos (Data Hub) models/tables, date fields, KPI candidates, status/category/owner dimensions, channels, agents/workflows, and required control loops.
-- When Boards are included, pass complete board context to `bottasker-board-architect`: appId, source module, source ids, group/status field, title/description/display fields, intended columns, detail view needs, button automations, public/restricted access needs, and security constraints.
+- When Boards are included, pass complete board context to `bottasker-board-architect`: appId, source module, source ids, group/status field, title/description/display fields, intended columns, permanent business scope conditions, expected personal filters, detail view needs, button automations, public/restricted access needs, and security constraints.
 - When Forms are included, pass complete form context to `bottasker-forms-architect`: appId, audience, purpose, public/private access, destination connector, Base de datos (Data Hub)/model/table/workflow ids, required target fields, intended mappings, confirmation behavior, and publication risk.
 
 ## Safety Rules

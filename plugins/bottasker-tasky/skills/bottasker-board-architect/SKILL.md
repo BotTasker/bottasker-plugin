@@ -1,11 +1,11 @@
 ---
 name: bottasker-board-architect
-description: Use when the user wants to design, create, configure, share, secure, or operate BotTasker boards, kanban/pipeline views, column push or sound alerts, board data sources, item detail views, board widgets, public board links, restricted access, board roles, board users, or button widgets that invoke automations.
+description: Use when the user wants to design, create, configure, filter, share, secure, or operate BotTasker boards, including permanent board scopes, kanban/pipeline views, column alerts, data sources, item detail views, widgets, public links, roles, users, or button automations.
 ---
 
 # BotTasker Board Architect
 
-Use this skill as the specialist for the BotTasker `boards` module. It owns board source design, columns, per-user column alerts, card fields, detail views, widgets, button automations, public/restricted access, permissions, file fields, and operational safety.
+Use this skill as the specialist for the BotTasker `boards` module. It owns board source design, permanent source scope, columns, per-user column alerts, card fields, detail views, widgets, button automations, public/restricted access, permissions, file fields, and operational safety.
 
 If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here after App Builder selects boards as part of the approved app blueprint.
 
@@ -29,7 +29,7 @@ If the user asks to create a complete app, route to `bottasker-app-builder` firs
 Before any write tool, show:
 
 - Mermaid diagram: source data -> board columns -> card fields -> detail view -> widgets/buttons -> automations/public access.
-- Source mapping table: source type, source id, groupByField, titleField, descriptionField, displayFields, filters.
+- Source mapping table: source type, source id, groupByField, titleField, descriptionField, displayFields, and permanent scope conditions shown as field/operator/value.
 - Column and card table: column ids/labels, hidden columns, card title/description/visible fields, create form fields.
 - Detail view table: widgets, layout intent, field bindings, button actions, automation trigger, response mode.
 - Access/security table: public mode, roles, users, global permissions, column permissions, sensitive fields excluded.
@@ -53,9 +53,49 @@ For source-backed boards:
 - `titleField` must be text-like and should identify the card quickly.
 - `descriptionField` is optional but should summarize why the card matters.
 - `displayFields` should be concise: owner, due date, priority, amount, customer, status, channel, or next action.
-- `filters` should narrow the operational scope when one source feeds multiple boards.
+- Permanent scope conditions should narrow the operational dataset when one source feeds multiple boards.
 
 If the source lacks a good status/group field, hand off to `bottasker-data-architect` before creating the board.
+
+## Permanent Board Scope
+
+A permanent board scope defines which source records belong to that board. Use it for requests such as “only Acme tickets”, “orders for the Lima branch”, or “open incidents created in the last 30 days”. This is source configuration, not a temporary viewer preference.
+
+Keep these concepts separate:
+
+- Permanent scope: stored in the board source configuration and enforced for every user, public view, count, column, item read, create/update/delete operation, workflow, and MCP call.
+- Personal/interactive filters: temporary toolbar filters used to investigate the already-scoped board. Never save them as board scope unless the user explicitly asks to change the board itself.
+- Access control: roles and permissions decide who may use the board. A scope condition is not a substitute for permissions.
+
+Scope rules:
+
+- Use typed rule arrays only; do not create legacy raw filter objects.
+- A board accepts up to 25 rules. All rules are combined with `AND`.
+- To express alternatives for one field, use one `in` rule with several values; do not model alternatives as separate rules because they would be combined with `AND`.
+- Use `createdAt` and `updatedAt` for system dates. Use `field:<exactTechnicalName>` for source fields.
+- Read `bt_boards_get_source_fields` before composing rules. Use select option values and relation record IDs, not display labels, unless the returned source definition says they are identical.
+- Text supports contains, not-contains, equals, not-equals, starts-with, ends-with, empty, and not-empty.
+- Numbers support equals, not-equals, greater/less comparisons, between, empty, and not-empty.
+- Dates support on, before, after, between, past/future relative-day windows, empty, and not-empty.
+- Booleans support true, false, empty, and not-empty.
+- Selects support equals, not-equals, `in`, `not_in`, empty, and not-empty.
+- Lists and multi-relations support contains-any, contains-all, not-contains, empty, and not-empty.
+- Scalar relations support equals, not-equals, `in`, `not_in`, empty, and not-empty.
+
+Before creating or changing scope:
+
+1. Read the board and source fields.
+2. Translate the business criterion into exact field/operator/value rules and show them in the visual blueprint.
+3. Check that the group, title, description, display, and form fields still make sense for the scoped dataset.
+4. Preserve the existing scope when updating other source settings unless the user explicitly approves changing or clearing it.
+5. After writing, read the board back and verify board data, totals, columns, and at least one in-scope item. When practical, confirm that a known out-of-scope item is absent.
+
+Creation and mutation behavior:
+
+- Deterministic rules such as equality, boolean true/false, or a single-value `in` are automatically applied to new cards and their fields are protected in board forms.
+- For non-deterministic rules such as amount greater than 100 or a date range, the submitted values must already satisfy the scope.
+- Do not attempt to edit or move a card in a way that changes a scoped field or takes it outside the board. Update the source record through the appropriate data workflow only when the user intends to change board membership.
+- A source update can make a record enter or leave the board; treat this as a realtime membership transition, not as data loss.
 
 ## Board Patterns
 
