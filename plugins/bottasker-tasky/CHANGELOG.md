@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.8
+
+- Taught Tasky how to design and create Base de datos `sequence` fields with flat MCP parameters, supported pattern variables, reset rules, timezone behavior, and verification steps.
+- Marked sequence values as server-generated and read-only so agents, workflows, forms, and record writes never attempt to supply them manually.
+
 ## 0.2.7
 
 - Removed the ineligible private App mapping from the active Codex package so it cannot suppress the bundled MCP server.
