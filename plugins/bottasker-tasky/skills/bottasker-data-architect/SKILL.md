@@ -46,6 +46,27 @@ The user-facing module name is **Base de datos**. At the service/API level it is
 - For expense-like models, a field named `fecha` should usually be `type: "date"` and its description must include `YYYY-MM-DD`.
 - Avoid deleting models, fields, relations, or records without confirmation.
 
+## Sequence Fields
+
+Use `type: "sequence"` when a model needs a server-generated identifier such as an order number, case code, ticket code, or human-readable consecutive reference. Do not emulate sequences with `number`, timestamps, workflows, or agent-generated text.
+
+- Create a sequence field with `bt_data_hub_create_field` and flat parameters. Never send `uiConfig` directly.
+- Configure it with:
+  - `sequencePattern`: literal text plus dynamic variables. It must contain exactly one `{SEQ}`.
+  - `sequenceDigits`: counter width from 1 to 12. The counter is left-padded with zeros and grows naturally after that width.
+  - `sequenceStartAt`: non-negative starting integer. Use `0` for a first suffix such as `000`.
+  - `sequenceReset`: `never`, `daily`, `monthly`, or `yearly`.
+  - `sequenceTimeZone`: optional IANA timezone such as `America/Lima`; omit it to use the organization timezone.
+- Supported pattern variables are `{SEQ}`, `{YYYY}`, `{YY}`, `{MM}`, `{DD}`, `{HH}`, `{mm}`, and `{ss}`. Other variables are invalid.
+- A `daily` reset pattern must include year, month, and day; a `monthly` pattern must include year and month; a `yearly` pattern must include a year. This prevents values from repeating after a reset.
+- Example: `sequencePattern: "PED-{DD}{MM}{YYYY}-{SEQ}"`, `sequenceDigits: 3`, `sequenceStartAt: 0`, `sequenceReset: "daily"` produces `PED-29092026-000`, then `PED-29092026-001`.
+- Sequence values are generated only by the backend when a new record is created. Never include the sequence field in `values` for `bt_data_hub_create_record` or `bt_data_hub_update_record`.
+- Treat sequence fields as generated and read-only in agent prompts, workflow mappings, forms, and handoff contexts. They may be displayed, searched, filtered, used as a record title, or returned to users after creation.
+- The backend enforces `unique: true` and `required: false`. Existing records remain empty; only newly created records receive a value.
+- Counters are independent per field. Reserved gaps may occur after failed downstream writes and are never reused.
+- A field cannot be converted to or from `sequence`. Create a new sequence field instead of changing an existing field type.
+- After creating the field, verify it with `bt_data_hub_list_fields`. When creating a sample record, omit the field from `values` and read the returned record to verify the generated value.
+
 ## Domain Modeling Pass
 
 Before creating or changing models, analyze the solution being built and produce a compact entity map:
@@ -79,7 +100,7 @@ When Base de datos (Data Hub) will be used by AI Agents, return a `dataContext` 
 
 - Base de datos (Data Hub) id/name.
 - Model ids/names and any `uniqueKeys`.
-- Field names, labels, types, required flags, `unique`, enums/options, date/time formats, sensitive flags, and relation targets.
+- Field names, labels, types, required flags, `unique`, enums/options, date/time formats, sequence configuration and generated/read-only status, sensitive flags, and relation targets.
 - Recommended least-privilege permissions per model, explicitly as a matrix for AI Agent DataHub tools: Leer (`read`), Crear (`create`), and Editar (`update`) for each model the agent may access; include `manage_schema` only for approved schema-admin agents.
 - Fields that should be hidden from agents.
 - Which model each agent tool should read or write.
@@ -100,7 +121,7 @@ When Base de datos (Data Hub) will be used by workflow automations, return a `da
 
 - `dataHubId` and Base de datos (Data Hub) name.
 - Model IDs/names for every workflow node that will search, create, update, or trigger.
-- Field names, labels, types, required/optional flags, enum/options, date/time formats, sensitive flags, and relation targets.
+- Field names, labels, types, required/optional flags, enum/options, date/time formats, sequence configuration and generated/read-only status, sensitive flags, and relation targets.
 - Which Base de datos (DataHub) events should trigger workflows: `record.created`, `record.updated`, `record.deleted`, `record.linked`, or `record.unlinked`. The current UI no longer offers `record.status_changed` for new configurations.
 - For `record.updated`, whether to filter by one property; if so, include its field ID, technical name, type, desired operator, and exact select/multiselect option values or other comparison target in `dataContext`. The Automation Engineer configures `updatedFieldCondition` for the workflow trigger.
 - Which workflow nodes should be used: `on_data_hub_event`, `data_hub_search_records`, `data_hub_get_record`, `data_hub_create_record`, `data_hub_update_record`, `data_hub_archive_record`, `data_hub_delete_record`, `data_hub_link_records`, `data_hub_unlink_records`, or `data_hub_list_record_links`.
@@ -113,7 +134,7 @@ For workflows, prefer `data_hub_search_records` or `data_hub_get_record` before 
 When a form will create Base de datos (Data Hub) records or write to Dynamic Tables, return a `formContext` that includes:
 
 - Base de datos (Data Hub) id/name, model ids/names, or Dynamic Table ids/names.
-- Target field names, labels, types, required flags, options, relation targets, and date/time formats.
+- Target field names, labels, types, required flags, options, relation targets, date/time formats, and generated sequence fields that forms must not expose or map.
 - Recommended form fields with stable keys and labels.
 - Required static mappings such as source, initial status, channel, stage, or priority.
 - Fields that should not be exposed in a public form.
