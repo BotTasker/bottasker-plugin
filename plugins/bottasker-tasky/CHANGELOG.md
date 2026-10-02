@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.12
+
+- Updated the Codex and Claude Code package versions together to track Tasky's first-app onboarding release.
+- The companion onboarding UI is implemented in BotTasker Web ([frontend PR #400](https://github.com/BotTasker/frontend-web/pull/400)): a generic first-app invitation, template selection on the existing creation screens, blue popovers with white text and letter-by-letter narration, a sequential wave across template cards, and a draggable mascot, pointer and popover.
+- The web guide asks for confirmation before closing, can be minimized and restored, and pauses while a user reviews template details without losing the current step or reading position.
+- After creating a Ventas B2C app, Tasky presents a short introduction inside Configurar app before showing its configuration steps.
+- This package update changes release metadata only. Skills, prompts, MCP configuration and runtime capabilities are unchanged; updating the plugin alone does not enable the web onboarding UI.
+
 ## 0.2.8
 
 - Taught Tasky how to design and create Base de datos `sequence` fields with flat MCP parameters, supported pattern variables, reset rules, timezone behavior, and verification steps.
