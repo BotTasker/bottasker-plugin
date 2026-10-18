@@ -15,3 +15,5 @@ jobs:
           node-version: 22
       - run: node scripts/validate-plugin.mjs
       - run: node --test scripts/environment/environment.test.mjs
+      - run: node --test scripts/codex-package.test.mjs
+      - run: node scripts/build-codex-package.mjs submission

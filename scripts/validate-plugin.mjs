@@ -14,6 +14,9 @@ const codexManifest = readJson(path.join(plugin, '.codex-plugin', 'plugin.json')
 const claudeManifest = readJson(path.join(plugin, '.claude-plugin', 'plugin.json'))
 const codexMcp = readJson(path.join(plugin, '.mcp.json'))
 const claudeMcp = readJson(path.join(plugin, 'claude.mcp.json'))
+const portableManifest = readJson(path.join(plugin, 'plugin.json'))
+const portableMcp = readJson(path.join(plugin, 'mcp.json'))
+const openai = portableManifest.extensions?.['com.openai']
 const changelog = fs.readFileSync(path.join(plugin, 'CHANGELOG.md'), 'utf8')
 
 for (const requiredFile of ['LICENSE', 'README.md', 'submission/listing.json']) {
@@ -24,6 +27,27 @@ if (!fs.existsSync(path.join(plugin, 'README.md'))) fail('plugin README.md is mi
 
 if (codexManifest.name !== claudeManifest.name) fail('manifest names differ')
 if (codexManifest.version !== claudeManifest.version) fail('manifest versions differ')
+for (const field of ['name', 'version', 'description', 'author', 'homepage', 'repository', 'license', 'keywords']) {
+  if (JSON.stringify(portableManifest[field]) !== JSON.stringify(codexManifest[field])) fail(`portable ${field} differs from Codex compatibility manifest`)
+}
+if (portableManifest.$schema !== 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json') fail('portable plugin schema is missing')
+if (portableMcp.$schema !== 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json') fail('portable MCP schema is missing')
+if (JSON.stringify(openai?.interface) !== JSON.stringify(codexManifest.interface)) fail('OpenAI interface metadata differs between manifests')
+for (const field of ['onboardingSkill', 'review']) {
+  if (JSON.stringify(openai?.[field]) !== JSON.stringify(codexManifest.extensions?.['com.openai']?.[field])) fail(`OpenAI ${field} differs between manifests`)
+}
+if (openai?.apps !== undefined) fail('canonical portable package must remain eligible for ZIP submission')
+if (openai?.onboardingSkill !== './skills/bottasker-connection-guide/SKILL.md' ||
+    !fs.existsSync(path.join(plugin, openai.onboardingSkill))) fail('onboarding must reference the packaged connection guide')
+const cases = openai?.review?.test_cases
+if (cases?.positive?.length !== 5 || cases?.negative?.length !== 3) fail('MCP review needs five positive and three negative cases')
+for (const [kind, entries] of Object.entries(cases || {})) {
+  for (const entry of entries) {
+    for (const field of ['description', 'prompt', 'expected_behavior', ...(kind === 'positive' ? ['tools_triggered'] : [])]) {
+      if (typeof entry[field] !== 'string' || !entry[field].trim()) fail(`${kind} review case is missing ${field}`)
+    }
+  }
+}
 if (codexManifest.apps !== undefined) fail('Codex manifest must not reference a private App while it is ineligible')
 if (fs.existsSync(path.join(plugin, '.app.json'))) fail('private .app.json must stay out of the active development package')
 if (codexManifest.mcpServers !== './.mcp.json') fail('Codex manifest must reference ./.mcp.json')
@@ -39,12 +63,22 @@ for (const [field, value] of Object.entries({
   website: codexManifest.interface?.websiteURL,
   privacy: codexManifest.interface?.privacyPolicyURL,
   terms: codexManifest.interface?.termsOfServiceURL,
+  support: codexManifest.interface?.supportURL,
 })) {
   try {
     if (new URL(value).protocol !== 'https:') fail(`${field} URL must use HTTPS`)
   } catch {
     fail(`${field} URL is invalid`)
   }
+}
+for (const field of ['displayName', 'shortDescription']) {
+  if (!codexManifest.interface?.[field] || codexManifest.interface[field].length > 30) fail(`${field} must contain 1–30 characters for public submission`)
+}
+const listing = readJson(path.join(root, 'submission', 'listing.json'))
+for (const [field, listingField] of Object.entries({
+  supportURL: 'support', privacyPolicyURL: 'privacyPolicy', termsOfServiceURL: 'termsOfService', shortDescription: 'shortDescription',
+})) {
+  if (listing[listingField] !== codexManifest.interface[field]) fail(`submission listing ${listingField} differs from the packaged metadata`)
 }
 
 for (const field of ['composerIcon', 'logo', 'logoDark']) {
@@ -62,6 +96,13 @@ for (const [label, server] of [
 const codexServer = codexMcp.mcpServers?.['bottasker-tasky']
 if (codexServer?.type !== 'http') fail('Codex MCP transport must be http')
 if (codexServer?.oauth_resource !== 'https://api.bottasker.ai/mcp') fail('Codex MCP OAuth resource is not canonical')
+const portableServer = portableMcp.mcpServers?.['bottasker-tasky']
+const auth = portableServer?.extensions?.['com.openai']?.auth
+if (Object.keys(portableMcp.mcpServers || {}).length !== 1 || portableServer?.type !== 'streamable-http' ||
+    portableServer?.url !== codexServer?.url) fail('portable transport and URL must match the hosted MCP')
+if (auth?.type !== 'oauth' || auth?.client?.mode !== 'cimd' || auth?.resource !== codexServer?.url ||
+    JSON.stringify(auth?.baseScopes) !== JSON.stringify(['mcp:read', 'mcp:write']) ||
+    JSON.stringify(auth?.defaultScopes) !== JSON.stringify(['mcp:read', 'mcp:write'])) fail('portable OAuth must prefer CIMD and request only safe initial scopes')
 
 for (const [label, config] of [['Codex', codexMcp], ['Claude', claudeMcp]]) {
   const serverNames = Object.keys(config.mcpServers || {})
