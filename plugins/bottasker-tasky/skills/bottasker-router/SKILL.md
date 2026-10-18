@@ -57,6 +57,7 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 - App creation, module enablement, menu structure, templates: use `bottasker-app-builder`.
 - Complete app design from natural language, including module selection and specialist delegation: use `bottasker-app-builder`.
 - Base de datos (Data Hub), models, fields, relations, records, Dynamic Tables: use `bottasker-data-architect`.
+- Clientes, CRM, prospects/leads, person/company records, contacts, interactions, tasks, segments, CSV imports and contextual client follow-up: use `bottasker-clients-architect`.
 - Catalogs, product categories, products, variants, modifier groups, product properties, availability, and sales carts: use `bottasker-catalog-architect`.
 - Dashboards, KPIs, tracking, control views, reporting, widget strategy, and area-specific dashboards: use `bottasker-dashboard-architect`.
 - Boards, kanban/pipeline views, permanent source scopes such as “only records for this client”, column alerts, board sources, card detail views, widgets, public/restricted sharing, roles, users, and button automations: use `bottasker-board-architect`.

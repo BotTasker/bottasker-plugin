@@ -3,7 +3,7 @@
   "developer": "BotTasker",
   "category": "Developer Tools",
   "shortDescription": "Build and operate BotTasker apps from Codex and Claude Code.",
-  "description": "Tasky combines guided skills with the hosted BotTasker MCP to create and operate apps, data models, workflows, dashboards, boards, forms, catalogs, AI agents, knowledge bases and communication modules. Users connect through OAuth and keep their existing BotTasker roles and organization boundaries.",
+  "description": "Tasky combines guided skills with the hosted BotTasker MCP to create and operate apps, native Clientes CRM and contextual AI follow-up, data models, workflows, dashboards, boards, forms, catalogs, AI agents, knowledge bases and communication modules. Users connect through OAuth and keep their existing BotTasker roles and organization boundaries.",
   "website": "https://bottasker.ai",
   "support": "https://bottasker.ai/contact",
   "privacyPolicy": "https://bottasker.ai/privacy",
