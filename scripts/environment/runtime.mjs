@@ -53,8 +53,8 @@ export const verifyCanonicalProduction = (root) => {
   }
   const portableServer = portable.mcpServers?.[productionPluginName]
   if (portableServer?.type !== 'streamable-http' || portableServer.url !== productionMcpUrl ||
-      portableServer.extensions?.['com.openai']?.auth?.resource !== productionMcpUrl) {
-    throw new Error('The portable MCP declaration must match the production OAuth resource')
+      Object.keys(portableServer).some((field) => !['type', 'url'].includes(field))) {
+    throw new Error('The portable MCP declaration must match the production endpoint and desktop transport format')
   }
 }
 
@@ -145,7 +145,6 @@ export const buildLocalPlugin = (root) => {
   const portableMcp = readJson(path.join(pluginTarget, 'mcp.json'))
   const portableServer = portableMcp.mcpServers[productionPluginName]
   portableServer.url = localMcpUrl
-  portableServer.extensions['com.openai'].auth.resource = localMcpUrl
   portableMcp.mcpServers = { [localPluginName]: portableServer }
   writeJson(path.join(pluginTarget, 'mcp.json'), portableMcp)
   fs.rmSync(path.join(pluginTarget, '.app.json'), { force: true })

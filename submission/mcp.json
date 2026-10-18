@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "bottasker-tasky": {
+      "type": "streamable-http",
+      "url": "https://api.bottasker.ai/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "oauth",
+            "client": {
+              "mode": "cimd"
+            },
+            "resource": "https://api.bottasker.ai/mcp",
+            "baseScopes": [
+              "mcp:read",
+              "mcp:write"
+            ],
+            "defaultScopes": [
+              "mcp:read",
+              "mcp:write"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

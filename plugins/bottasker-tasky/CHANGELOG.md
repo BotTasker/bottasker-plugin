@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.17
+
+- Fixed native Codex MCP loading: repository installations use a transport-only portable MCP declaration that the current desktop parser accepts. OAuth remains handled by native server discovery.
+- Kept explicit CIMD preference, resource and safe scopes in the submission MCP template, applied only to the portal submission package.
+- Added regression coverage for runtime/submission separation and Local environment preservation.
+
 ## 0.2.16
 
 - Added Spanish, Brazilian Portuguese, and English response guidance to all 15 skills, including explicit language changes, generated-content language, and preservation of technical values and existing data.

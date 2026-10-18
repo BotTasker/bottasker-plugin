@@ -40,6 +40,18 @@ export function buildPackage({ root = repository, profile = 'submission', plugin
   const compatibilityPath = path.join(target, '.codex-plugin', 'plugin.json')
   const manifest = readJson(manifestPath)
   const compatibility = readJson(compatibilityPath)
+  // The current desktop loader rejects per-server portable extensions. Keep
+  // native installs on OAuth discovery; the submission portal imports this
+  // explicit OAuth declaration instead.
+  if (profile === 'submission') {
+    const mcp = readJson(path.join(root, 'submission', 'mcp.json'))
+    const runtime = readJson(path.join(source, 'mcp.json'))
+    const server = mcp.mcpServers?.['bottasker-tasky']
+    if (server?.url !== runtime.mcpServers?.['bottasker-tasky']?.url) {
+      throw new Error('Submission MCP endpoint must match the runtime endpoint')
+    }
+    writeJson(path.join(target, 'mcp.json'), mcp)
+  }
   if (appId) {
     manifest.extensions['com.openai'].apps = './.app.json'
     compatibility.apps = './.app.json'

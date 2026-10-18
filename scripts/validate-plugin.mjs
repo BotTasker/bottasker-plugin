@@ -16,6 +16,7 @@ const codexMcp = readJson(path.join(plugin, '.mcp.json'))
 const claudeMcp = readJson(path.join(plugin, 'claude.mcp.json'))
 const portableManifest = readJson(path.join(plugin, 'plugin.json'))
 const portableMcp = readJson(path.join(plugin, 'mcp.json'))
+const submissionMcp = readJson(path.join(root, 'submission', 'mcp.json'))
 const openai = portableManifest.extensions?.['com.openai']
 const changelog = fs.readFileSync(path.join(plugin, 'CHANGELOG.md'), 'utf8')
 
@@ -119,12 +120,20 @@ const codexServer = codexMcp.mcpServers?.['bottasker-tasky']
 if (codexServer?.type !== 'http') fail('Codex MCP transport must be http')
 if (codexServer?.oauth_resource !== 'https://api.bottasker.ai/mcp') fail('Codex MCP OAuth resource is not canonical')
 const portableServer = portableMcp.mcpServers?.['bottasker-tasky']
-const auth = portableServer?.extensions?.['com.openai']?.auth
+const submissionServer = submissionMcp.mcpServers?.['bottasker-tasky']
+const auth = submissionServer?.extensions?.['com.openai']?.auth
 if (Object.keys(portableMcp.mcpServers || {}).length !== 1 || portableServer?.type !== 'streamable-http' ||
     portableServer?.url !== codexServer?.url) fail('portable transport and URL must match the hosted MCP')
+if (Object.keys(portableServer || {}).some((field) => !['type', 'url'].includes(field))) {
+  fail('runtime portable MCP must contain only transport and URL for desktop compatibility')
+}
+if (submissionMcp.$schema !== portableMcp.$schema || Object.keys(submissionMcp.mcpServers || {}).length !== 1 ||
+    submissionServer?.type !== portableServer?.type || submissionServer?.url !== portableServer?.url) {
+  fail('submission MCP must match the runtime portable endpoint')
+}
 if (auth?.type !== 'oauth' || auth?.client?.mode !== 'cimd' || auth?.resource !== codexServer?.url ||
     JSON.stringify(auth?.baseScopes) !== JSON.stringify(['mcp:read', 'mcp:write']) ||
-    JSON.stringify(auth?.defaultScopes) !== JSON.stringify(['mcp:read', 'mcp:write'])) fail('portable OAuth must prefer CIMD and request only safe initial scopes')
+    JSON.stringify(auth?.defaultScopes) !== JSON.stringify(['mcp:read', 'mcp:write'])) fail('submission OAuth must prefer CIMD and request only safe initial scopes')
 
 for (const [label, config] of [['Codex', codexMcp], ['Claude', claudeMcp]]) {
   const serverNames = Object.keys(config.mcpServers || {})

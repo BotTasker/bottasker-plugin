@@ -6,6 +6,8 @@ Tasky's skills follow the user's conversation in Spanish, Brazilian Portuguese o
 
 The standard package loads the hosted BotTasker MCP directly and declares the connection guide as its setup skill. A separate connected build links a personal registered app available to the current Codex account; linking an unavailable app can hide the bundled MCP from the plugin UI. Personal registration and button-based connection can be tested before public marketplace publication.
 
+Repository installations use native OAuth discovery and a transport-only portable MCP declaration compatible with the current desktop loader. The portal submission ZIP separately includes explicit OAuth registration, resource and scope settings; it is intended for upload to OpenAI rather than installation as a local desktop marketplace.
+
 After installing from the client plugin catalog, sign in to BotTasker, select an organization, and approve **Trabajo seguro**. No repository clone, terminal setup, environment variable, or API key is required.
 
 Codex and Claude Code renew the short-lived access token automatically with a rotating refresh token. A browser login should reappear only for the initial connection, permission elevation, revocation, or a terminal refresh-token failure. The initial browser consent must finish before Tasky-dependent work begins; an open or expired consent page is not an authenticated connection.

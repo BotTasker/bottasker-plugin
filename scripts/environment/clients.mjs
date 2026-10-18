@@ -76,7 +76,7 @@ export function createClient(client, root, run, {
               Object.keys(portableServers || {}).length !== 1 ||
               portableServers[name]?.type !== 'streamable-http' ||
               portableServers[name]?.url !== servers[name]?.url ||
-              portableServers[name]?.extensions?.['com.openai']?.auth?.resource !== servers[name]?.url) {
+              Object.keys(portableServers[name] || {}).some((field) => !['type', 'url'].includes(field))) {
             throw new Error('El manifiesto portable instalado no coincide con el entorno y OAuth del plugin')
           }
         }
