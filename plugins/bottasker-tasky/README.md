@@ -12,6 +12,8 @@ The initial connection includes reading, planning, and reversible writes allowed
 
 Authentication, permission, module, validation, and tool failures remain explicit errors. Tasky does not silently fall back to an API key or report simulated progress or success.
 
+The Clientes skill covers native client apps, prospects, contacts, history, tasks, segments, imports and contextual AI follow-up. Its canonical `bt_clients_*` tools are shared with in-app Tasky and require the companion backend release. Updating the plugin alone does not add tools to an older MCP server. Existing organization/app roles remain authoritative; configuration does not start retroactive campaigns.
+
 - Website: https://bottasker.ai
 - Support: https://bottasker.ai/contact
 - Privacy: https://bottasker.ai/privacy

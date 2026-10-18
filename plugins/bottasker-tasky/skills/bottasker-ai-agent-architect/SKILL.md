@@ -120,6 +120,10 @@ For each input/output/tool item, include:
 - Do not design Base de datos (Data Hub) models here. Request `bottasker-data-architect` output as `dataContext`.
 - Do not design dashboards, boards, forms, conversations, catalogs, files, or knowledge here. Request `bottasker-dashboard-architect` output for dashboard/control context, `bottasker-board-architect` output for board/source/widget/security context, `bottasker-forms-architect` output for form capture/submission/mapping context, `bottasker-knowledge-base-assistant` output for Knowledge Base context and agent knowledge tools, and `bottasker-ops-builder` output for other operational module context.
 
+## Native client follow-up
+
+For Clients capture, qualification, tasks or follow-up, load `bottasker-clients-architect` and use `moduleContext.clients`. Discover the native Clients tool and its real scope/options; enable **Usar el seguimiento con IA configurado** (`start_followup`) only when the approved design uses it. The backend injects follow-up instructions automatically; the app administrator does not paste another prompt. Preserve unrelated tool selections and channel Response items. App configuration, equipped capability and an individual client cycle are separate. Only one next task is pending, assigned to the resolved AI agent, and the next step is created after confirmed success. Do not enable a second simple agent follow-up or another timer for the same purpose. Later follow-up depends on conversation context; stop for completion, rejection, No contactar or human takeover.
+
 ## Agent Design Rules
 
 - Prefer one main coordinator agent plus focused subagents.

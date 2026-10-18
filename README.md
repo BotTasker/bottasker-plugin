@@ -1,6 +1,6 @@
 # Tasky by BotTasker
 
-Installable BotTasker plugin for Codex and Claude Code. It bundles 14 Tasky skills and connects them to the hosted BotTasker MCP so an authenticated user can design, create, inspect, and operate BotTasker apps.
+Installable BotTasker plugin for Codex and Claude Code. It bundles 15 Tasky skills and connects them to the hosted BotTasker MCP so an authenticated user can design, create, inspect, and operate BotTasker apps.
 
 > **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
@@ -268,6 +268,7 @@ claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-ta
 - `bottasker-router`: entrypoint and workflow router.
 - `bottasker-connection-guide`: OAuth sign-in, organization selection, scope elevation, explicit errors, reauthorization, and revocation.
 - `bottasker-app-builder`: complete app design, module selection, specialist handoffs, apps, modules, menus, and templates.
+- `bottasker-clients-architect`: native Clientes apps, prospects, contacts, states, fields, history, tasks, segments, import/export and contextual AI follow-up.
 - `bottasker-data-architect`: Base de datos (Data Hub) and Dynamic Tables.
 - `bottasker-ai-agent-architect`: AI Agents module specialist for agents, subagents, dynamic tools, tool schemas, inputs, and outputs inside an app.
 - `bottasker-knowledge-base-assistant`: Knowledge Base specialist for documents, URL/text sources, semantic queries, ingestion state, and Knowledge Base tools attached to agents.

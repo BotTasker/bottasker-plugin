@@ -1,7 +1,7 @@
 {
   "name": "bottasker-tasky",
   "displayName": "Tasky by BotTasker",
-  "version": "0.2.12",
+  "version": "0.2.14",
   "description": "Tasky helps create and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -29,7 +29,10 @@
     "ai-agents",
     "knowledge-base",
     "semantic-search",
-    "dynamic-tools"
+    "dynamic-tools",
+    "clients",
+    "crm",
+    "client-follow-up"
   ],
   "skills": "./skills/",
   "mcpServers": "./claude.mcp.json"

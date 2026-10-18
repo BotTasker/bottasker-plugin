@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Clients Architect"
+  short_description: "Build client apps and contextual AI follow-up."
+  brand_color: "#2563EB"
+  default_prompt: "Use $bottasker-clients-architect to build or configure a BotTasker app with Clientes and contextual AI follow-up."
+policy:
+  allow_implicit_invocation: true

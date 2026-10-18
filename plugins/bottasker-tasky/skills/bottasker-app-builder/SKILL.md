@@ -38,6 +38,7 @@ Roles and permissions are not a default pillar for this skill right now. Only in
 11. Create or update the app with `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, or approved staged tools from the implementation plan.
 12. Delegate module implementation to specialists after app creation:
    - `bottasker-data-architect` for Base de datos (Data Hub), models, relations, records, and Dynamic Tables.
+   - `bottasker-clients-architect` for native client/prospect identity, contacts, states, fields, history, tasks, segments, import/export and contextual AI follow-up.
    - `bottasker-catalog-architect` for catalogs, categories, products, variants, modifiers, availability, and sales carts.
    - `bottasker-dashboard-architect` for useful dashboards, KPIs, tracking, control views, widget strategy, and area-specific dashboard sets.
    - `bottasker-board-architect` for boards, sources, columns, cards, detail views, widgets, button automations, access mode when needed, and operational state tracking.
@@ -88,6 +89,7 @@ Do not create apps, modules, Base de datos workspaces (Data Hub service), agents
 Use known module capabilities from `bt_apps_list_modules`:
 
 - Base de datos (Data Hub): durable models, fields, relations, records, and structured app data.
+- Clientes: native people/companies, prospects, contacts, interactions, commercial states, custom fields, tasks, views/segments, imports and contextual AI follow-up. Prefer it over duplicating a CRM in Base de datos.
 - Dynamic Tables: simpler table-style operational records.
 - AI Agents: agent workspaces, subagents, tools, and autonomous behavior inside the app.
 - Workflows: deterministic automation graphs, edges, tests, and runs.
@@ -115,6 +117,7 @@ Use known module capabilities from `bt_apps_list_modules`:
 - Do not let a module specialist create unrelated app-level resources.
 - If the user asks for "crear una app", App Builder remains in control until the app blueprint is approved.
 - When AI Agents are included, pass complete `dataContext` and `moduleContext` to `bottasker-ai-agent-architect`: appId, Base de datos (Data Hub) IDs, model IDs, fields, enums, relations, intended permissions, channels, dashboards, and conversation behavior.
+- When Clientes is included, load `bottasker-clients-architect` and pass `moduleContext.clients`: appId, actual states/default, fields/privacy, capture and duplicate rules, contacts/ownership, approved follow-up configuration and agent-tool scope. Use Base de datos only for additional business entities; confirm real integration/reporting sources before promising cross-module links.
 - When Catalogs/Sales Carts are included, pass complete catalog context to `bottasker-catalog-architect`: currency, categories, product types, variants, modifier groups, availability rules, channel visibility, and checkout requirements.
 - When Dashboards are included, pass complete reporting context to `bottasker-dashboard-architect`: appId, audience, decisions to support, Base de datos (Data Hub) models/tables, date fields, KPI candidates, status/category/owner dimensions, channels, agents/workflows, and required control loops.
 - When Boards are included, pass complete board context to `bottasker-board-architect`: appId, source module, source ids, group/status field, title/description/display fields, intended columns, permanent business scope conditions, expected personal filters, detail view needs, button automations, public/restricted access needs, and security constraints.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.14
+
+- Fixed the companion in-app Tasky runtime so an explicitly closed execution phase is not rejected as a progress-only final reply. Verified writes and the real completed/partial/blocked/failed phase result survive without replaying write tools.
+- This companion Core fix supports multi-phase creation and configuration of native Clientes apps; the shared skill instructions and client permissions remain unchanged.
+
+## 0.2.13
+
+- Added the Clientes specialist for building apps around native prospects, contacts, states, custom fields, history, tasks, segments, imports and contextual AI follow-up.
+- Connected Clients routing with App Builder and AI Agent Architect; the equipped Clients tool automatically supplies follow-up instructions without an extra administrator prompt.
+- The companion Core change exposes app-scoped Clients tools through the canonical MCP authorization/approval chain and synchronizes the internal Tasky prompt. It preserves one next pending task, contextual stop/reply rules and non-retroactive activation.
+
 ## 0.2.12
 
 - Updated the Codex and Claude Code package versions together to track Tasky's first-app onboarding release.

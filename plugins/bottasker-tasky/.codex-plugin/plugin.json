@@ -1,6 +1,6 @@
 {
   "name": "bottasker-tasky",
-  "version": "0.2.12",
+  "version": "0.2.14",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -29,14 +29,17 @@
     "knowledge-base",
     "semantic-search",
     "whatsapp-templates",
-    "dynamic-tools"
+    "dynamic-tools",
+    "clients",
+    "crm",
+    "client-follow-up"
   ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Tasky by BotTasker",
     "shortDescription": "Create and operate BotTasker apps with Tasky and MCP tools.",
-    "longDescription": "Tasky Assistant gives Codex guided skills for creating apps, Base de datos modules (Data Hub service), catalogs, products, carts, useful dashboards for tracking and control, boards with per-user push/sound alerts, secure sharing and automation buttons, Meta-compatible WhatsApp templates, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
+    "longDescription": "Tasky Assistant gives Codex guided skills for creating apps, Base de datos modules (Data Hub service), native Clientes CRM with contacts, history, tasks and contextual AI follow-up, catalogs, products, carts, useful dashboards for tracking and control, boards with per-user push/sound alerts, secure sharing and automation buttons, Meta-compatible WhatsApp templates, AI agents, subagents, dynamic tools, workflows, and operational modules through the BotTasker external MCP.",
     "developerName": "BotTasker",
     "category": "Developer Tools",
     "capabilities": [
