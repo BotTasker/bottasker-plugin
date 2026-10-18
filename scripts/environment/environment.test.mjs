@@ -201,15 +201,15 @@ test('preparation preserves installations and canonical files', async (t) => {
   assert.deepEqual(Object.keys(portableMcp.mcpServers), ['bottasker-tasky-local'])
   assert.equal(portableMcp.mcpServers['bottasker-tasky-local'].type, 'streamable-http')
   assert.equal(portableMcp.mcpServers['bottasker-tasky-local'].url, environments.local.url)
-  assert.equal(portableMcp.mcpServers['bottasker-tasky-local'].extensions['com.openai'].auth.resource, environments.local.url)
+  assert.equal(portableMcp.mcpServers['bottasker-tasky-local'].extensions, undefined)
   assert.deepEqual(fs.readdirSync(path.join(generated, 'skills')), fs.readdirSync(path.join(f.root, 'plugins/bottasker-tasky/skills')))
 })
 
-test('portable PROD resource mismatch aborts local preparation before writing', (t) => {
+test('portable PROD endpoint mismatch aborts local preparation before writing', (t) => {
   const f = fixture(t)
   const file = path.join(f.root, 'plugins/bottasker-tasky/mcp.json')
   const mcp = readJson(file)
-  mcp.mcpServers['bottasker-tasky'].extensions['com.openai'].auth.resource = environments.local.url
+  mcp.mcpServers['bottasker-tasky'].url = environments.local.url
   writeJson(file, mcp)
   assert.throws(() => buildLocalPlugin(f.root), /portable MCP/)
   assert.equal(fs.existsSync(path.join(f.root, '.tasky-runtime')), false)

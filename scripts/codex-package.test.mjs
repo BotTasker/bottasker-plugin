@@ -31,6 +31,9 @@ test('submission ZIP contains skills, OAuth, legal metadata and onboarding, with
   assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 15)
   assert.ok(!entries.some((entry) => /\.app\.json|\.env|hooks\/|\.tasky-runtime/.test(entry)))
   const manifest = readJson(path.join(result.plugin, 'plugin.json'))
+  assert.equal(manifest.extensions['com.openai'].review.demo_recording_url, 'https://youtu.be/GE1NGw_v7jc')
+  assert.deepEqual(manifest.extensions['com.openai'].review,
+    readJson(path.join(result.plugin, '.codex-plugin/plugin.json')).extensions['com.openai'].review)
   const publication = manifest.extensions['com.openai'].publication
   assert.deepEqual(Object.keys(publication.translations).sort(), ['en-US', 'es-PE', 'pt-BR'])
   assert.deepEqual(publication, readJson(path.join(result.plugin, '.codex-plugin/plugin.json')).extensions['com.openai'].publication)
@@ -55,6 +58,60 @@ test('connected package uses only the supplied registered app and leaves canonic
     readJson(path.join(root, 'plugins/bottasker-tasky/plugin.json')).extensions['com.openai'].publication)
   assert.equal(fs.readFileSync(path.join(root, 'plugins/bottasker-tasky/plugin.json'), 'utf8'), original)
   assert.equal(fs.existsSync(path.join(root, 'plugins/bottasker-tasky/.app.json')), false)
+  assert.equal(readJson(path.join(result.plugin, 'plugin.json')).extensions['com.openai'].review.demo_recording_url,
+    'https://youtu.be/GE1NGw_v7jc')
+  assert.deepEqual(readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky'], {
+    type: 'streamable-http', url: 'https://api.bottasker.ai/mcp',
+  })
+})
+
+for (const video of [undefined, '', 'http://example.com/demo', 'https://user:password@example.com/demo']) {
+  test(`validator rejects missing or unsafe demo recording URL: ${video ?? 'missing'}`, (t) => {
+    const root = fixture(t)
+    const file = path.join(root, 'plugins/bottasker-tasky/plugin.json')
+    const manifest = readJson(file)
+    manifest.extensions['com.openai'].review.demo_recording_url = video
+    fs.writeFileSync(file, JSON.stringify(manifest))
+    const result = spawnSync(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')], { encoding: 'utf8' })
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /demo recording URL/)
+  })
+}
+
+test('repository runtime stays desktop-compatible while submission preserves explicit OAuth settings', (t) => {
+  const root = fixture(t)
+  const runtime = readJson(path.join(root, 'plugins/bottasker-tasky/mcp.json'))
+  assert.deepEqual(runtime.mcpServers['bottasker-tasky'], {
+    type: 'streamable-http', url: 'https://api.bottasker.ai/mcp',
+  })
+  const result = buildPackage({ root })
+  const server = readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky']
+  assert.equal(server.url, runtime.mcpServers['bottasker-tasky'].url)
+  assert.deepEqual(server.extensions['com.openai'].auth, {
+    type: 'oauth', client: { mode: 'cimd' }, resource: server.url,
+    baseScopes: ['mcp:read', 'mcp:write'], defaultScopes: ['mcp:read', 'mcp:write'],
+  })
+  assert.deepEqual(readJson(path.join(root, 'plugins/bottasker-tasky/mcp.json')), runtime)
+})
+
+test('validator rejects runtime extensions rejected by the native desktop MCP loader', (t) => {
+  const root = fixture(t)
+  const file = path.join(root, 'plugins/bottasker-tasky/mcp.json')
+  const mcp = readJson(file)
+  mcp.mcpServers['bottasker-tasky'].extensions = { 'com.openai': { auth: { type: 'oauth' } } }
+  fs.writeFileSync(file, JSON.stringify(mcp))
+  const result = spawnSync(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')], { encoding: 'utf8' })
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /desktop compatibility/)
+})
+
+test('submission packaging rejects an OAuth template pointing at another environment', (t) => {
+  const root = fixture(t)
+  const file = path.join(root, 'submission/mcp.json')
+  const mcp = readJson(file)
+  mcp.mcpServers['bottasker-tasky'].url = 'http://localhost:3200/mcp'
+  fs.writeFileSync(file, JSON.stringify(mcp))
+  assert.throws(() => buildPackage({ root }), /Submission MCP endpoint/)
 })
 
 for (const [label, mutate] of [
@@ -86,13 +143,13 @@ test('invalid profile and missing or invented app identifiers fail before creati
   assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
 })
 
-test('validator rejects a portable declaration that silently points Local at PROD', (t) => {
+test('validator rejects a submission OAuth resource pointing at the wrong environment', (t) => {
   const root = fixture(t)
-  const file = path.join(root, 'plugins/bottasker-tasky/mcp.json')
+  const file = path.join(root, 'submission/mcp.json')
   const mcp = readJson(file)
   mcp.mcpServers['bottasker-tasky'].extensions['com.openai'].auth.resource = 'http://localhost:3200/mcp'
   fs.writeFileSync(file, JSON.stringify(mcp))
   const result = spawnSync(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')], { encoding: 'utf8' })
   assert.equal(result.status, 1)
-  assert.match(result.stderr, /portable OAuth/)
+  assert.match(result.stderr, /submission OAuth/)
 })

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.18
+
+- Added the demonstration video URL to the portable and Codex review manifests: https://youtu.be/GE1NGw_v7jc.
+- Retained English, Spanish and Brazilian Portuguese guidance and listing translations, and the 0.2.17 native Codex MCP loading correction.
+- Added video URL validation and submission/connected packaging checks so future packages preserve the reviewer link.
+- Added a review PDF with a clickable demonstration link and release details.
+
+## 0.2.17
+
+- Fixed native Codex MCP loading: repository installations use a transport-only portable MCP declaration that the current desktop parser accepts. OAuth remains handled by native server discovery.
+- Kept explicit CIMD preference, resource and safe scopes in the submission MCP template, applied only to the portal submission package.
+- Added regression coverage for runtime/submission separation and Local environment preservation.
+
 ## 0.2.16
 
 - Added Spanish, Brazilian Portuguese, and English response guidance to all 15 skills, including explicit language changes, generated-content language, and preservation of technical values and existing data.
