@@ -4,6 +4,14 @@ Installable BotTasker plugin for Codex and Claude Code. It bundles 15 Tasky skil
 
 > **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
+## Languages
+
+Tasky's 15 skills include guidance for Spanish, Brazilian Portuguese and English. They follow an explicitly requested response language or the user's current request, retaining the established preference for ambiguous short messages. Plans, questions, confirmations and summaries follow that language. Generated content can use a separately requested language; changing the conversation language does not authorize translating existing records. Tool identifiers, payload keys, enum values and error codes keep their exact values.
+
+The submission includes listing translations for `en-US`, `es-PE` and `pt-BR`, with English in the base listing fields. Both manifests and package profiles retain these translations. OpenAI currently imports and retains translations without changing visible directory text or listing API responses; see [Translate listing text](https://developers.openai.com/plugins/deploy/submission#translate-listing-text).
+
+These changes apply to the packaged assistant guidance and listing metadata. BotTasker's login/consent pages and other web UI use their own application translations. Language switching should be evaluated with the scenarios in `submission/review-matrix.md`; packaging checks do not prove model output quality.
+
 ## Native app connection in Codex
 
 Tasky can be tested as a personal connected plugin before public marketplace publication. The registered app supplies the host's connection/account buttons; bundled skills supply Tasky's workflows. A custom HTML widget is optional and does not create those authentication controls.

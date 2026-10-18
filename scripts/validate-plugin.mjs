@@ -33,8 +33,29 @@ for (const field of ['name', 'version', 'description', 'author', 'homepage', 're
 if (portableManifest.$schema !== 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json') fail('portable plugin schema is missing')
 if (portableMcp.$schema !== 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json') fail('portable MCP schema is missing')
 if (JSON.stringify(openai?.interface) !== JSON.stringify(codexManifest.interface)) fail('OpenAI interface metadata differs between manifests')
-for (const field of ['onboardingSkill', 'review']) {
+for (const field of ['onboardingSkill', 'review', 'publication']) {
   if (JSON.stringify(openai?.[field]) !== JSON.stringify(codexManifest.extensions?.['com.openai']?.[field])) fail(`OpenAI ${field} differs between manifests`)
+}
+const translations = openai?.publication?.translations
+if (!openai?.publication?.release_notes?.trim()) fail('publication release notes are missing')
+for (const locale of ['en-US', 'es-PE', 'pt-BR']) {
+  const translation = translations?.[locale]
+  if (!translation || typeof translation !== 'object') {
+    fail(`missing translation for ${locale}`)
+    continue
+  }
+  for (const [field, limit] of [['subtitle', 30], ['description', 4000]]) {
+    const value = translation[field]
+    if (typeof value !== 'string' || !value.trim() || value.length > limit ||
+        /[\u0000-\u0009\u000B-\u001F\u007F]/u.test(value) ||
+        (field === 'subtitle' && /[\r\n]/u.test(value))) {
+      fail(`${locale} translation ${field} must contain supported text within ${limit} characters`)
+    }
+  }
+}
+if (translations?.['en-US']?.subtitle !== codexManifest.interface?.shortDescription ||
+    translations?.['en-US']?.description !== codexManifest.interface?.longDescription) {
+  fail('English translation must match the base English listing')
 }
 if (openai?.apps !== undefined) fail('canonical portable package must remain eligible for ZIP submission')
 if (openai?.onboardingSkill !== './skills/bottasker-connection-guide/SKILL.md' ||
@@ -76,10 +97,11 @@ for (const field of ['displayName', 'shortDescription']) {
 }
 const listing = readJson(path.join(root, 'submission', 'listing.json'))
 for (const [field, listingField] of Object.entries({
-  supportURL: 'support', privacyPolicyURL: 'privacyPolicy', termsOfServiceURL: 'termsOfService', shortDescription: 'shortDescription',
+  supportURL: 'support', privacyPolicyURL: 'privacyPolicy', termsOfServiceURL: 'termsOfService', shortDescription: 'shortDescription', longDescription: 'description',
 })) {
   if (listing[listingField] !== codexManifest.interface[field]) fail(`submission listing ${listingField} differs from the packaged metadata`)
 }
+if (JSON.stringify(listing.translations) !== JSON.stringify(translations)) fail('submission listing translations differ from the packaged metadata')
 
 for (const field of ['composerIcon', 'logo', 'logoDark']) {
   const relativePath = codexManifest.interface?.[field]

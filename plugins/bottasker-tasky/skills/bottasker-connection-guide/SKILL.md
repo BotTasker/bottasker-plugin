@@ -7,6 +7,10 @@ description: Use when connecting Tasky to BotTasker, selecting an organization, 
 
 Use the client's native OAuth flow. The normal connection requires only installing Tasky, signing in to BotTasker, selecting an organization, and approving the requested access. Never ask a nontechnical user to copy an API key, configure an environment variable, clone a repository, or edit an MCP configuration file.
 
+## Response language
+
+Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
+
 ## Permission Model
 
 - `mcp:read` allows reading and planning.

@@ -9,6 +9,10 @@ Use this skill as the app-level solution architect. It owns the complete app blu
 
 Module specialists do not own the full app design. They implement their module inside the app after App Builder decides that module is needed.
 
+## Response language
+
+Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
+
 ## App Experience Architecture
 
 App Builder must think at the complete app experience level, not only at the module-selection level. Before proposing a solution, identify whether the request leaves critical ambiguity in any of these five pillars. If a pillar is unclear and the app design would materially change depending on the answer, ask concise clarification questions before presenting the blueprint.
