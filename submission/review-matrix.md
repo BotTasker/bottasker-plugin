@@ -4,6 +4,10 @@ Build the public submission ZIP with `node scripts/build-codex-package.mjs submi
 
 For private connected-app acceptance, use the exact personal `plugin_asdk_app_…` identifier and `node scripts/build-codex-package.mjs connected --plugin-id=<id>`. This package is for account-aware local testing and must not be uploaded as the public submission ZIP.
 
+## Demonstration recording
+
+[Tasky demonstration video](https://youtu.be/GE1NGw_v7jc) is declared in both manifests at `extensions.com.openai.review.demo_recording_url` and retained by both package profiles. The supplementary PDF is `output/pdf/tasky-review.pdf`; the portal imports the URL from the ZIP manifest. The link is supplied by the publisher; language acceptance results must still be recorded separately.
+
 ## Native Codex acceptance
 
 - Confirm the personal app is visible to the same Codex account/workspace; public publication is not a prerequisite.
@@ -56,5 +60,4 @@ Run the same functional cases with the demo account in Spanish, Brazilian Portug
 - Verified OpenAI and Anthropic publisher accounts.
 - Temporary reviewer account and organization.
 - Final catalog screenshots captured from the production OAuth flow.
-- A reviewer-accessible demonstration recording.
 - Country availability and policy attestations entered in each submission portal.

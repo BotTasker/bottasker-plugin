@@ -62,6 +62,15 @@ if (openai?.apps !== undefined) fail('canonical portable package must remain eli
 if (openai?.onboardingSkill !== './skills/bottasker-connection-guide/SKILL.md' ||
     !fs.existsSync(path.join(plugin, openai.onboardingSkill))) fail('onboarding must reference the packaged connection guide')
 const cases = openai?.review?.test_cases
+try {
+  const value = openai?.review?.demo_recording_url
+  const url = new URL(value)
+  if (typeof value !== 'string' || /\s/u.test(value) || url.protocol !== 'https:' || url.username || url.password) {
+    fail('review demo recording URL must be a public HTTPS URL without credentials')
+  }
+} catch {
+  fail('review demo recording URL is missing or invalid')
+}
 if (cases?.positive?.length !== 5 || cases?.negative?.length !== 3) fail('MCP review needs five positive and three negative cases')
 for (const [kind, entries] of Object.entries(cases || {})) {
   for (const entry of entries) {

@@ -297,7 +297,9 @@ The last command creates a ZIP under `.tasky-runtime/packages/`, containing the 
 
 Repository and connected installs use a transport-only `mcp.json` with native OAuth discovery. The current Codex desktop parser rejects per-server `extensions` in that file and otherwise drops the server. The portal submission build replaces it with `submission/mcp.json`, which contains the explicit OAuth configuration required for importing the connection settings. Use the submission ZIP for the portal, not as a desktop test marketplace. Keep both endpoints aligned; validation rejects a mismatched submission endpoint or unsafe initial scopes.
 
-These checks verify packaging and environment isolation. They do not establish OpenAI approval, a registered app's eligibility, successful end-user OAuth, or every live tool's behavior. Five positive and three negative reviewer scenarios are included in the manifest; reviewer access, domain verification, a demo recording, and actual evaluation results must still be supplied.
+Demonstration video: [Tasky walkthrough](https://youtu.be/GE1NGw_v7jc). The submission imports it from `extensions.com.openai.review.demo_recording_url`; the PDF under `output/pdf/tasky-review.pdf` is a supplementary review sheet. Regenerate it with `python3 scripts/build-review-pdf.py` (requires ReportLab).
+
+These checks verify packaging and environment isolation. They do not establish OpenAI approval, a registered app's eligibility, successful end-user OAuth, or every live tool's behavior. Five positive and three negative reviewer scenarios and the demonstration URL are included in the manifest. Reviewer credentials, domain verification, and actual evaluation results remain separate submission requirements.
 
 For Claude Code:
 
