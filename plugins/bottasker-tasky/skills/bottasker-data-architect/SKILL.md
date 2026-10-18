@@ -7,6 +7,10 @@ description: Use when the user wants to design Base de datos module (Data Hub se
 
 Use this skill to build durable data structures for BotTasker apps.
 
+## Response language
+
+Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
+
 ## Naming
 
 The user-facing module name is **Base de datos**. At the service/API level it is still the Data Hub module, so keep technical identifiers such as `data-hub`, `data_hub`, `dataHubId`, and `bt_data_hub_*` unchanged.

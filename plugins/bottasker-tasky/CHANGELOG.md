@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.16
+
+- Added Spanish, Brazilian Portuguese, and English response guidance to all 15 skills, including explicit language changes, generated-content language, and preservation of technical values and existing data.
+- Added `en-US`, `es-PE`, and `pt-BR` listing translations and release notes to the portable and Codex compatibility manifests.
+- Added validation for translated subtitles, descriptions and manifest parity, and verified that both package profiles retain the translations.
+- Kept the English base listing required by OpenAI. Imported translations are retained in the ZIP; their display in the public directory is controlled by OpenAI.
+- The submission video URL remains pending until an actual reviewer-accessible recording is supplied.
+
 ## 0.2.15
 
 - Added the portable Agent Plugins manifest and Streamable HTTP MCP configuration alongside the supported Codex and Claude compatibility files.

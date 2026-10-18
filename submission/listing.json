@@ -3,7 +3,7 @@
   "developer": "BotTasker",
   "category": "Developer Tools",
   "shortDescription": "Build and run BotTasker apps",
-  "description": "Tasky combines guided skills with the hosted BotTasker MCP to create and operate apps, native Clientes CRM and contextual AI follow-up, data models, workflows, dashboards, boards, forms, catalogs, AI agents, knowledge bases and communication modules. Users connect through OAuth and keep their existing BotTasker roles and organization boundaries.",
+  "description": "Tasky helps you design, create, inspect, and operate BotTasker apps through guided skills and secure OAuth tools. Work with data models, Clients CRM, dashboards, kanban boards, forms, catalogs, AI agents, knowledge bases, and workflows while preserving your organization and role permissions. Tasky follows your conversation in English, Spanish, or Brazilian Portuguese and uses the language you request for generated content.",
   "website": "https://bottasker.ai",
   "support": "https://bottasker.ai/es/contacto/",
   "privacyPolicy": "https://bottasker.ai/es/politica-privacidad/",
@@ -14,5 +14,19 @@
     "Diseña una app de seguimiento de ventas con tablero, Base de datos y dashboard.",
     "Crea un borrador de plantilla de WhatsApp para confirmar una cita.",
     "Revisa este proceso y propón qué pasos conviene automatizar."
-  ]
+  ],
+  "translations": {
+    "en-US": {
+      "subtitle": "Build and run BotTasker apps",
+      "description": "Tasky helps you design, create, inspect, and operate BotTasker apps through guided skills and secure OAuth tools. Work with data models, Clients CRM, dashboards, kanban boards, forms, catalogs, AI agents, knowledge bases, and workflows while preserving your organization and role permissions. Tasky follows your conversation in English, Spanish, or Brazilian Portuguese and uses the language you request for generated content."
+    },
+    "es-PE": {
+      "subtitle": "Crea y gestiona apps BotTasker",
+      "description": "Tasky te ayuda a diseñar, crear, consultar y gestionar apps de BotTasker mediante skills guiadas y herramientas con conexión OAuth segura. Trabaja con modelos de datos, CRM de Clientes, dashboards, tableros kanban, formularios, catálogos, agentes de IA, bases de conocimiento y flujos de trabajo, respetando los permisos de tu organización y rol. Tasky sigue tu conversación en español, portugués de Brasil o inglés y utiliza el idioma que solicites para el contenido generado."
+    },
+    "pt-BR": {
+      "subtitle": "Crie e gerencie apps BotTasker",
+      "description": "O Tasky ajuda você a planejar, criar, consultar e gerenciar apps do BotTasker com skills guiadas e ferramentas conectadas por OAuth seguro. Trabalhe com modelos de dados, CRM de Clientes, dashboards, quadros kanban, formulários, catálogos, agentes de IA, bases de conhecimento e fluxos de trabalho, respeitando as permissões da sua organização e do seu perfil. O Tasky acompanha a conversa em português do Brasil, espanhol ou inglês e usa o idioma solicitado para o conteúdo gerado."
+    }
+  }
 }

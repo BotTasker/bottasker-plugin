@@ -31,6 +31,10 @@ test('submission ZIP contains skills, OAuth, legal metadata and onboarding, with
   assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 15)
   assert.ok(!entries.some((entry) => /\.app\.json|\.env|hooks\/|\.tasky-runtime/.test(entry)))
   const manifest = readJson(path.join(result.plugin, 'plugin.json'))
+  const publication = manifest.extensions['com.openai'].publication
+  assert.deepEqual(Object.keys(publication.translations).sort(), ['en-US', 'es-PE', 'pt-BR'])
+  assert.deepEqual(publication, readJson(path.join(result.plugin, '.codex-plugin/plugin.json')).extensions['com.openai'].publication)
+  assert.equal(publication.translations['en-US'].description, manifest.extensions['com.openai'].interface.longDescription)
   assert.equal(manifest.extensions['com.openai'].apps, undefined)
   assert.ok(fs.existsSync(path.join(result.plugin, manifest.extensions['com.openai'].onboardingSkill)))
   assert.deepEqual(readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky']
@@ -47,9 +51,29 @@ test('connected package uses only the supplied registered app and leaves canonic
   })
   assert.equal(readJson(path.join(result.plugin, 'plugin.json')).extensions['com.openai'].apps, './.app.json')
   assert.equal(readJson(path.join(result.plugin, '.codex-plugin/plugin.json')).apps, './.app.json')
+  assert.deepEqual(readJson(path.join(result.plugin, 'plugin.json')).extensions['com.openai'].publication,
+    readJson(path.join(root, 'plugins/bottasker-tasky/plugin.json')).extensions['com.openai'].publication)
   assert.equal(fs.readFileSync(path.join(root, 'plugins/bottasker-tasky/plugin.json'), 'utf8'), original)
   assert.equal(fs.existsSync(path.join(root, 'plugins/bottasker-tasky/.app.json')), false)
 })
+
+for (const [label, mutate] of [
+  ['missing Portuguese', (translations) => { delete translations['pt-BR'] }],
+  ['oversized subtitle', (translations) => { translations['es-PE'].subtitle = 'a'.repeat(31) }],
+  ['multiline subtitle', (translations) => { translations['pt-BR'].subtitle = 'Tasky\nBotTasker' }],
+  ['unsupported control character', (translations) => { translations['es-PE'].description = 'Texto\tcon tabulación' }],
+]) {
+  test(`validator rejects publication translations: ${label}`, (t) => {
+    const root = fixture(t)
+    const file = path.join(root, 'plugins/bottasker-tasky/plugin.json')
+    const manifest = readJson(file)
+    mutate(manifest.extensions['com.openai'].publication.translations)
+    fs.writeFileSync(file, JSON.stringify(manifest))
+    const result = spawnSync(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')], { encoding: 'utf8' })
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /translation/)
+  })
+}
 
 test('invalid profile and missing or invented app identifiers fail before creating outputs', (t) => {
   const root = fixture(t)

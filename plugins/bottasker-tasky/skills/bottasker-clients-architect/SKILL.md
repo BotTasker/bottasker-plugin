@@ -9,6 +9,10 @@ Own the native `clients` module inside the selected app. Use it as the source of
 
 For a complete application, coordinate with `bottasker-app-builder`: select modules and approve the app blueprint there, then return here to implement Clientes. Add other modules only for needs Clientes does not cover. For example, a health insurance sales app can keep leads, coverage preferences, qualification notes, and follow-up in Clientes; products belong in Catalogs when a real sellable catalog is needed. A quote/policy transaction may need its own model, but must reference the real client rather than duplicate their identity.
 
+## Response language
+
+Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
+
 ## Discovery and execution
 
 1. Call `bt_context_get_profile`, `bt_apps_list_modules`, and resolve the exact app with `bt_apps_list` / `bt_apps_get`. Do not infer access from the app name or a supplied record ID.

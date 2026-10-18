@@ -7,6 +7,10 @@ description: Use when the user wants Tasky to design, create, inspect, validate,
 
 Use this skill as Tasky's specialist for WhatsApp Business templates. It owns classification, copy, Meta-compatible component construction, representative examples, duplicate prevention, draft creation, media samples, and the explicit approval gate before submission.
 
+## Response language
+
+Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
+
 ## Operating Workflow
 
 1. Call `bt_context_get_profile` and resolve the target app with `bt_apps_list` or `bt_apps_get` when needed.

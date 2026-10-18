@@ -21,6 +21,20 @@ For private connected-app acceptance, use the exact personal `plugin_asdk_app_�
 - Confirm that installation does not request an API key, environment variable, repository clone, or terminal configuration.
 - Complete browser OAuth, choose an organization, and return to the client.
 
+## Language acceptance
+
+Run the same functional cases with the demo account in Spanish, Brazilian Portuguese and English, recording actual prompts, results and failures. English remains the base listing language; imported listing translations are not proof of a translated directory UI.
+
+| Scenario | Prompt or action | Expected result |
+| --- | --- | --- |
+| Spanish | `Muéstrame mis apps de BotTasker y resume sus módulos.` | Read-only discovery and a Spanish summary. |
+| Brazilian Portuguese | `Mostre meus apps do BotTasker e resuma os módulos.` | The equivalent read-only discovery and a Brazilian Portuguese summary. |
+| English | `Show my BotTasker apps and summarize their modules.` | The equivalent read-only discovery and an English summary. |
+| Explicit switch | After the Spanish case: `Continue in English.` Then: `Agora responda em português.` | Each next answer follows the requested language without restarting discovery unnecessarily. |
+| Separate content language | `Explícame en español y redacta en portugués un mensaje de bienvenida, sin guardarlo ni enviarlo.` | Spanish explanation and Portuguese draft, with no write or send. |
+| Existing data | Repeat the app-list case in another language. | Existing app names and stored values retain their exact values. |
+| Error explanation | Trigger the same validation/policy error in each language. | The explanation follows the conversation; error codes and permission requirements remain accurate. |
+
 ## Authorization
 
 - `mcp:read` exposes read and planning tools.

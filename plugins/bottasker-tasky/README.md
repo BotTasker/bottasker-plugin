@@ -2,6 +2,8 @@
 
 Tasky combines BotTasker skills with the hosted MCP at `https://api.bottasker.ai/mcp` for Codex and Claude Code.
 
+Tasky's skills follow the user's conversation in Spanish, Brazilian Portuguese or English, including explicit language changes. Content can use a separately requested language. Existing resource names, technical identifiers and stored values remain unchanged unless the user requests their translation. The package includes listing translations for `en-US`, `es-PE` and `pt-BR`; their display in the directory depends on OpenAI's localization support. BotTasker web pages use their own UI translations.
+
 The standard package loads the hosted BotTasker MCP directly and declares the connection guide as its setup skill. A separate connected build links a personal registered app available to the current Codex account; linking an unavailable app can hide the bundled MCP from the plugin UI. Personal registration and button-based connection can be tested before public marketplace publication.
 
 After installing from the client plugin catalog, sign in to BotTasker, select an organization, and approve **Trabajo seguro**. No repository clone, terminal setup, environment variable, or API key is required.
