@@ -68,6 +68,18 @@ export function createClient(client, root, run, {
         if (Object.keys(servers || {}).length !== 1 || servers[name]?.url !== env[1].url) {
           throw new Error('La URL o el identificador MCP instalado no corresponde a su entorno')
         }
+        const portableManifestPath = path.join(item.installPath, 'plugin.json')
+        if (fs.existsSync(portableManifestPath)) {
+          const portableManifest = readJson(portableManifestPath)
+          const portableServers = readJson(path.join(item.installPath, 'mcp.json')).mcpServers
+          if (portableManifest.name !== name || portableManifest.version !== p.version ||
+              Object.keys(portableServers || {}).length !== 1 ||
+              portableServers[name]?.type !== 'streamable-http' ||
+              portableServers[name]?.url !== servers[name]?.url ||
+              portableServers[name]?.extensions?.['com.openai']?.auth?.resource !== servers[name]?.url) {
+            throw new Error('El manifiesto portable instalado no coincide con el entorno y OAuth del plugin')
+          }
+        }
         if (item.enabled !== true && item.enabled !== false) throw new Error('Estado de habilitación desconocido')
         if (item.enabled && effective) {
           const server = effective.find((s) => s.name === name)

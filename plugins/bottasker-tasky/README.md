@@ -2,7 +2,7 @@
 
 Tasky combines BotTasker skills with the hosted MCP at `https://api.bottasker.ai/mcp` for Codex and Claude Code.
 
-During private development, the Codex package loads the hosted BotTasker MCP directly. The registered Tasky App will be linked only after it is eligible for the current Codex account; linking an ineligible private App can hide the otherwise valid bundled MCP server from the plugin UI.
+The standard package loads the hosted BotTasker MCP directly and declares the connection guide as its setup skill. A separate connected build links a personal registered app available to the current Codex account; linking an unavailable app can hide the bundled MCP from the plugin UI. Personal registration and button-based connection can be tested before public marketplace publication.
 
 After installing from the client plugin catalog, sign in to BotTasker, select an organization, and approve **Trabajo seguro**. No repository clone, terminal setup, environment variable, or API key is required.
 
@@ -15,6 +15,6 @@ Authentication, permission, module, validation, and tool failures remain explici
 The Clientes skill covers native client apps, prospects, contacts, history, tasks, segments, imports and contextual AI follow-up. Its canonical `bt_clients_*` tools are shared with in-app Tasky and require the companion backend release. Updating the plugin alone does not add tools to an older MCP server. Existing organization/app roles remain authoritative; configuration does not start retroactive campaigns.
 
 - Website: https://bottasker.ai
-- Support: https://bottasker.ai/contact
-- Privacy: https://bottasker.ai/privacy
-- Terms: https://bottasker.ai/terms
+- Support: https://bottasker.ai/es/contacto/
+- Privacy: https://bottasker.ai/es/politica-privacidad/
+- Terms: https://bottasker.ai/es/terminos-condiciones/

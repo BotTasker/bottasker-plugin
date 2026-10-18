@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.15
+
+- Added the portable Agent Plugins manifest and Streamable HTTP MCP configuration alongside the supported Codex and Claude compatibility files.
+- Declared OAuth with CIMD preference, safe initial scopes, and the existing connection guide as the onboarding skill.
+- Corrected public legal/support URLs, shortened the directory subtitle, and removed the unsupported implication that Tasky already renders interactive MCP UI.
+- Included five positive and three negative review scenarios; these are reviewer instructions, not claims of completed acceptance tests.
+- Added separate submission and registered-app package builds. A connected build requires the personal plugin's exact technical ID; it never assumes the old private registration is available.
+- Kept portable Local manifests and OAuth resources aligned with the separate localhost runtime.
+
 ## 0.2.14
 
 - Fixed the companion in-app Tasky runtime so an explicitly closed execution phase is not rejected as a progress-only final reply. Verified writes and the real completed/partial/blocked/failed phase result survive without replaying write tools.

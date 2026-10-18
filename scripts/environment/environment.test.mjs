@@ -190,7 +190,41 @@ test('preparation preserves installations and canonical files', async (t) => {
   assert.equal(localCodexServer.oauth_resource, environments.local.url)
   assert.equal(readJson(path.join(generated, '.codex-plugin/plugin.json')).apps, undefined)
   assert.equal(fs.existsSync(path.join(generated, '.app.json')), false)
+  const portable = readJson(path.join(generated, 'plugin.json'))
+  const compatibility = readJson(path.join(generated, '.codex-plugin/plugin.json'))
+  assert.equal(portable.name, 'bottasker-tasky-local')
+  assert.equal(portable.version, compatibility.version)
+  assert.deepEqual(portable.extensions['com.openai'].interface, compatibility.interface)
+  assert.equal(portable.extensions['com.openai'].apps, undefined)
+  assert.equal(portable.extensions['com.openai'].review, undefined)
+  const portableMcp = readJson(path.join(generated, 'mcp.json'))
+  assert.deepEqual(Object.keys(portableMcp.mcpServers), ['bottasker-tasky-local'])
+  assert.equal(portableMcp.mcpServers['bottasker-tasky-local'].type, 'streamable-http')
+  assert.equal(portableMcp.mcpServers['bottasker-tasky-local'].url, environments.local.url)
+  assert.equal(portableMcp.mcpServers['bottasker-tasky-local'].extensions['com.openai'].auth.resource, environments.local.url)
   assert.deepEqual(fs.readdirSync(path.join(generated, 'skills')), fs.readdirSync(path.join(f.root, 'plugins/bottasker-tasky/skills')))
+})
+
+test('portable PROD resource mismatch aborts local preparation before writing', (t) => {
+  const f = fixture(t)
+  const file = path.join(f.root, 'plugins/bottasker-tasky/mcp.json')
+  const mcp = readJson(file)
+  mcp.mcpServers['bottasker-tasky'].extensions['com.openai'].auth.resource = environments.local.url
+  writeJson(file, mcp)
+  assert.throws(() => buildLocalPlugin(f.root), /portable MCP/)
+  assert.equal(fs.existsSync(path.join(f.root, '.tasky-runtime')), false)
+})
+
+test('status detects a portable installed config pointing at the wrong environment', async (t) => {
+  const f = fixture(t)
+  f.seed('codex', 'production')
+  const file = path.join(f.states.codex.installed[0].installPath, 'mcp.json')
+  const mcp = readJson(file)
+  mcp.mcpServers['bottasker-tasky'].url = environments.local.url
+  writeJson(file, mcp)
+  assert.equal(await f.invoke(['status', '--client=codex']), 1)
+  assert.match(f.output(), /portable instalado/)
+  assert.equal(f.mutations.length, 0)
 })
 
 test('status respects client and reports disabled, missing and scope conflict', async (t) => {

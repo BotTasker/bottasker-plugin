@@ -4,6 +4,32 @@ Installable BotTasker plugin for Codex and Claude Code. It bundles 15 Tasky skil
 
 > **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
+## Native app connection in Codex
+
+Tasky can be tested as a personal connected plugin before public marketplace publication. The registered app supplies the host's connection/account buttons; bundled skills supply Tasky's workflows. A custom HTML widget is optional and does not create those authentication controls.
+
+For the private development route:
+
+1. Sign in at [ChatGPT Plugins](https://chatgpt.com/plugins) with the account/workspace used by Codex.
+2. Choose **+ → Add custom MCP server**, name it **Tasky by BotTasker**, and enter `https://api.bottasker.ai/mcp` with OAuth authentication. Complete the host's warning and **Create as a plugin** flow.
+3. Sign in to BotTasker, choose an organization, approve the safe grant, and verify the discovered tools. Account/workspace policies can restrict custom MCP registration.
+4. Copy the exact `plugin_asdk_app_…` technical ID from that personal plugin's URL. An old developer registration is not proof that an app is available to the current account.
+5. Build the connected package with that ID:
+
+```bash
+node scripts/build-codex-package.mjs connected --plugin-id=plugin_asdk_app_<actual-id>
+```
+
+The command prints a generated marketplace directory and ZIP; it does not install or publish. Add that directory through `codex plugin marketplace add <generated-directory>` and install `bottasker-tasky@bottasker-tasky-connected`. In Codex's plugin settings, enable the connected variant and disable any other Tasky variant for this acceptance test, preserving the chosen environment. Open a new chat and verify **Connect/Authenticate**, account display, setup, and read-only tools. Do not enable an app mapping that the current account cannot access: the host can suppress the otherwise usable bundled MCP.
+
+The connected build follows the registered-app wiring used by installed Linear and Cloudflare plugins: `.app.json` plus skills and the bundled MCP declaration. It sets the supplied app dependency as required. Only an actual signed-in client test establishes availability and successful authentication.
+
+The Local/PROD selector manages the two direct-MCP marketplaces only. A Tasky installation from `bottasker-tasky-connected` is reported as outside that selector's managed marketplaces; remove that test installation through Codex before using the selector again. Removing a test plugin does not revoke its BotTasker grant; account revocation is managed separately.
+
+For public distribution, upload the separate submission ZIP through [OpenAI Platform Plugins](https://platform.openai.com/plugins). OpenAI currently rejects app references in submission ZIPs; registration, domain verification, scanning and review happen in the portal. This is independent of the GitHub installation below.
+
+[The Spanish integration study](docs/codex-integration-study.md) records the comparison, verified endpoints, changes, and remaining acceptance work.
+
 ## Install from GitHub
 
 ### Codex
@@ -251,10 +277,17 @@ Codex should use `bottasker-app-builder` to propose the app structure, module co
 
 ## Validate Plugin
 
+Run the maintained repository checks:
+
 ```bash
-python3 /Users/this/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py \
-  /Users/this/Documents/projects/bottasker/app/bottasker-tasky/plugins/bottasker-tasky
+node scripts/validate-plugin.mjs
+node --test scripts/codex-package.test.mjs scripts/environment/environment.test.mjs
+node scripts/build-codex-package.mjs submission
 ```
+
+The last command creates a ZIP under `.tasky-runtime/packages/`, containing the portable `plugin.json`, `mcp.json`, 15 skills, assets, license and compatibility files. OAuth prefers CIMD with DCR available through server discovery. Initial scopes are `mcp:read mcp:write`; destructive scope is excluded. The existing connection guide is declared as the setup skill. Generated builds stay out of Git.
+
+These checks verify packaging and environment isolation. They do not establish OpenAI approval, a registered app's eligibility, successful end-user OAuth, or every live tool's behavior. Five positive and three negative reviewer scenarios are included in the manifest; reviewer access, domain verification, a demo recording, and actual evaluation results must still be supplied.
 
 For Claude Code:
 

@@ -41,6 +41,7 @@ const request = (url, { insecure = false } = {}) => new Promise((resolve, reject
 export const verifyCanonicalProduction = (root) => {
   const canonicalPlugin = path.join(root, "plugins", productionPluginName)
   const codex = readJson(path.join(canonicalPlugin, '.mcp.json'))
+  const portable = readJson(path.join(canonicalPlugin, 'mcp.json'))
   const claude = readJson(path.join(canonicalPlugin, 'claude.mcp.json'))
   const codexServer = codex.mcpServers?.['bottasker-tasky']
   const claudeServer = claude.mcpServers?.['bottasker-tasky']
@@ -49,6 +50,11 @@ export const verifyCanonicalProduction = (root) => {
   }
   if (codexServer.type !== 'http' || codexServer.oauth_resource !== productionMcpUrl) {
     throw new Error('The canonical Codex MCP must declare the HTTP transport and OAuth resource')
+  }
+  const portableServer = portable.mcpServers?.[productionPluginName]
+  if (portableServer?.type !== 'streamable-http' || portableServer.url !== productionMcpUrl ||
+      portableServer.extensions?.['com.openai']?.auth?.resource !== productionMcpUrl) {
+    throw new Error('The portable MCP declaration must match the production OAuth resource')
   }
 }
 
@@ -121,8 +127,27 @@ export const buildLocalPlugin = (root) => {
   claudeManifest.version = localVersion
   claudeManifest.description = `${claudeManifest.description} Local development environment.`
 
-  writeJson(codexManifestPath, codexManifest)
   writeJson(claudeManifestPath, claudeManifest)
+  const portableManifestPath = path.join(pluginTarget, 'plugin.json')
+  const portableManifest = readJson(portableManifestPath)
+  Object.assign(portableManifest, {
+    name: localPluginName,
+    version: localVersion,
+    description: codexManifest.description,
+  })
+  portableManifest.extensions['com.openai'].interface = codexManifest.interface
+  delete portableManifest.extensions['com.openai'].apps
+  // Review cases describe the hosted service, not a developer's local data.
+  delete portableManifest.extensions['com.openai'].review
+  delete codexManifest.extensions?.['com.openai']?.review
+  writeJson(codexManifestPath, codexManifest)
+  writeJson(portableManifestPath, portableManifest)
+  const portableMcp = readJson(path.join(pluginTarget, 'mcp.json'))
+  const portableServer = portableMcp.mcpServers[productionPluginName]
+  portableServer.url = localMcpUrl
+  portableServer.extensions['com.openai'].auth.resource = localMcpUrl
+  portableMcp.mcpServers = { [localPluginName]: portableServer }
+  writeJson(path.join(pluginTarget, 'mcp.json'), portableMcp)
   fs.rmSync(path.join(pluginTarget, '.app.json'), { force: true })
   writeJson(path.join(pluginTarget, '.mcp.json'), {
     mcpServers: {
