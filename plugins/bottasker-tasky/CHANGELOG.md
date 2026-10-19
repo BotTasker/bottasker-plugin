@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.22
+
+- Distinguished each workflow trigger near the start of its operation name and title, retaining full revision and scope checks.
+- Corrected the destructive annotation for undoing a process change.
+- Clarified read-only app-stage planning and stopped advertising the non-executing legacy planning helper as a public runner. Real setup still uses separately declared tools.
+- Updated App Builder and Automation skills; preserved all three languages and the demonstration video.
+
 ## 0.2.21
 
 - Replaced opaque individual execution names with readable verbs and business purposes, and added full display titles.

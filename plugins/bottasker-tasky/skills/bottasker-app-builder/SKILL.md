@@ -35,10 +35,10 @@ Roles and permissions are not a default pillar for this skill right now. Only in
 4. For an existing app, resolve `appId` with `bt_apps_list` or `bt_apps_get`.
 5. Check the five App Experience Architecture pillars. Ask clarification questions before calling `bt_apps_blueprint_plan` or proposing a solution when missing answers would change the data model, intake path, tracking/control design, lifecycle, or daily work surfaces.
 6. When creating a complete app from natural language and the critical pillars are clear enough, call `bt_apps_blueprint_plan`.
-7. Convert approved blueprints into executable stages with `bt_apps_implementation_plan`.
+7. Compile approved blueprints into proposed setup stages with `bt_apps_implementation_plan`; this does not execute them.
 8. If AI Agents may be needed, call `bt_ai_agent_tools_discover` only as supporting discovery, not as the owner of the app plan.
 9. Present the app blueprint as a visual design and ask for approval before writes.
-10. Run `bt_apps_run_implementation_plan` with `dryRun: true` before any real execution.
+10. Review the proposed stages against current discovery and approvals. Execute each real setup step through its separately declared tool and verify the result; do not use the legacy internal planning helper as an executor.
 11. Create or update the app with `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, or approved staged tools from the implementation plan.
 12. Delegate module implementation to specialists after app creation:
    - `bottasker-data-architect` for Base de datos (Data Hub), models, relations, records, and Dynamic Tables.
@@ -140,4 +140,4 @@ Use `bt_context_get_profile`, `bt_apps_list_modules`, `bt_apps_blueprint_plan`, 
 
 Use `bt_ai_agent_tools_discover` only when the app blueprint needs to know whether AI Agent tools exist. Detailed agent design belongs to `bottasker-ai-agent-architect`.
 
-For end-to-end builds, use `bt_apps_implementation_plan` and `bt_apps_run_implementation_plan` first in dry-run mode. For WhatsApp commerce demos, use `bt_apps_seed_demo_data`, `bt_whatsapp_templates_create_pack`, and `bt_roles_create_from_template` only after the app/module blueprint is approved.
+For end-to-end builds, use the read-only `bt_apps_implementation_plan` to prepare stages, then run the separately declared setup tools after approval. A returned plan is not proof that any app resource was created. For WhatsApp commerce demos, use `bt_apps_seed_demo_data`, `bt_whatsapp_templates_create_pack`, and `bt_roles_create_from_template` only after the app/module blueprint is approved.
