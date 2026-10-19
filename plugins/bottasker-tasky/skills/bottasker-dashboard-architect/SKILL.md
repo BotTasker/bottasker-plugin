@@ -269,10 +269,12 @@ Use dashboard tools when available:
 - `bt_dashboards_archive`
 - `bt_dashboards_generate_from_data_hub`
 - `bt_dashboards_preview_widget`
-- `bt_dashboards_run_widget`
+- `bt_dashboards_run_widget_query`
 - `bt_dashboards_list_sources`
 - `bt_dashboards_list_available_fields`
 
 For public sharing, use `bt_mcp_find_tools` with the `dashboards` module and the exact sharing or access-management intent. Use only tools returned by live discovery; if none are exposed, provide the verified UI workflow from **Public Dashboard Access** instead of inventing a tool or simulating success.
 
 For app and source context use `bt_apps_list`, `bt_apps_get`, `bt_apps_list_modules`, `bt_data_hub_*`, `bt_dynamic_tables_*`, `bt_catalogs_*`, `bt_sales_carts_*`, `bt_conversations_*`, `bt_ai_agents_*`, and `bt_workflows_*` read tools as needed.
+
+Use `bt_dashboards_run_widget_query` with `dashboardId`, `widgetId`, optional `range` and `forceRefresh` to read computed data for a saved widget. Refreshing derived cached results does not edit the dashboard configuration. Use `bt_dashboards_preview_widget` with `widget` for an unsaved configuration preview. The legacy `bt_dashboards_run_widget` alias is internal.

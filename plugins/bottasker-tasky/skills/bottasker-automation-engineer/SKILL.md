@@ -27,12 +27,12 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - `bt_workflows_list`
 4. Create or update AI agents with `bt_ai_agents_*`.
 5. Before workflow creation, call `bt_workflows_get_create_schema` and `bt_workflows_validate_create_payload`.
-6. Create workflows with explicit `bt_workflows_create` payload: `appId`, `name`, optional `timezone`, `folderPath`, `status`, and `workflowData: {nodes: [], edges: []}`.
+6. Create workflows with explicit `bt_workflows_create` payload: `appId`, `name`, optional `timezone`, `folderPath`, `status: "inactive"`, and `workflowData: {nodes: [], edges: []}`.
 7. Prefer `bt_workflows_create_from_template` for common patterns such as incoming message to order, voucher review, board change notification, or repurchase follow-up.
 8. Add nodes with `bt_workflows_add_action`.
 9. Configure action instances with `bt_action_instances_update_config`.
 10. Connect graph edges with `bt_workflows_add_edges`.
-11. In external MCP clients, discover the exact individual workflow execution tools, review their effects and request approved scope elevation before testing. Inside BotTasker, use the available internal testing tools. Inspect results with `bt_workflow_runs_get_events`.
+11. In external MCP clients, use the stable workflow execution operation with authorized workflow and trigger IDs, review their effects and request approved scope elevation before testing. Inside BotTasker, use the available internal testing tools. Inspect results with `bt_workflow_runs_get_events`.
 
 ## Design Rules
 
@@ -118,9 +118,11 @@ When a workflow must interact with Yango Fleet:
 
 ## Public execution contracts
 
-Saved endpoint and workflow executions in Codex/Claude use exact `bt_call_api_*`, `bt_run_workflow_*` and `bt_toggle_workflow_test_*` tools declared by the active server. Discover them after saving configuration; do not construct their names or revision values. Read the fixed operation and input schema, explain its actual effects and obtain approval before the native OAuth step-up to `mcp:destructive`.
+Saved resources are dynamic; the public operations are stable: `bt_api_tools_call_endpoint` calls a saved endpoint, `bt_workflows_run` dispatches one workflow execution, `bt_workflows_set_test_mode` sets a desired test-mode state, and `bt_workflows_set_status` sets active/inactive status. Resource IDs and endpoint/trigger IDs are data arguments, never parts of tool names. Saving or editing a workflow does not add MCP tools.
 
-`bt_api_tools_test_endpoint`, `bt_workflows_start_testing` and `bt_workflows_run_trigger_test` are internal BotTasker operations. Use them only when executing inside BotTasker with internal authentication and the tool is actually available. For external MCP clients, use the individually listed replacement; if none is admitted, validate the explicit input schema and saved configuration or report that testing needs the BotTasker UI. Configuration metadata never authorizes execution of an unlisted operation. After editing a configured endpoint or workflow, refresh discovery and review the new individual tool before running it.
+Read the selected resource with `includeExecution: true`, inspect its current configuration and data contract, explain the actual effects, and obtain approval before the native OAuth step-up to `mcp:destructive`. A listed operation still requires its policy and app access. `bt_api_tools_test_endpoint`, `bt_workflows_start_testing` and `bt_workflows_run_trigger_test` remain internal compatibility tools; never use them as external fallbacks.
+
+New workflows start inactive. `bt_workflows_update` accepts configuration fields only; use `bt_workflows_set_status` for activation and `bt_workflows_set_test_mode` for test listeners. Disabling test mode leaves an already active workflow active; leaving testing puts it inactive. Set the desired state explicitly, rather than toggling. Review current status after an interrupted change.
 
 ## Expected MCP Tools
 
@@ -128,8 +130,8 @@ Use `bt_ai_agent_tools_discover`, `bt_registry_*`, `bt_ai_agents_*`, `bt_workflo
 
 For workflows triggered by forms, provide the target workflow id and trigger action instance id back to `bottasker-forms-architect`, then let Forms configure the `workflow.trigger` connector and submission mapping.
 
-For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.
+Read the selected resource with `includeExecution: true`: `bt_workflows_get` for workflow revisions and trigger data schemas, `bt_api_tools_get` for endpoint revisions and parameter schemas, or `bt_boards_get` for button revisions. Copy its `execution` revision into the stable operation's `definitionRevision` argument. Pass resource IDs and business data using that operation's declared fields. On `MCP_RESOURCE_CHANGED`, reread that resource and review its changed effects before retrying; do not invent a revision or request a new tool name.
 
-A workflow can have several distinct configured triggers. Use the exact trigger-specific tool and title returned by discovery, including its trigger identity; do not treat two triggers of the same workflow as interchangeable or choose by a truncated common workflow name.
+A workflow can have several configured triggers. Read their IDs and event data contracts with `bt_workflows_get(includeExecution: true)` and pass the selected `triggerId` to `bt_workflows_run`. Never assume different triggers accept the same event. `event` and API `parameters` are bounded JSON data, checked against the explicit saved input schema when present. Example test values are not required schema fields. Organization/app authorization context comes from the server.
 
-Read the individual workflow tool description before execution: it identifies the event input, saved action inventory and real effects. Branches decide which saved actions run. A successful dispatch with `workflowRunnerId` and `triggeredTargets` does not establish that downstream work has finished. Test mode can perform real writes, execute saved custom functions and send messages; never describe it as a simulation.
+Read the stable workflow operation description and the selected workflow configuration before execution to identify its event input, saved actions and real effects. Branches decide which saved actions run. A successful dispatch with `workflowRunnerId` and `triggeredTargets` does not establish that downstream work has finished. Test mode can perform real writes, execute saved custom functions and send messages; never describe it as a simulation.

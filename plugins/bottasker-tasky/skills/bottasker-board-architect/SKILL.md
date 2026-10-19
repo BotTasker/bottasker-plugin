@@ -305,11 +305,11 @@ When an AI Agent needs board capabilities, hand off to `bottasker-ai-agent-archi
 
 Agents must not change public access, roles, users, or sharing settings unless the app blueprint explicitly approves an administrative tool.
 
-## Individually exposed button execution
+## Configured button execution
 
-For external MCP clients, invoke a configured button only through its exact `bt_click_board_button_*` tool returned by current discovery. Its board, button and automation revision are fixed; supply only the declared item input. Confirm the automation's effects and obtain the required `mcp:destructive` grant before execution. The internal `bt_boards_invoke_detail_widget_action` executor is available only inside BotTasker, not as an external fallback.
+For external clients, use the stable `bt_boards_click_button` operation with the selected board ID, button ID and item ID. Read `bt_boards_get` with `includeExecution: true` for the configured button's current revision and inspect its saved workflow/bindings. Confirm its actual effects and obtain the required `mcp:destructive` grant and policy/app access before activation. The server resolves the saved bindings; callers cannot replace the workflow through this operation.
 
-After changing a button, its bindings or its referenced workflow, refresh discovery and review the replacement tool. Catalog and trigger-schema reads configure a button but do not make a new execution callable or grant permission to run it. If an individual tool is unavailable, validate the saved configuration or explain the UI execution requirement.
+Changing a button, its bindings or referenced workflow requires rereading the resource and reviewing its revision, not creating or discovering a replacement tool. Component and trigger-schema reads configure buttons without granting execution access. The internal `bt_boards_invoke_detail_widget_action` is not an external fallback.
 
 ## Expected MCP Tools
 
@@ -321,10 +321,10 @@ Use:
 - `bt_boards_get_column_alerts`, `bt_boards_configure_column_alert`, `bt_boards_remove_column_alert`
 - `bt_boards_get_items`, `bt_boards_get_item`, `bt_boards_create_item`, `bt_boards_update_item`, `bt_boards_move_item`, `bt_boards_delete_item`
 - `bt_boards_update_display_config`, `bt_boards_update_column_order`, `bt_boards_prepare_detail_view_config`, `bt_boards_update_detail_view_config`
-- `bt_boards_list_invocable_automations`, `bt_boards_list_invocable_automation_triggers`, `bt_boards_get_invocable_automation_trigger_schema`, `bt_boards_invoke_detail_widget_action`
+- `bt_boards_list_invocable_automations`, `bt_boards_list_invocable_automation_triggers`, `bt_boards_get_invocable_automation_trigger_schema`, `bt_boards_click_button`
 - `bt_boards_generate_public_link`, `bt_boards_set_public_access_mode`
 - `bt_boards_list_public_roles`, `bt_boards_add_public_role`, `bt_boards_update_public_role`, `bt_boards_delete_public_role`
 - `bt_boards_list_allowed_users`, `bt_boards_add_allowed_user`, `bt_boards_update_allowed_user`, `bt_boards_revoke_allowed_user`, `bt_boards_restore_allowed_user`, `bt_boards_delete_allowed_user`
 - `bt_boards_init_item_field_file_upload`, `bt_boards_complete_item_field_file_upload`, `bt_boards_get_item_field_file_download_url`, `bt_boards_delete_item_field_file`
 
-For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.
+Read the selected resource with `includeExecution: true`: `bt_workflows_get` for workflow revisions and trigger data schemas, `bt_api_tools_get` for endpoint revisions and parameter schemas, or `bt_boards_get` for button revisions. Copy its `execution` revision into the stable operation's `definitionRevision` argument. Pass resource IDs and business data using that operation's declared fields. On `MCP_RESOURCE_CHANGED`, reread that resource and review its changed effects before retrying; do not invent a revision or request a new tool name.

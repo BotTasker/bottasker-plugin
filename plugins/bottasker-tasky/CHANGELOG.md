@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.26
+
+- Replaced tenant-derived execution tool names with stable product operations and dynamic resource identifiers; new resources do not generate MCP tools.
+- Separated workflow configuration, real execution, desired test mode and activation; new workflows start inactive.
+- Audited all 342 registered definitions (335 public): added scoped call-history operations, corrected calendar/billing policies and effects, and protected follow-up receipt reconciliation.
+- Updated six skills for resource revisions, typed dashboard/call inputs and accurate effects while preserving authorization boundaries.
+- Retained English, Spanish, Brazilian Portuguese, secure OAuth and the demonstration video. OpenAI review remains required.
+
 ## 0.2.25
 
 - Replaced opaque workflow worker-code inventories with readable event and action explanations.

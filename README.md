@@ -297,13 +297,15 @@ The last command creates a ZIP under `.tasky-runtime/packages/`, containing the 
 
 Repository and connected installs use a transport-only `mcp.json` with native OAuth discovery. The current Codex desktop parser rejects per-server `extensions` in that file and otherwise drops the server. The portal submission build replaces it with `submission/mcp.json`, which contains the explicit OAuth configuration required for importing the connection settings. Use the submission ZIP for the portal, not as a desktop test marketplace. Keep both endpoints aligned; validation rejects a mismatched submission endpoint or unsafe initial scopes.
 
-### Individually declared execution tools
+### Stable operations and dynamic resources
 
-The companion MCP server declares one individual `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` or `bt_click_board_button_*` tool for each admitted saved API endpoint, workflow trigger, workflow test-mode toggle and board button. Each has a readable purpose, a full title and an explicit input schema with the single allowed `definitionRevision` and bounded business arguments under `input`. This binds approval to the target app/resource and configuration even when the readable name stays the same. The handler checks configuration again before dispatch. These checks do not freeze an asynchronous workflow against subsequent administrator edits.
+The companion MCP server declares stable product operations: `bt_api_tools_call_endpoint`, `bt_workflows_run`, `bt_workflows_set_test_mode`, `bt_workflows_set_status` and `bt_boards_click_button`. Saved integrations, endpoints, workflows, triggers and buttons are selected by resource identifiers. Their names and counts never determine public tool names or schemas. A newly saved workflow uses the same operation without catalog regeneration.
 
-Public clients cannot use the internal generic API/workflow/button executors. Discover the exact individual tool from `tools/list`; do not construct a revision-bound name. Strict local object schemas are required; unrestricted objects and remote schema references are not admitted. A configuration change requires fresh discovery and review of the replacement definition.
+Read a selected integration, workflow or board with `includeExecution: true` to obtain current resource revisions and parameter/event contracts. Supply the selected revision as `definitionRevision`, alongside the operation's declared IDs and data fields. Dynamic business data is bounded and checked against an explicit saved JSON schema when present; examples do not define required fields. A stale revision returns `MCP_RESOURCE_CHANGED`: reread and review that resource. The check does not freeze asynchronous work against later administrator edits.
 
-Declared execution tools require the existing execution policy, the bound app access and `mcp:destructive`. Their declarations can be discovered before scope elevation; discovery never grants execution permission. The initial OAuth grant remains `mcp:read mcp:write`, and user approval is required before requesting the additional scope.
+The public catalog is product metadata, independent of tenant resources and execution consent. Every call still enforces the OAuth scope, protected policy and organization/app access. Execution and activation operations require `mcp:destructive` and explicit approval; initial consent remains `mcp:read mcp:write`. Internal compatibility executors are not public fallbacks. New workflows start inactive, configuration edits cannot change activation status, and test-mode setting uses an explicit desired state.
+
+This replaces the per-resource tool generation in 0.2.20–0.2.25. OpenAI must review the new operation contracts; this architecture change is not a claim of marketplace approval.
 
 ### Portal OAuth registration and callbacks
 

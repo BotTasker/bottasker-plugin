@@ -62,3 +62,11 @@ For deterministic workflows, use the corresponding work actions `find_conversati
 ## Expected MCP Tools
 
 Use operational module tools plus `bt_conversation_tags_list`, `bt_conversations_get_tags`, `bt_conversations_add_tags`, `bt_conversations_remove_tag`, `bt_apps_list`, `bt_apps_get`, `bt_mcp_list_skills`, and `bt_mcp_load_skill` for discovery.
+
+## Operation boundaries
+
+Call-record transcript and tool-event operations store supplied history; they do not place calls or execute the tool described by an event. WhatsApp template drafts stay local; synchronization reads Meta and updates local records, while submission sends a draft to Meta for review. Use each declared operation for its specific purpose.
+
+For authorized billing questions, `bt_billing_usage_get_summary` returns aggregate usage and credits for an optional `from`/`to` period, plus `complete` to indicate the summary limit. Do not present incomplete totals as a complete ledger or attempt raw consumption-log access.
+
+Call-record operations use explicit `appId` and `callSessionId` fields; transcript additions also take `speaker`, `text` and `partial`, tool-event additions take `event`, and board-state replacement takes `boardState`. Do not use the old generic `payload` shape. Receipt reconciliation can schedule the next automatic follow-up message and requires execution consent; marking a manual contact completed only advances its manual sequence.
