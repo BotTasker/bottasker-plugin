@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bottasker-tasky",
-  "version": "0.2.22",
+  "version": "0.2.23",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -118,7 +118,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Distinguish workflow triggers in operation names and titles; label process undo as destructive and clarify that app implementation planning does not execute stages. Preserve secure OAuth, English, Spanish, Brazilian Portuguese and the demonstration video.",
+        "release_notes": "Expose 13 independent process editing operations with strict inputs, revision checks and scoped removal approval. Clarify follow-up pause behavior and URL ingestion metadata. Preserve secure OAuth, English, Spanish, Brazilian Portuguese and the demonstration video.",
         "translations": {
           "en-US": {
             "subtitle": "Build and run BotTasker apps",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.23
+
+- Exposed 13 independent process editing operations; the generic batch dispatcher remains internal.
+- Added strict operation-specific inputs, revision and idempotency checks, and explicit destructive-scope approval for removal.
+- Clarified follow-up pause effects and arbitrary URL ingestion metadata.
+- Updated Process Designer guidance; retained English, Spanish, Brazilian Portuguese and the demonstration video.
+
 ## 0.2.22
 
 - Distinguished each workflow trigger near the start of its operation name and title, retaining full revision and scope checks.

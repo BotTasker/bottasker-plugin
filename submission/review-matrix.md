@@ -96,3 +96,11 @@ Run the same functional cases with the demo account in Spanish, Brazilian Portug
 - Temporary reviewer account and organization.
 - Final catalog screenshots captured from the production OAuth flow.
 - Country availability and policy attestations entered in each submission portal.
+
+## Live 0.2.22 verification and individual process edits
+
+Backend PR #611 and plugin PR #18 were merged. Production workflow 39215249552 succeeded with image `a49ad274d0f8405998fa3a17279695583aa69275`; all nine deployments adopted it. OpenAI's completed scan returned ten findings on nine tools. Duplicate-name, process undo and app planning findings disappeared. Two findings were technical: the process batch dispatcher and the follow-up pause description. Eight were further-review notices, including one overlapping the pause description. Further review is an OpenAI decision, not evidence of an unspecified code defect.
+
+Version 0.2.23 replaces external process batching with thirteen independently declared editor operations. Each has a strict operation-specific schema, fixed server-side operation type, canonical authenticated organization/app scoping, existing `processes:update` policy, revision checking and idempotency. Removal requires destructive scope and explicit confirmation. The batch dispatcher remains internal for Tasky. Draft editing never executes the documented business process. Descriptions disclose node removal's connected-edge cleanup and review-answer clearing.
+
+The pause description now states status, approval clearing, rejected run states, retained history and absence of message sending. Arbitrary URL knowledge ingestion explicitly declares its open-world effect. Existing permissions and initial OAuth scopes are preserved. Local verification: 306 backend tests in eleven suites, TypeScript checking, 57 plugin tests and manifest validation passed. The new production scan remains pending. Reviewer credentials remain for the owner to enter manually.
