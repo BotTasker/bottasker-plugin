@@ -307,7 +307,7 @@ Agents must not change public access, roles, users, or sharing settings unless t
 
 ## Configured button execution
 
-For external clients, use the stable `bt_boards_click_button` operation with the selected board ID, button ID and item ID. Read `bt_boards_get` with `includeExecution: true` for the configured button's current revision and inspect its saved workflow/bindings. Confirm its actual effects and obtain the required `mcp:destructive` grant and policy/app access before activation. The server resolves the saved bindings; callers cannot replace the workflow through this operation.
+For external clients, use the stable `bt_boards_invoke_detail_widget_action` operation with the selected board `id`, button `widgetId` and `itemId`. Read `bt_boards_get` with `includeExecution: true` for the configured button's current revision and inspect its saved workflow/bindings. Pass the reviewed revision as optional `definitionRevision`. One reusable operation serves every authorized board button. Confirm its actual effects and obtain the required `mcp:destructive` grant and policy/app access before activation. The server resolves the saved bindings; callers cannot replace the workflow through this operation.
 
 Changing a button, its bindings or referenced workflow requires rereading the resource and reviewing its revision, not creating or discovering a replacement tool. Component and trigger-schema reads configure buttons without granting execution access. The internal `bt_boards_invoke_detail_widget_action` is not an external fallback.
 
@@ -321,7 +321,7 @@ Use:
 - `bt_boards_get_column_alerts`, `bt_boards_configure_column_alert`, `bt_boards_remove_column_alert`
 - `bt_boards_get_items`, `bt_boards_get_item`, `bt_boards_create_item`, `bt_boards_update_item`, `bt_boards_move_item`, `bt_boards_delete_item`
 - `bt_boards_update_display_config`, `bt_boards_update_column_order`, `bt_boards_prepare_detail_view_config`, `bt_boards_update_detail_view_config`
-- `bt_boards_list_invocable_automations`, `bt_boards_list_invocable_automation_triggers`, `bt_boards_get_invocable_automation_trigger_schema`, `bt_boards_click_button`
+- `bt_boards_list_invocable_automations`, `bt_boards_list_invocable_automation_triggers`, `bt_boards_get_invocable_automation_trigger_schema`, `bt_boards_invoke_detail_widget_action`
 - `bt_boards_generate_public_link`, `bt_boards_set_public_access_mode`
 - `bt_boards_list_public_roles`, `bt_boards_add_public_role`, `bt_boards_update_public_role`, `bt_boards_delete_public_role`
 - `bt_boards_list_allowed_users`, `bt_boards_add_allowed_user`, `bt_boards_update_allowed_user`, `bt_boards_revoke_allowed_user`, `bt_boards_restore_allowed_user`, `bt_boards_delete_allowed_user`

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.27
+
+- Restore original reusable workflow, API endpoint, board-button and process-editing tool contracts; do not create tools from customer resource names or split each process edit into a new tool.
+- Preserve all 70 native Clients operations, server-side tenant/app and OAuth checks, reviewed effects and optional resource revisions.
+- Keep production endpoints, all three languages and the demonstration video. Refresh native discovery and rescan the deployed server after rollout.
+
 ## 0.2.26
 
 - Replaced tenant-derived execution tool names with stable product operations and dynamic resource identifiers; new resources do not generate MCP tools.

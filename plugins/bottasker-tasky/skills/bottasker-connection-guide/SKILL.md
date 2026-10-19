@@ -47,7 +47,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 
 The stable public catalog is product metadata and can describe operations before execution consent or resource access is granted. It does not enumerate an organization's workflows or create tools for its resources. Listing is not permission to execute: every call separately checks OAuth scope, policy and organization/app access.
 
-`bt_api_tools_call_endpoint`, `bt_workflows_run`, `bt_workflows_set_test_mode`, `bt_workflows_set_status` and `bt_boards_click_button` use authorized resource IDs and the current resource revision. They require `mcp:destructive` and explicit approval of actual effects. Do not silently expand a normal read/write connection. A new workflow or changed configuration does not require reconnection or a new conversation.
+`bt_api_tools_test_endpoint`, `bt_workflows_run_trigger_test`, `bt_workflows_start_testing`, `bt_workflows_update` and `bt_boards_invoke_detail_widget_action` reuse their original names with authorized resource IDs. Reviewed execution revisions are optional compatible arguments; supply them after reading current configuration when possible. They require `mcp:destructive` and explicit approval of actual effects. Do not silently expand a normal read/write connection. A new workflow or changed configuration does not require reconnection or a new conversation.
 
 `MCP_RESOURCE_CHANGED` means the selected resource configuration changed: reread it with `includeExecution: true` and review the new revision. Broader consent cannot bypass that check. Never fall back to internal generic executors.
 
