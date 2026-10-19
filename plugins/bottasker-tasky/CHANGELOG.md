@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.24
+
+- Kept WhatsApp template listing strictly read-only and declared local Meta synchronization as a separate protected write.
+- Disclosed local overwrite effects and retained the existing synchronization policy.
+- Updated WhatsApp Template Architect; preserved all three languages, the video and individual process editing tools.
+
 ## 0.2.23
 
 - Exposed 13 independent process editing operations; the generic batch dispatcher remains internal.
