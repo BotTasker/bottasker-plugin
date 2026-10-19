@@ -1,3 +1,15 @@
+# Current release: 0.2.27
+
+The owner requested the original reusable catalog rather than the later per-action expansion. Version 0.2.27 restores the public names from the pre-review baseline, retaining all 70 Clients tools. It removes generated customer/workflow tool names and the 13-way process-editor split. There are 322 public operations: the old unsupported raw consumption-log wrapper stays removed and one duplicate dashboard alias stays internal. No new public names are introduced relative to the 324-name historical baseline.
+
+The historical execution names are public, reusable and protected again: `bt_api_tools_test_endpoint`, `bt_workflows_run_trigger_test`, `bt_workflows_start_testing`, and `bt_boards_invoke_detail_widget_action`. Saved IDs remain arguments; selected-resource authorization and saved-schema validation stay authoritative. Reviewed resource revisions are optional compatible inputs, not schema-generated tool names.
+
+The combined process editor declares its full bounded operation schema and destructive effects. The original WhatsApp list/sync contract is restored with conservative write/overwrite/external annotations and an additional policy check for refresh. Workflow status uses the original update operation with status-only input and execution consent. Reviewer acceptance of these contracts remains subject to OpenAI review; do not split them back into tools named after customer resources to bypass findings.
+
+The sections below record earlier scans and superseded approaches; they are not instructions for the current release. Uploading a ZIP updates package metadata/skills only. Complete the backend production rollout and verify its native catalog before requesting a new MCP scan.
+
+---
+
 # Tasky plugin review matrix
 
 Build the public submission ZIP with `node scripts/build-codex-package.mjs submission`. It contains no registered-app references or hooks. The manifest includes five positive and three negative review scenarios; those definitions are not recorded pass results.
