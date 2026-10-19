@@ -307,9 +307,9 @@ Agents must not change public access, roles, users, or sharing settings unless t
 
 ## Configured button execution
 
-For external clients, use the stable `bt_boards_invoke_detail_widget_action` operation with the selected board `id`, button `widgetId` and `itemId`. Read `bt_boards_get` with `includeExecution: true` for the configured button's current revision and inspect its saved workflow/bindings. Pass the reviewed revision as optional `definitionRevision`. One reusable operation serves every authorized board button. Confirm its actual effects and obtain the required `mcp:destructive` grant and policy/app access before activation. The server resolves the saved bindings; callers cannot replace the workflow through this operation.
+Use the configuration reads to inspect saved editor data. For a non-executing check, call `bt_api_tools_preview_endpoint` with `id`, `endpointKey` and `input`; `bt_workflows_preview_trigger` with `workflowId`, `actionInstanceId` and `testData`; or `bt_boards_preview_detail_widget_action` with `id`, `widgetId` and `itemId`. These read-only validations return `valid`, `executionPerformed: false`, `definitionRevision`, `validationScope` and `limitations`. They do not execute downstream nodes, render arbitrary request templates or prove successful delivery. Pass the reviewed `definitionRevision` to the matching real execution tool when available. On `MCP_RESOURCE_CHANGED`, inspect the changed configuration, repeat validation and obtain approval of its current effects. Never invent a revision, infer execution success from validation or generate a tool name from a resource.
 
-Changing a button, its bindings or referenced workflow requires rereading the resource and reviewing its revision, not creating or discovering a replacement tool. Component and trigger-schema reads configure buttons without granting execution access. The internal `bt_boards_invoke_detail_widget_action` is not an external fallback.
+Changing a button, its bindings or referenced workflow requires repeating its read-only validation and reviewing the changed configuration. The automation and trigger choice reads return `{options: [...]}` for the editor; the trigger schema read returns the saved input-binding definition for configuration. Neither grants execution rights.
 
 ## Expected MCP Tools
 
@@ -327,4 +327,5 @@ Use:
 - `bt_boards_list_allowed_users`, `bt_boards_add_allowed_user`, `bt_boards_update_allowed_user`, `bt_boards_revoke_allowed_user`, `bt_boards_restore_allowed_user`, `bt_boards_delete_allowed_user`
 - `bt_boards_init_item_field_file_upload`, `bt_boards_complete_item_field_file_upload`, `bt_boards_get_item_field_file_download_url`, `bt_boards_delete_item_field_file`
 
-Read the selected resource with `includeExecution: true`: `bt_workflows_get` for workflow revisions and trigger data schemas, `bt_api_tools_get` for endpoint revisions and parameter schemas, or `bt_boards_get` for button revisions. Copy its `execution` revision into the stable operation's `definitionRevision` argument. Pass resource IDs and business data using that operation's declared fields. On `MCP_RESOURCE_CHANGED`, reread that resource and review its changed effects before retrying; do not invent a revision or request a new tool name.
+
+Use `bt_boards_preview_detail_widget_action` before an approved real button activation. A valid result checks the saved target, trigger ownership and item presence only; it does not evaluate bindings or downstream nodes. Run `bt_boards_invoke_detail_widget_action` only after reviewing the actual saved workflow effects and obtaining execution consent.

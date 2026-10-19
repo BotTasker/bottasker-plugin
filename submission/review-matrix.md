@@ -1,3 +1,18 @@
+# Current release: 0.2.29
+
+Deploy the production server and verify the 327-tool catalog before uploading the ZIP and rescanning. All 321 previous public names and 70 Clients operations remain. Six fixed product operations are added; tenant resource names/counts never affect discovery.
+
+- Six configuration reads have explicit output contracts. API/workflow/board reads omit execution manifests and accept no includeExecution mode. Board automation/trigger editor choices return an options array in an object; their saved binding-schema read remains configuration data.
+- Workflow updates accept configuration fields only and require the workflow inactive. Separate activation, deactivation, start-test-listeners and stop-test-listeners operations have explicit side effects and consent requirements. No status/action selector can convert a configuration update into activation.
+- Three read-only previews validate the saved endpoint input, selected workflow trigger input, or configured board-button target/item. Each returns validation status, a revision and its limited validation scope; none dispatches a run, sends HTTP requests/messages, resolves credentials or evaluates custom code. They do not claim to simulate downstream workflow behavior or guarantee successful delivery.
+- Real endpoint/trigger/button execution remains dynamic, saved-resource scoped, input-validated and approval-gated. The owner explicitly requires dynamic workflows; no resource-specific tools or restrictive per-organization allowlists are introduced. These contracts may still need human review. Do not claim automatic acceptance before the scan result.
+
+Authorization uses existing seeded policies: read policies for previews, workflows:update for editing/activation, workflows:run for listeners. No new roles or OAuth grants. The package retains the three languages, video and demo review cases; credentials stay in the secure portal.
+
+Earlier sections below describe historical scans and are superseded by this release.
+
+---
+
 # Current release: 0.2.28
 
 Production must be deployed and verified before this ZIP is uploaded. The public catalog now contains 321 original names, including all 70 Clientes operations; it introduces no customer-specific tool names. The duplicate `bt_apps_run_implementation_plan` alias stays internal because it only previews stages; the existing `bt_apps_implementation_plan` remains the public planner. Clientes control descriptions now distinguish cancellation, a resumable pause, future outbound scheduling, recording real manual contact and classifying a real incoming response.
