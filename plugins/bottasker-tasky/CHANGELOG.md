@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.28
+
+- Clarify the actual effects and limits of Clientes cancellation, resuming, manual-contact completion and response classification.
+- Keep the duplicate planning-only runner alias internal; use the existing implementation planner instead. The public catalog contains 321 historical names and all 70 Clientes operations.
+- Preserve the original reusable execution contracts, three languages, production OAuth and video. Deploy and verify the server before uploading this ZIP and requesting another scan.
+
 ## 0.2.27
 
 - Restore original reusable workflow, API endpoint, board-button and process-editing tool contracts; do not create tools from customer resource names or split each process edit into a new tool.

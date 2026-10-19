@@ -1,3 +1,15 @@
+# Current release: 0.2.28
+
+Production must be deployed and verified before this ZIP is uploaded. The public catalog now contains 321 original names, including all 70 Clientes operations; it introduces no customer-specific tool names. The duplicate `bt_apps_run_implementation_plan` alias stays internal because it only previews stages; the existing `bt_apps_implementation_plan` remains the public planner. Clientes control descriptions now distinguish cancellation, a resumable pause, future outbound scheduling, recording real manual contact and classifying a real incoming response.
+
+The 0.2.27 automated scan reported 13 grouped-operation findings, one misleading runner-name finding, one unclear cancellation description and two new-definition/further-review notices for manual follow-up completion and response classification. The name and description findings are corrected here. The owner explicitly requested the original reusable interface rather than tools generated from each customer's workflows or endpoints. The remaining reusable-contract findings are submitted for human consideration, not hidden or claimed to have passed.
+
+Seven flagged tools only read configuration or preview document edits: process preview, API/workflow/board reads, and the three board automation-choice/schema reads. They do not execute the returned configuration. The six write/execution contracts are the bounded process editor, saved endpoint execution, workflow update/testing/trigger execution and configured board-button invocation. Each has a static schema, fixed product action boundary, existing tenant/app guards and explicit approval/consent. IDs are resource data; configuration schemas never add callable tools. Only process documentation edits use the fully enumerated bounded operation array; no arbitrary backend action is accepted.
+
+The two Clients notices request further review rather than identify a specific runtime defect. Manual completion is restricted to manual-mode cycles and does not send messages. Classification validates a real incoming message and can close a purpose, pause it or restrict client contact, but does not itself send or automatically restart a cycle. Existing policies, revision checks and truthful destructive annotations remain authoritative. Reviewer credentials remain separately entered by the owner; keep using the dedicated test account and sample data.
+
+---
+
 # Current release: 0.2.27
 
 The owner requested the original reusable catalog rather than the later per-action expansion. Version 0.2.27 restores the public names from the pre-review baseline, retaining all 70 Clients tools. It removes generated customer/workflow tool names and the 13-way process-editor split. There are 322 public operations: the old unsupported raw consumption-log wrapper stays removed and one duplicate dashboard alias stays internal. No new public names are introduced relative to the 324-name historical baseline.

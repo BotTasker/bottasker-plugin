@@ -1,6 +1,6 @@
 {
   "name": "bottasker-tasky",
-  "version": "0.2.27",
+  "version": "0.2.28",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -119,7 +119,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Restore the original reusable tool catalog and keep all native Clients capabilities. Remove per-workflow, per-endpoint and per-customer tool names and the later process-action split. Retain tenant isolation, OAuth authorization, English, Spanish, Brazilian Portuguese and the demonstration video.",
+        "release_notes": "Clarify Clients cancellation, resume, manual-contact completion and response-classification effects. Retire the duplicate planning-only runner alias whose name implied execution. Preserve the original reusable catalog, all 70 Clients tools, production OAuth, English, Spanish, Brazilian Portuguese and the demonstration video. Reusable execution contracts remain available for human review without customer-specific tool names.",
         "translations": {
           "en-US": {
             "subtitle": "Build and run BotTasker apps",
