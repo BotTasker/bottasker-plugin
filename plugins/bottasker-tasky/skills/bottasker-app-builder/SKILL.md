@@ -38,7 +38,7 @@ Roles and permissions are not a default pillar for this skill right now. Only in
 7. Compile approved blueprints into proposed setup stages with `bt_apps_implementation_plan`; this does not execute them.
 8. If AI Agents may be needed, call `bt_ai_agent_tools_discover` only as supporting discovery, not as the owner of the app plan.
 9. Present the app blueprint as a visual design and ask for approval before writes.
-10. Review the proposed stages against current discovery and approvals. Execute each real setup step through its separately declared tool and verify the result; `bt_apps_run_implementation_plan` can preview those stages but does not execute them.
+10. Review the proposed stages against current discovery and approvals. Execute each real setup step through its separately declared tool and verify the result; use the read-only `bt_apps_implementation_plan` to preview stages. The duplicate legacy runner alias is internal because it does not execute them.
 11. Create or update the app with `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, or approved staged tools from the implementation plan.
 12. Delegate module implementation to specialists after app creation:
    - `bottasker-data-architect` for Base de datos (Data Hub), models, relations, records, and Dynamic Tables.
