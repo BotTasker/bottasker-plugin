@@ -131,3 +131,5 @@ For workflows triggered by forms, provide the target workflow id and trigger act
 For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.
 
 A workflow can have several distinct configured triggers. Use the exact trigger-specific tool and title returned by discovery, including its trigger identity; do not treat two triggers of the same workflow as interchangeable or choose by a truncated common workflow name.
+
+Read the individual workflow tool description before execution: it identifies the event input, saved action inventory and real effects. Branches decide which saved actions run. A successful dispatch with `workflowRunnerId` and `triggeredTargets` does not establish that downstream work has finished. Test mode can perform real writes, execute saved custom functions and send messages; never describe it as a simulation.
