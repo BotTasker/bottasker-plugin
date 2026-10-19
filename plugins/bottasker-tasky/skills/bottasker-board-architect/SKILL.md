@@ -307,7 +307,7 @@ Agents must not change public access, roles, users, or sharing settings unless t
 
 ## Individually exposed button execution
 
-For external MCP clients, invoke a configured button only through its exact `bt_exec_button_*` tool returned by current discovery. Its board, button and automation revision are fixed; supply only the declared item input. Confirm the automation's effects and obtain the required `mcp:destructive` grant before execution. The internal `bt_boards_invoke_detail_widget_action` executor is available only inside BotTasker, not as an external fallback.
+For external MCP clients, invoke a configured button only through its exact `bt_click_board_button_*` tool returned by current discovery. Its board, button and automation revision are fixed; supply only the declared item input. Confirm the automation's effects and obtain the required `mcp:destructive` grant before execution. The internal `bt_boards_invoke_detail_widget_action` executor is available only inside BotTasker, not as an external fallback.
 
 After changing a button, its bindings or its referenced workflow, refresh discovery and review the replacement tool. Catalog and trigger-schema reads configure a button but do not make a new execution callable or grant permission to run it. If an individual tool is unavailable, validate the saved configuration or explain the UI execution requirement.
 
@@ -326,3 +326,5 @@ Use:
 - `bt_boards_list_public_roles`, `bt_boards_add_public_role`, `bt_boards_update_public_role`, `bt_boards_delete_public_role`
 - `bt_boards_list_allowed_users`, `bt_boards_add_allowed_user`, `bt_boards_update_allowed_user`, `bt_boards_revoke_allowed_user`, `bt_boards_restore_allowed_user`, `bt_boards_delete_allowed_user`
 - `bt_boards_init_item_field_file_upload`, `bt_boards_complete_item_field_file_upload`, `bt_boards_get_item_field_file_download_url`, `bt_boards_delete_item_field_file`
+
+For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.

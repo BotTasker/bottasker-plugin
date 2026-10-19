@@ -25,10 +25,17 @@ Two inspected findings require a separate server-definition review: `bt_registry
 
 ## Individual execution acceptance
 
-- Discover eligible `bt_exec_*` endpoint, workflow-trigger, test-mode and button operations in `tools/list`; each target has a separate name, strict input schema and declared effects.
+### Observed 0.2.20 production scan — 2026-10-19
+
+Backend PR #608 and plugin PR #16 were merged. Production rollout completed successfully. OpenAI scanned 299 tools, including 18 individual execution declarations, with none of the four internal generic executors exposed. The original 42 findings were absent from this result. The new result had 30 findings on 25 tools: seven overwrite annotations, 18 unclear individual execution names and five further-review notices on a subset of those executions. Version 0.2.21 addresses the annotation/name findings; a new production scan is required before reporting their resolution. Further review remains OpenAI's decision.
+
+The owner-approved Tasky privacy disclosure was published through website PRs #33 and #34 and verified on the Spanish and English public pages. The owner will enter reviewer credentials manually at the end.
+
+- Discover eligible `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` and `bt_click_board_button_*` endpoint, workflow-trigger, test-mode and button operations in `tools/list`; each target has a separate name, strict input schema and declared effects.
 - Confirm the generic `bt_api_tools_test_endpoint`, `bt_workflows_start_testing`, `bt_workflows_run_trigger_test` and `bt_boards_invoke_detail_widget_action` operations are not available to external OAuth/API-key clients.
 - Under the initial read/write grant, inspect declarations without executing them. Calling an execution must require `mcp:destructive`; obtain explicit approval before step-up.
-- Reject changed target selectors or extra fields. Update a saved configuration, refresh discovery and confirm the old operation name is no longer accepted.
+- Reject changed target selectors or extra fields. Update a saved configuration, refresh discovery and confirm the old definition revision is no longer accepted.
+- Supply the exact single allowed `definitionRevision` and put business arguments under `input`. After a configuration change, the old revision must be rejected even if the readable tool name remains the same. Refresh and review the new contract before approving it.
 - Confirm missing policy and cross-organization/app access still fail. Do not run production sends or automation tests just to satisfy review; use a dedicated demo organization.
 - Record the actual post-deployment OpenAI scan. Local contract tests do not establish that all automated findings or human review requirements passed.
 
@@ -67,7 +74,7 @@ Run the same functional cases with the demo account in Spanish, Brazilian Portug
 
 - `mcp:read` exposes read and planning tools.
 - `mcp:write` exposes reversible writes only.
-- Destructive tools remain hidden until a separate `mcp:destructive` grant is approved.
+- Static destructive tools remain hidden until a separate `mcp:destructive` grant is approved. Individual execution declarations are visible for upfront review; invocation still requires that separate grant.
 - Revoking the connection in BotTasker makes the next MCP request return `401`.
 - A token issued for another audience or organization is rejected.
 

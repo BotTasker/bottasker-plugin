@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.21
+
+- Replaced opaque individual execution names with readable verbs and business purposes, and added full display titles.
+- Bound execution approval to the required single-value `definitionRevision` in each strict input contract; changed configurations reject old revisions even after resolving the same readable name.
+- Corrected overwrite annotations for process editing, bulk product upserts and five CRM configuration/import/draft writes.
+- Updated four skills for the readable names and explicit revision input. All three languages and the demonstration video remain included.
+
 ## 0.2.20
 
 - Added individually declared, revision-bound API endpoint, workflow trigger/test-mode and board-button executions in the companion MCP server.
