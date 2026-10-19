@@ -45,10 +45,12 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 
 ## Execution discovery and step-up
 
-Individually declared `bt_exec_*` operations may be listed before their execution scope is granted so the host can review their exact contract. Listing is not permission to run them. These operations require `mcp:destructive`, the corresponding BotTasker policy and app access, and explicit approval for their actual effects. A normal read/write connection must not be silently expanded.
+Individually declared `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` and `bt_click_board_button_*` operations may be listed before their execution scope is granted so the host can review their exact contract. Listing is not permission to run them. These operations require `mcp:destructive`, the corresponding BotTasker policy and app access, and explicit approval for their actual effects. A normal read/write connection must not be silently expanded.
 
 A saved operation's configuration revision is part of its tool name. `MCP_OPERATION_CHANGED` means its previous definition is stale: refresh native MCP discovery and review the current individual tool. Do not reconnect with broader access merely to bypass this check or use an internal generic executor as a fallback.
 
 ## Revocation
 
 The user can revoke Tasky under BotTasker **Conexiones → Asistentes de IA** or clear authentication in the client. Revocation invalidates the grant for the next MCP request.
+
+For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.

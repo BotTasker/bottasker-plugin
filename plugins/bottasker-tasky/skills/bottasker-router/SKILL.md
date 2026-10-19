@@ -93,7 +93,7 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 
 ## Individually declared executions
 
-For saved API endpoint executions, workflow trigger tests, workflow test-mode changes and board button actions, use only the exact `bt_exec_*` tool already returned by the active MCP server's `tools/list` or `bt_mcp_find_tools`. Each tool binds one saved operation, its app and a configuration revision; do not invent its name or pass resource/operation selectors absent from its input schema. Catalogs and editor configuration schemas are not execution permissions or callable tools.
+For saved API endpoint executions, workflow trigger tests, workflow test-mode changes and board button actions, use only the exact `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` and `bt_click_board_button_*` tool already returned by the active MCP server's `tools/list` or `bt_mcp_find_tools`. Each tool binds one saved operation, its app and the required `definitionRevision`; do not invent its name or pass resource/operation selectors absent from its input schema. Catalogs and editor configuration schemas are not execution permissions or callable tools.
 
 Configuration changes produce a different tool name. On `MCP_OPERATION_CHANGED` or an outdated tool name, refresh native discovery, inspect the new description and schema, and obtain renewed approval when the operation or effects changed. Never retry through the internal generic executor, a different API, or a fabricated tool. If no eligible individual tool is exposed, report the limitation and prepare the configuration or use the BotTasker UI with the user's direction.
 
@@ -106,3 +106,5 @@ Core tools include `bt_context_get_profile`, `bt_apps_list_modules`, `bt_apps_bl
 For AI Agent item configuration also use `bt_ai_agent_prepare_item_config` and `bt_ai_agent_validate_item_config` before `bt_ai_agents_add_item`.
 
 Use `bt_mcp_find_tools` whenever discovery/listing looks inconsistent. If a module has write permissions but no matching MCP tool, report the `notExposedReason` instead of guessing payloads.
+
+For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.

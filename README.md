@@ -299,7 +299,7 @@ Repository and connected installs use a transport-only `mcp.json` with native OA
 
 ### Individually declared execution tools
 
-The companion MCP server declares one `bt_exec_*` tool for each admitted saved API endpoint, workflow trigger, workflow test-mode toggle and board button. Each has an explicit input schema and binds the target app/resource and a configuration fingerprint. The handler checks configuration again before dispatch. These checks do not freeze an asynchronous workflow against subsequent administrator edits.
+The companion MCP server declares one individual `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` or `bt_click_board_button_*` tool for each admitted saved API endpoint, workflow trigger, workflow test-mode toggle and board button. Each has a readable purpose, a full title and an explicit input schema with the single allowed `definitionRevision` and bounded business arguments under `input`. This binds approval to the target app/resource and configuration even when the readable name stays the same. The handler checks configuration again before dispatch. These checks do not freeze an asynchronous workflow against subsequent administrator edits.
 
 Public clients cannot use the internal generic API/workflow/button executors. Discover the exact individual tool from `tools/list`; do not construct a revision-bound name. Strict local object schemas are required; unrestricted objects and remote schema references are not admitted. A configuration change requires fresh discovery and review of the replacement definition.
 

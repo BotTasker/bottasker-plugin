@@ -118,7 +118,7 @@ When a workflow must interact with Yango Fleet:
 
 ## Public execution contracts
 
-Saved endpoint and workflow executions in Codex/Claude use exact `bt_exec_api_*`, `bt_exec_workflow_*` and `bt_exec_testmode_*` tools declared by the active server. Discover them after saving configuration; do not construct their revision-bound names. Read the fixed operation and input schema, explain its actual effects and obtain approval before the native OAuth step-up to `mcp:destructive`.
+Saved endpoint and workflow executions in Codex/Claude use exact `bt_call_api_*`, `bt_run_workflow_*` and `bt_toggle_workflow_test_*` tools declared by the active server. Discover them after saving configuration; do not construct their names or revision values. Read the fixed operation and input schema, explain its actual effects and obtain approval before the native OAuth step-up to `mcp:destructive`.
 
 `bt_api_tools_test_endpoint`, `bt_workflows_start_testing` and `bt_workflows_run_trigger_test` are internal BotTasker operations. Use them only when executing inside BotTasker with internal authentication and the tool is actually available. For external MCP clients, use the individually listed replacement; if none is admitted, validate the explicit input schema and saved configuration or report that testing needs the BotTasker UI. Configuration metadata never authorizes execution of an unlisted operation. After editing a configured endpoint or workflow, refresh discovery and review the new individual tool before running it.
 
@@ -127,3 +127,5 @@ Saved endpoint and workflow executions in Codex/Claude use exact `bt_exec_api_*`
 Use `bt_ai_agent_tools_discover`, `bt_registry_*`, `bt_ai_agents_*`, `bt_workflows_*`, `bt_action_instances_*`, and `bt_workflow_runs_get_events`.
 
 For workflows triggered by forms, provide the target workflow id and trigger action instance id back to `bottasker-forms-architect`, then let Forms configure the `workflow.trigger` connector and submission mapping.
+
+For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.
