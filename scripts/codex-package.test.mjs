@@ -88,11 +88,34 @@ test('repository runtime stays desktop-compatible while submission preserves exp
   const server = readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky']
   assert.equal(server.url, runtime.mcpServers['bottasker-tasky'].url)
   assert.deepEqual(server.extensions['com.openai'].auth, {
-    type: 'oauth', client: { mode: 'cimd' }, resource: server.url,
+    type: 'oauth', client: {
+      mode: 'provided', clientId: 'T8HLDAid7PWyT6sv3ZpuYfkL6t7FXLo1', tokenEndpointAuthMethod: 'none',
+    },
+    authorizationUrl: 'https://api.bottasker.ai/oauth/authorize',
+    tokenUrl: 'https://api.bottasker.ai/oauth/token', resource: server.url,
     baseScopes: ['mcp:read', 'mcp:write'], defaultScopes: ['mcp:read', 'mcp:write'],
   })
   assert.deepEqual(readJson(path.join(root, 'plugins/bottasker-tasky/mcp.json')), runtime)
 })
+
+for (const [label, mutate] of [
+  ['missing client ID', (auth) => { delete auth.client.clientId }],
+  ['client secret in package', (auth) => { auth.client.clientSecret = 'must-not-be-packaged' }],
+  ['top-level client secret in package', (auth) => { auth.clientSecret = 'must-not-be-packaged' }],
+  ['confidential client method', (auth) => { auth.client.tokenEndpointAuthMethod = 'client_secret_basic' }],
+  ['destructive initial scope', (auth) => { auth.defaultScopes.push('mcp:destructive') }],
+]) {
+  test(`validator rejects unsafe or incomplete submission OAuth: ${label}`, (t) => {
+    const root = fixture(t)
+    const file = path.join(root, 'submission/mcp.json')
+    const mcp = readJson(file)
+    mutate(mcp.mcpServers['bottasker-tasky'].extensions['com.openai'].auth)
+    fs.writeFileSync(file, JSON.stringify(mcp))
+    const result = spawnSync(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')], { encoding: 'utf8' })
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /submission OAuth/)
+  })
+}
 
 test('validator rejects runtime extensions rejected by the native desktop MCP loader', (t) => {
   const root = fixture(t)

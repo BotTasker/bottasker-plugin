@@ -8,6 +8,21 @@ For private connected-app acceptance, use the exact personal `plugin_asdk_app_â€
 
 [Tasky demonstration video](https://youtu.be/GE1NGw_v7jc) is declared in both manifests at `extensions.com.openai.review.demo_recording_url` and retained by both package profiles. The supplementary PDF is `output/pdf/tasky-review.pdf`; the portal imports the URL from the ZIP manifest. The link is supplied by the publisher; language acceptance results must still be recorded separately.
 
+## Submission portal OAuth acceptance
+
+- Create the connection with the registered public client in `submission/mcp.json`; no client secret is required.
+- Compare the client ID in the actual authorization request with the package. An existing registered client may survive later ZIP uploads.
+- Register the exact callback shown by OpenAI in the provider, with owner authorization; do not assume the general ChatGPT callback is selected.
+- Complete BotTasker sign-in, choose the intended organization, and approve the displayed safe scope request.
+- Confirm OpenAI reports the account connected, then wait for the separate MCP tool scan to finish. Account connection alone is not a passing scan.
+- If a replacement registration is necessary, validate it before requesting any irreversible deletion of an existing plugin.
+
+### Observed verification result â€” 2026-10-19
+
+The independent `Tasky OAuth verification` draft completed owner-selected organization consent and reported `Account connected`. OpenAI discovered 292 tools and returned findings for 44 of them. This verifies OAuth and tool discovery for that draft, not migration of the original draft or marketplace approval.
+
+Two inspected findings require a separate server-definition review: `bt_registry_list_workers` was flagged for operations not individually exposed; `bt_processes_apply_changes` was flagged both for grouped operations and possible material loss or hard-to-reverse behavior while declaring `destructiveHint: false`. These are scanner findings, not confirmed runtime defects. Review actual operation behavior, schema and annotations before changing them or resubmitting. Do not fix these by broadening the initial OAuth scopes.
+
 ## Native Codex acceptance
 
 - Confirm the personal app is visible to the same Codex account/workspace; public publication is not a prerequisite.
