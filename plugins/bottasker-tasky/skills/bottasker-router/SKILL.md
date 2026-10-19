@@ -91,13 +91,11 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 - In visible plans, describe the outcome and business object, not the tool that will execute it. For example, say "Crear un tablero kanban para Driver agrupado por etapa actual", not "Usar bt_boards_create_from_data_hub_model".
 - If technical identifiers are necessary for execution, use them only inside MCP tool inputs or internal context, not in the message shown to the user.
 
-## Individually declared executions
+## Stable product operations and dynamic resources
 
-For saved API endpoint executions, workflow trigger tests, workflow test-mode changes and board button actions, use only the exact `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` and `bt_click_board_button_*` tool already returned by the active MCP server's `tools/list` or `bt_mcp_find_tools`. Each tool binds one saved operation, its app and the required `definitionRevision`; do not invent its name or pass resource/operation selectors absent from its input schema. Catalogs and editor configuration schemas are not execution permissions or callable tools.
+The public MCP catalog describes stable product operations, not tools generated from an organization's saved resources. Use `bt_api_tools_call_endpoint`, `bt_workflows_run`, `bt_workflows_set_test_mode`, `bt_workflows_set_status` and `bt_boards_click_button` when those exact operations are available. Select the authorized app, resource, trigger or endpoint by IDs returned from reads. Resource names, additions and edits never create tool names or require new discovery. Editor component schemas describe configuration data; they do not add callable MCP operations.
 
-Configuration changes produce a different tool name. On `MCP_OPERATION_CHANGED` or an outdated tool name, refresh native discovery, inspect the new description and schema, and obtain renewed approval when the operation or effects changed. Never retry through the internal generic executor, a different API, or a fabricated tool. If no eligible individual tool is exposed, report the limitation and prepare the configuration or use the BotTasker UI with the user's direction.
-
-Individual executions declare their effects and require an explicit `mcp:destructive` OAuth grant. Being listed does not grant permission to execute. Preserve the initial read/write grant; request elevation only after user approval of the concrete operation.
+Listing a public operation is not permission to use it. Each call enforces the OAuth scope, BotTasker policy, organization and app access. Real executions and workflow activation/test-mode changes require explicit approval of their concrete effects before requesting `mcp:destructive`; preserve the initial read/write grant. Do not fall back to an internal executor or another API after an authorization failure.
 
 ## Expected MCP Tools
 
@@ -107,4 +105,4 @@ For AI Agent item configuration also use `bt_ai_agent_prepare_item_config` and `
 
 Use `bt_mcp_find_tools` whenever discovery/listing looks inconsistent. If a module has write permissions but no matching MCP tool, report the `notExposedReason` instead of guessing payloads.
 
-For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.
+Read the selected resource with `includeExecution: true`: `bt_workflows_get` for workflow revisions and trigger data schemas, `bt_api_tools_get` for endpoint revisions and parameter schemas, or `bt_boards_get` for button revisions. Copy its `execution` revision into the stable operation's `definitionRevision` argument. Pass resource IDs and business data using that operation's declared fields. On `MCP_RESOURCE_CHANGED`, reread that resource and review its changed effects before retrying; do not invent a revision or request a new tool name.

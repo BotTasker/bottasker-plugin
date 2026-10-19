@@ -43,14 +43,16 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 - Ask the user to open a new conversation only when the client has authenticated successfully but the current conversation still has a stale tool snapshot.
 - When recovery succeeds, continue the user's original request. Do not require a ceremonial confirmation such as “listo” unless the client genuinely needs a new user turn to refresh its tools.
 
-## Execution discovery and step-up
+## Operation discovery and step-up
 
-Individually declared `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` and `bt_click_board_button_*` operations may be listed before their execution scope is granted so the host can review their exact contract. Listing is not permission to run them. These operations require `mcp:destructive`, the corresponding BotTasker policy and app access, and explicit approval for their actual effects. A normal read/write connection must not be silently expanded.
+The stable public catalog is product metadata and can describe operations before execution consent or resource access is granted. It does not enumerate an organization's workflows or create tools for its resources. Listing is not permission to execute: every call separately checks OAuth scope, policy and organization/app access.
 
-A saved operation's configuration revision is part of its tool name. `MCP_OPERATION_CHANGED` means its previous definition is stale: refresh native MCP discovery and review the current individual tool. Do not reconnect with broader access merely to bypass this check or use an internal generic executor as a fallback.
+`bt_api_tools_call_endpoint`, `bt_workflows_run`, `bt_workflows_set_test_mode`, `bt_workflows_set_status` and `bt_boards_click_button` use authorized resource IDs and the current resource revision. They require `mcp:destructive` and explicit approval of actual effects. Do not silently expand a normal read/write connection. A new workflow or changed configuration does not require reconnection or a new conversation.
+
+`MCP_RESOURCE_CHANGED` means the selected resource configuration changed: reread it with `includeExecution: true` and review the new revision. Broader consent cannot bypass that check. Never fall back to internal generic executors.
 
 ## Revocation
 
 The user can revoke Tasky under BotTasker **Conexiones → Asistentes de IA** or clear authentication in the client. Revocation invalidates the grant for the next MCP request.
 
-For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.
+Read the selected resource with `includeExecution: true`: `bt_workflows_get` for workflow revisions and trigger data schemas, `bt_api_tools_get` for endpoint revisions and parameter schemas, or `bt_boards_get` for button revisions. Copy its `execution` revision into the stable operation's `definitionRevision` argument. Pass resource IDs and business data using that operation's declared fields. On `MCP_RESOURCE_CHANGED`, reread that resource and review its changed effects before retrying; do not invent a revision or request a new tool name.
