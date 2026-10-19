@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.29
+
+- Keep workflows dynamic and tool names identical across organizations; retain all 70 Clients tools.
+- Separate inactive workflow configuration edits, activation/deactivation and starting/stopping test listeners. Real execution still requires consent and approval.
+- Add three read-only validations for saved endpoint input, workflow trigger input and board-button targets. They never dispatch or claim downstream execution success.
+- Give six editor reads explicit output contracts; remove the execution-manifest mode from configuration reads.
+- Preserve production OAuth, three languages and the video. Deploy and verify the server before upload and rescan.
+
 ## 0.2.28
 
 - Clarify the actual effects and limits of Clientes cancellation, resuming, manual-contact completion and response classification.
