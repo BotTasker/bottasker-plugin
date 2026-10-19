@@ -91,6 +91,14 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 - In visible plans, describe the outcome and business object, not the tool that will execute it. For example, say "Crear un tablero kanban para Driver agrupado por etapa actual", not "Usar bt_boards_create_from_data_hub_model".
 - If technical identifiers are necessary for execution, use them only inside MCP tool inputs or internal context, not in the message shown to the user.
 
+## Individually declared executions
+
+For saved API endpoint executions, workflow trigger tests, workflow test-mode changes and board button actions, use only the exact `bt_exec_*` tool already returned by the active MCP server's `tools/list` or `bt_mcp_find_tools`. Each tool binds one saved operation, its app and a configuration revision; do not invent its name or pass resource/operation selectors absent from its input schema. Catalogs and editor configuration schemas are not execution permissions or callable tools.
+
+Configuration changes produce a different tool name. On `MCP_OPERATION_CHANGED` or an outdated tool name, refresh native discovery, inspect the new description and schema, and obtain renewed approval when the operation or effects changed. Never retry through the internal generic executor, a different API, or a fabricated tool. If no eligible individual tool is exposed, report the limitation and prepare the configuration or use the BotTasker UI with the user's direction.
+
+Individual executions declare their effects and require an explicit `mcp:destructive` OAuth grant. Being listed does not grant permission to execute. Preserve the initial read/write grant; request elevation only after user approval of the concrete operation.
+
 ## Expected MCP Tools
 
 Core tools include `bt_context_get_profile`, `bt_apps_list_modules`, `bt_apps_blueprint_plan`, `bt_apps_list`, `bt_apps_get`, `bt_ai_agent_tools_discover`, `bt_ai_agent_blueprint_plan`, `bt_mcp_list_skills`, and `bt_mcp_load_skill`.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.20
+
+- Added individually declared, revision-bound API endpoint, workflow trigger/test-mode and board-button executions in the companion MCP server.
+- Removed external access to generic executors; internal BotTasker execution remains available.
+- Corrected write, overwrite, public-sharing and outbound-effect annotations, approval metadata and scope guards.
+- Updated four skills for individual execution discovery, stale-definition handling and explicit scope elevation.
+- Retained all three languages and the demonstration video.
+
+## 0.2.19
+
+- Configured portal submission with the registered public OAuth client, explicit endpoints, PKCE and no client secret. Native Codex and Claude installations continue to use OAuth discovery.
+- Added guards against missing client IDs, packaged client secrets, confidential-client authentication and destructive initial scopes.
+- Documented the portal's retained OAuth client registration, exact callback requirements and the separately verified account-connection and tool-scan stages.
+- Retained all 15 skills, English/Spanish/Brazilian Portuguese metadata, and the demonstration video URL.
+
 ## 0.2.18
 
 - Added the demonstration video URL to the portable and Codex review manifests: https://youtu.be/GE1NGw_v7jc.

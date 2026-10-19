@@ -140,9 +140,16 @@ if (submissionMcp.$schema !== portableMcp.$schema || Object.keys(submissionMcp.m
     submissionServer?.type !== portableServer?.type || submissionServer?.url !== portableServer?.url) {
   fail('submission MCP must match the runtime portable endpoint')
 }
-if (auth?.type !== 'oauth' || auth?.client?.mode !== 'cimd' || auth?.resource !== codexServer?.url ||
+if (auth?.type !== 'oauth' || auth?.client?.mode !== 'provided' ||
+    Object.keys(auth || {}).some((field) => !['type', 'client', 'authorizationUrl', 'tokenUrl', 'resource', 'baseScopes', 'defaultScopes'].includes(field)) ||
+    !/^[A-Za-z0-9_-]{32}$/.test(auth?.client?.clientId || '') ||
+    auth?.client?.tokenEndpointAuthMethod !== 'none' ||
+    Object.keys(auth?.client || {}).some((field) => !['mode', 'clientId', 'tokenEndpointAuthMethod'].includes(field)) ||
+    auth?.authorizationUrl !== 'https://api.bottasker.ai/oauth/authorize' ||
+    auth?.tokenUrl !== 'https://api.bottasker.ai/oauth/token' ||
+    auth?.resource !== codexServer?.url ||
     JSON.stringify(auth?.baseScopes) !== JSON.stringify(['mcp:read', 'mcp:write']) ||
-    JSON.stringify(auth?.defaultScopes) !== JSON.stringify(['mcp:read', 'mcp:write'])) fail('submission OAuth must prefer CIMD and request only safe initial scopes')
+    JSON.stringify(auth?.defaultScopes) !== JSON.stringify(['mcp:read', 'mcp:write'])) fail('submission OAuth must use the registered public client without a secret and request only safe initial scopes')
 
 for (const [label, config] of [['Codex', codexMcp], ['Claude', claudeMcp]]) {
   const serverNames = Object.keys(config.mcpServers || {})

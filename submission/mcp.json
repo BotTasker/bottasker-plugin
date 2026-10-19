@@ -9,8 +9,12 @@
           "auth": {
             "type": "oauth",
             "client": {
-              "mode": "cimd"
+              "mode": "provided",
+              "clientId": "T8HLDAid7PWyT6sv3ZpuYfkL6t7FXLo1",
+              "tokenEndpointAuthMethod": "none"
             },
+            "authorizationUrl": "https://api.bottasker.ai/oauth/authorize",
+            "tokenUrl": "https://api.bottasker.ai/oauth/token",
             "resource": "https://api.bottasker.ai/mcp",
             "baseScopes": [
               "mcp:read",

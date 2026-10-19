@@ -1,6 +1,6 @@
 {
   "name": "bottasker-tasky",
-  "version": "0.2.18",
+  "version": "0.2.20",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -119,7 +119,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Includes the demonstration video for OpenAI review, English, Spanish, and Brazilian Portuguese guidance and listing translations, plus the native Codex MCP loading fix.",
+        "release_notes": "Expose revision-bound individual API, workflow and board-button executions; correct MCP side-effect, overwrite and public-sharing annotations. Preserve English, Spanish, Brazilian Portuguese and the demonstration video.",
         "translations": {
           "en-US": {
             "subtitle": "Build and run BotTasker apps",

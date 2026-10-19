@@ -8,6 +8,30 @@ For private connected-app acceptance, use the exact personal `plugin_asdk_app_â€
 
 [Tasky demonstration video](https://youtu.be/GE1NGw_v7jc) is declared in both manifests at `extensions.com.openai.review.demo_recording_url` and retained by both package profiles. The supplementary PDF is `output/pdf/tasky-review.pdf`; the portal imports the URL from the ZIP manifest. The link is supplied by the publisher; language acceptance results must still be recorded separately.
 
+## Submission portal OAuth acceptance
+
+- Create the connection with the registered public client in `submission/mcp.json`; no client secret is required.
+- Compare the client ID in the actual authorization request with the package. An existing registered client may survive later ZIP uploads.
+- Register the exact callback shown by OpenAI in the provider, with owner authorization; do not assume the general ChatGPT callback is selected.
+- Complete BotTasker sign-in, choose the intended organization, and approve the displayed safe scope request.
+- Confirm OpenAI reports the account connected, then wait for the separate MCP tool scan to finish. Account connection alone is not a passing scan.
+- If a replacement registration is necessary, validate it before requesting any irreversible deletion of an existing plugin.
+
+### Observed verification result â€” 2026-10-19
+
+The independent `Tasky OAuth verification` draft completed owner-selected organization consent and reported `Account connected`. OpenAI discovered 292 tools and returned findings for 44 of them. After explicit owner approval, the original unpublished registration was deleted and recreated from the 0.2.19 package. The owner completed organization consent in the replacement, and its connection dialog reported `Authorized` and `Tools scanned successfully`. The replacement scan finished with 42 findings for 41 tools. Its review-information dialog imported English, Spanish (Peru) and Portuguese translations from the ZIP; reviewer sign-in credentials remain unset. These results verify OAuth and discovery; they do not establish marketplace approval or resolution of the scanner findings.
+
+Two inspected findings require a separate server-definition review: `bt_registry_list_workers` was flagged for operations not individually exposed; `bt_processes_apply_changes` was flagged both for grouped operations and possible material loss or hard-to-reverse behavior while declaring `destructiveHint: false`. These are scanner findings, not confirmed runtime defects. Review actual operation behavior, schema and annotations before changing them or resubmitting. Do not fix these by broadening the initial OAuth scopes.
+
+## Individual execution acceptance
+
+- Discover eligible `bt_exec_*` endpoint, workflow-trigger, test-mode and button operations in `tools/list`; each target has a separate name, strict input schema and declared effects.
+- Confirm the generic `bt_api_tools_test_endpoint`, `bt_workflows_start_testing`, `bt_workflows_run_trigger_test` and `bt_boards_invoke_detail_widget_action` operations are not available to external OAuth/API-key clients.
+- Under the initial read/write grant, inspect declarations without executing them. Calling an execution must require `mcp:destructive`; obtain explicit approval before step-up.
+- Reject changed target selectors or extra fields. Update a saved configuration, refresh discovery and confirm the old operation name is no longer accepted.
+- Confirm missing policy and cross-organization/app access still fail. Do not run production sends or automation tests just to satisfy review; use a dedicated demo organization.
+- Record the actual post-deployment OpenAI scan. Local contract tests do not establish that all automated findings or human review requirements passed.
+
 ## Native Codex acceptance
 
 - Confirm the personal app is visible to the same Codex account/workspace; public publication is not a prerequisite.

@@ -43,6 +43,12 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 - Ask the user to open a new conversation only when the client has authenticated successfully but the current conversation still has a stale tool snapshot.
 - When recovery succeeds, continue the user's original request. Do not require a ceremonial confirmation such as “listo” unless the client genuinely needs a new user turn to refresh its tools.
 
+## Execution discovery and step-up
+
+Individually declared `bt_exec_*` operations may be listed before their execution scope is granted so the host can review their exact contract. Listing is not permission to run them. These operations require `mcp:destructive`, the corresponding BotTasker policy and app access, and explicit approval for their actual effects. A normal read/write connection must not be silently expanded.
+
+A saved operation's configuration revision is part of its tool name. `MCP_OPERATION_CHANGED` means its previous definition is stale: refresh native MCP discovery and review the current individual tool. Do not reconnect with broader access merely to bypass this check or use an internal generic executor as a fallback.
+
 ## Revocation
 
 The user can revoke Tasky under BotTasker **Conexiones → Asistentes de IA** or clear authentication in the client. Revocation invalidates the grant for the next MCP request.

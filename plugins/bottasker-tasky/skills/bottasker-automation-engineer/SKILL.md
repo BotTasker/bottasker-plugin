@@ -32,7 +32,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 8. Add nodes with `bt_workflows_add_action`.
 9. Configure action instances with `bt_action_instances_update_config`.
 10. Connect graph edges with `bt_workflows_add_edges`.
-11. Test with `bt_workflows_start_testing`, `bt_workflows_run_trigger_test`, and inspect with `bt_workflow_runs_get_events`.
+11. In external MCP clients, discover the exact individual workflow execution tools, review their effects and request approved scope elevation before testing. Inside BotTasker, use the available internal testing tools. Inspect results with `bt_workflow_runs_get_events`.
 
 ## Design Rules
 
@@ -115,6 +115,12 @@ When a workflow must interact with Yango Fleet:
 - Before update, load the current driver or vehicle when existing values must be preserved. For a v3 balance movement, map only `driver_id`, non-zero signed decimal `importe`, and `descripcion`; do not pass `categoria_id`. After creation, map the returned `id` and integer `version` into a bounded status-check path.
 - Put financially sensitive movements and ambiguous fleet writes behind an explicit approval or review step. Make retries idempotent-aware and never blindly repeat a create or balance operation after a timeout.
 - Test read-only nodes first, then each write path with a controlled record. Verify the final Yango state and inspect workflow events before enabling production traffic.
+
+## Public execution contracts
+
+Saved endpoint and workflow executions in Codex/Claude use exact `bt_exec_api_*`, `bt_exec_workflow_*` and `bt_exec_testmode_*` tools declared by the active server. Discover them after saving configuration; do not construct their revision-bound names. Read the fixed operation and input schema, explain its actual effects and obtain approval before the native OAuth step-up to `mcp:destructive`.
+
+`bt_api_tools_test_endpoint`, `bt_workflows_start_testing` and `bt_workflows_run_trigger_test` are internal BotTasker operations. Use them only when executing inside BotTasker with internal authentication and the tool is actually available. For external MCP clients, use the individually listed replacement; if none is admitted, validate the explicit input schema and saved configuration or report that testing needs the BotTasker UI. Configuration metadata never authorizes execution of an unlisted operation. After editing a configured endpoint or workflow, refresh discovery and review the new individual tool before running it.
 
 ## Expected MCP Tools
 
