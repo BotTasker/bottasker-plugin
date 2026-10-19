@@ -31,6 +31,10 @@ Backend PR #608 and plugin PR #16 were merged. Production rollout completed succ
 
 The owner-approved Tasky privacy disclosure was published through website PRs #33 and #34 and verified on the Spanish and English public pages. The owner will enter reviewer credentials manually at the end.
 
+### Observed 0.2.21 production scan — 2026-10-19
+
+Production workflow 39211318545 succeeded. OpenAI imported 299 tools with 18 readable individual executions and no old `bt_exec_*` names; all 15 skills and metadata passed. The scan returned 18 findings on 14 tools: one undo annotation, ten duplicate-name notices, and seven further-review notices (four overlap with duplicate notices). The catalog's literal names were all unique, but repeated triggers had identical full titles. Version 0.2.22 makes each trigger's identity prominent in both name and title and corrects the undo annotation. It also presents the app-stage compiler truthfully as planning and keeps its non-executing legacy helper internal. A post-deployment scan is still required; further-review notices are OpenAI decisions.
+
 - Discover eligible `bt_call_api_*`, `bt_run_workflow_*`, `bt_toggle_workflow_test_*` and `bt_click_board_button_*` endpoint, workflow-trigger, test-mode and button operations in `tools/list`; each target has a separate name, strict input schema and declared effects.
 - Confirm the generic `bt_api_tools_test_endpoint`, `bt_workflows_start_testing`, `bt_workflows_run_trigger_test` and `bt_boards_invoke_detail_widget_action` operations are not available to external OAuth/API-key clients.
 - Under the initial read/write grant, inspect declarations without executing them. Calling an execution must require `mcp:destructive`; obtain explicit approval before step-up.

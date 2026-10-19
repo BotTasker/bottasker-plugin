@@ -129,3 +129,5 @@ Use `bt_ai_agent_tools_discover`, `bt_registry_*`, `bt_ai_agents_*`, `bt_workflo
 For workflows triggered by forms, provide the target workflow id and trigger action instance id back to `bottasker-forms-architect`, then let Forms configure the `workflow.trigger` connector and submission mapping.
 
 For an individual execution, copy the single allowed `definitionRevision` from its current schema and put the business arguments under `input`. Never invent the revision, reuse an approval after its value changes, or bypass a revision mismatch; refresh discovery and review the changed operation first.
+
+A workflow can have several distinct configured triggers. Use the exact trigger-specific tool and title returned by discovery, including its trigger identity; do not treat two triggers of the same workflow as interchangeable or choose by a truncated common workflow name.
