@@ -305,6 +305,12 @@ When an AI Agent needs board capabilities, hand off to `bottasker-ai-agent-archi
 
 Agents must not change public access, roles, users, or sharing settings unless the app blueprint explicitly approves an administrative tool.
 
+## Individually exposed button execution
+
+For external MCP clients, invoke a configured button only through its exact `bt_exec_button_*` tool returned by current discovery. Its board, button and automation revision are fixed; supply only the declared item input. Confirm the automation's effects and obtain the required `mcp:destructive` grant before execution. The internal `bt_boards_invoke_detail_widget_action` executor is available only inside BotTasker, not as an external fallback.
+
+After changing a button, its bindings or its referenced workflow, refresh discovery and review the replacement tool. Catalog and trigger-schema reads configure a button but do not make a new execution callable or grant permission to run it. If an individual tool is unavailable, validate the saved configuration or explain the UI execution requirement.
+
 ## Expected MCP Tools
 
 Use:

@@ -23,6 +23,15 @@ The independent `Tasky OAuth verification` draft completed owner-selected organi
 
 Two inspected findings require a separate server-definition review: `bt_registry_list_workers` was flagged for operations not individually exposed; `bt_processes_apply_changes` was flagged both for grouped operations and possible material loss or hard-to-reverse behavior while declaring `destructiveHint: false`. These are scanner findings, not confirmed runtime defects. Review actual operation behavior, schema and annotations before changing them or resubmitting. Do not fix these by broadening the initial OAuth scopes.
 
+## Individual execution acceptance
+
+- Discover eligible `bt_exec_*` endpoint, workflow-trigger, test-mode and button operations in `tools/list`; each target has a separate name, strict input schema and declared effects.
+- Confirm the generic `bt_api_tools_test_endpoint`, `bt_workflows_start_testing`, `bt_workflows_run_trigger_test` and `bt_boards_invoke_detail_widget_action` operations are not available to external OAuth/API-key clients.
+- Under the initial read/write grant, inspect declarations without executing them. Calling an execution must require `mcp:destructive`; obtain explicit approval before step-up.
+- Reject changed target selectors or extra fields. Update a saved configuration, refresh discovery and confirm the old operation name is no longer accepted.
+- Confirm missing policy and cross-organization/app access still fail. Do not run production sends or automation tests just to satisfy review; use a dedicated demo organization.
+- Record the actual post-deployment OpenAI scan. Local contract tests do not establish that all automated findings or human review requirements passed.
+
 ## Native Codex acceptance
 
 - Confirm the personal app is visible to the same Codex account/workspace; public publication is not a prerequisite.

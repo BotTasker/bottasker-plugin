@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bottasker-tasky",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -118,7 +118,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Use a registered public OAuth client with PKCE and no client secret for OpenAI portal submission. Retain all 15 skills, English, Spanish and Brazilian Portuguese, the demo video, and native MCP discovery.",
+        "release_notes": "Expose revision-bound individual API, workflow and board-button executions; correct MCP side-effect, overwrite and public-sharing annotations. Preserve English, Spanish, Brazilian Portuguese and the demonstration video.",
         "translations": {
           "en-US": {
             "subtitle": "Build and run BotTasker apps",
