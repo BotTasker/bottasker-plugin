@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.25
+
+- Replaced opaque workflow worker-code inventories with readable event and action explanations.
+- Clarified real execution effects, conditional branches, strict event payloads and asynchronous dispatch results.
+- Updated Automation guidance; preserved independent process edits, separate WhatsApp sync, all three languages and the video.
+
 ## 0.2.24
 
 - Kept WhatsApp template listing strictly read-only and declared local Meta synchronization as a separate protected write.
