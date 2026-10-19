@@ -242,4 +242,6 @@ If required business content is missing, ask one focused question. If the missin
 
 ## Expected MCP Tools
 
-Use `bt_context_get_profile`, `bt_apps_list`, `bt_apps_get`, `bt_whatsapp_templates_list`, `bt_whatsapp_templates_upload_media`, `bt_whatsapp_templates_create_draft`, `bt_whatsapp_templates_create_pack`, and `bt_whatsapp_templates_submit`.
+Use `bt_context_get_profile`, `bt_apps_list`, `bt_apps_get`, `bt_whatsapp_templates_list`, `bt_whatsapp_templates_sync`, `bt_whatsapp_templates_upload_media`, `bt_whatsapp_templates_create_draft`, `bt_whatsapp_templates_create_pack`, and `bt_whatsapp_templates_submit`.
+
+Listing reads the local template copy without synchronizing with Meta. If the user needs a fresh copy, explain that synchronization creates or replaces local template records, obtain approval and use `bt_whatsapp_templates_sync` with the authorized credential. Then list again. Synchronization does not submit templates or send messages. Never pass a `sync` flag to the read-only list tool.
