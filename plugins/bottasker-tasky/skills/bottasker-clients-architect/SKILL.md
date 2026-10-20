@@ -61,7 +61,7 @@ For integrations, discover the real target connector or workflow node. A form is
 
 ## Tasks and follow-up are different operations
 
-Manual tasks use `bt_clients_list_tasks`, `bt_clients_create_tasks`, `bt_clients_update_tasks` and `bt_clients_list_followup_tasks`. They have title, description, responsible person, optional dueAt (Unix milliseconds), and `pending` / `completed` / `cancelled` state. A null/missing date is unscheduled. A normal task alone does not equip or wake an AI agent.
+Manual tasks use `bt_clients_list_tasks`, `bt_clients_create_tasks`, `bt_clients_update_tasks` and `bt_clients_list_followup_tasks`. They have title, description, responsible person, required dueAt (Unix milliseconds), and `pending` / `completed` / `cancelled` state. New tasks require a valid date and time; do not omit dueAt or send null to clear it. Existing undated historical records may still be read. A normal task alone does not equip or wake an AI agent.
 
 For native AI follow-up, distinguish three levels:
 
@@ -91,7 +91,7 @@ Configure the discovered access scope (`assigned` or `all`) and enabled `tools` 
 
 During conversation, capture/update the client, explicit contact, permitted qualification data and useful history. Start/reuse follow-up for a real unresolved commercial purpose. A first contact may need a return if identity/qualification is incomplete; later decisions depend on context. Do not follow up after rejection, completion, No contactar or human takeover, or when no useful pending purpose remains. Never schedule another cycle or manual task on every normal response. Use the existing pending task/cycle and the configured restart/continue/stop behavior; update an agreed date or close a fulfilled/rejected purpose through the contextual tool when appropriate.
 
-Automatic work is assigned to the resolved same AI agent (or configured fixed/fallback agent), not its creator. Only the next pending task exists. After a confirmed successful send the system creates the next step; no whole sequence of pending tasks upfront. Redis wakes the agent at the computed time; startup/hourly recovery handles the last hour. Tasky must not add its own cron, poll loop, Redis job, workflow timer or duplicate task to implement this behavior.
+Automatic work is assigned to the resolved same AI agent (or configured fixed/fallback agent), not its creator. Only the next pending task exists, and every new task has a valid dueAt. When a new cycle is awaiting the agent message, no task is created yet: the confirmed outgoing message supplies the timing anchor, then the system creates the dated task. A cycle waiting for its anchor is not a scheduled task. Do not invent a provisional date to hide a missing anchor. After a confirmed successful send the system creates the next step; no whole sequence of pending tasks upfront. Redis wakes the agent at the computed time; startup/hourly recovery handles the last hour. Tasky must not add its own cron, poll loop, Redis job, workflow timer or duplicate task to implement this behavior.
 
 ### Operate and diagnose a cycle
 

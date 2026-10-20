@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.30
+
+- Require a valid due date when creating client follow-up tasks; never clear a task deadline.
+- Distinguish the pending AI conversation cycle from its scheduled task: create the task only after the confirmed agent message provides the timing anchor.
+- Preserve existing task identity during replies and keep unrelated module guidance unchanged.
+
 ## 0.2.29
 
 - Keep workflows dynamic and tool names identical across organizations; retain all 70 Clients tools.
