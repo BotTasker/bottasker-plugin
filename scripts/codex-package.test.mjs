@@ -65,6 +65,23 @@ test('connected package uses only the supplied registered app and leaves canonic
   })
 })
 
+for (const identity of [
+  'asdk_app_0123456789abcdef0123456789abcdef',
+  pluginId,
+  `https://chatgpt.com/plugins/${pluginId}`,
+  `https://chatgpt.com/plugins/${pluginId}?directoryTab=personal`,
+]) {
+  test(`connected build accepts a copied ChatGPT identity: ${identity}`, (t) => {
+    const root = fixture(t)
+    const result = buildPackage({ root, profile: 'connected', pluginId: identity })
+    assert.equal(result.appId, 'asdk_app_0123456789abcdef0123456789abcdef')
+    assert.equal(readJson(path.join(result.plugin, '.app.json')).apps['bottasker-tasky'].id, result.appId)
+    assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 15)
+    assert.equal(readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky'].url, 'https://api.bottasker.ai/mcp')
+    assert.throws(() => buildPackage({ root, profile: 'submission', pluginId: identity }))
+  })
+}
+
 for (const video of [undefined, '', 'http://example.com/demo', 'https://user:password@example.com/demo']) {
   test(`validator rejects missing or unsafe demo recording URL: ${video ?? 'missing'}`, (t) => {
     const root = fixture(t)
@@ -157,7 +174,7 @@ for (const [label, mutate] of [
 
 test('invalid profile and missing or invented app identifiers fail before creating outputs', (t) => {
   const root = fixture(t)
-  for (const value of [undefined, '', 'asdk_app_0123456789abcdef0123456789abcdef', 'Tasky', `${pluginId}?x=1`]) {
+  for (const value of [undefined, '', 'Tasky', `${pluginId}?x=1`]) {
     assert.throws(() => normalizeAppId(value))
     assert.throws(() => buildPackage({ root, profile: 'connected', pluginId: value }))
   }
@@ -165,6 +182,24 @@ test('invalid profile and missing or invented app identifiers fail before creati
   assert.throws(() => buildPackage({ root, profile: 'public' }))
   assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
 })
+
+for (const value of [
+  `http://chatgpt.com/plugins/${pluginId}`,
+  `https://example.com/plugins/${pluginId}`,
+  `https://chatgpt.com.example.com/plugins/${pluginId}`,
+  `https://user:password@chatgpt.com/plugins/${pluginId}`,
+  `https://chatgpt.com:8443/plugins/${pluginId}`,
+  `https://chatgpt.com/connector/oauth/${pluginId}`,
+  `https://chatgpt.com/plugins/${pluginId}/other`,
+  `https://chatgpt.com/plugins/${pluginId}?code=do-not-accept`,
+  `https://chatgpt.com/plugins/${pluginId}#fragment`,
+]) {
+  test(`reject untrusted or incorrect app page before creating output: ${value}`, (t) => {
+    const root = fixture(t)
+    assert.throws(() => buildPackage({ root, profile: 'connected', pluginId: value }))
+    assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
+  })
+}
 
 test('validator rejects a submission OAuth resource pointing at the wrong environment', (t) => {
   const root = fixture(t)

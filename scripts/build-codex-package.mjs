@@ -7,11 +7,23 @@ import { readJson, writeJson } from './environment/runtime.mjs'
 const repository = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 export function normalizeAppId(value) {
-  // The personal-plugin URL identifies the plugin; .app.json references its app.
-  if (!/^plugin_asdk_app_[a-f0-9]{32}$/.test(value || '')) {
-    throw new Error('Copy the exact plugin_asdk_app_… ID from the registered personal plugin URL. No app ID is assumed.')
+  const invalid = () => new Error('Copy the registered asdk_app_… App ID, plugin_asdk_app_… plugin ID, or its https://chatgpt.com/plugins/… URL. No app ID is assumed.')
+  if (typeof value !== 'string') throw invalid()
+  let identifier = value.trim()
+  // Accept the two identifiers shown by ChatGPT and the actual plugin page,
+  // but never extract an ID from another host or an OAuth callback URL.
+  if (identifier.startsWith('https://')) {
+    let url
+    try { url = new URL(identifier) } catch { throw invalid() }
+    const match = url.pathname.match(/^\/plugins\/(plugin_asdk_app_[a-f0-9]{32})\/?$/)
+    if (url.origin !== 'https://chatgpt.com' || url.username || url.password || url.hash || !match ||
+        [...url.searchParams].some(([key, entry]) => key !== 'directoryTab' || entry !== 'personal')) {
+      throw invalid()
+    }
+    identifier = match[1]
   }
-  return value.slice('plugin_'.length)
+  if (!/^(?:plugin_)?asdk_app_[a-f0-9]{32}$/.test(identifier)) throw invalid()
+  return identifier.replace(/^plugin_/, '')
 }
 
 export function buildPackage({ root = repository, profile = 'submission', pluginId } = {}) {
@@ -81,9 +93,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   try {
     const args = process.argv.slice(2)
     if (args.length === 1 && args[0] === '--help') {
-      console.log('node scripts/build-codex-package.mjs [submission|connected --plugin-id=plugin_asdk_app_…]\n' +
+      console.log('node scripts/build-codex-package.mjs [submission|connected --plugin-id=<registered-app-id-or-plugin-url>]\n' +
         'Builds a ZIP and a local marketplace. Does not install, register, authenticate, or publish.\n' +
-        'Connected requires an existing personal plugin available to the current account.')
+        'Connected accepts an asdk_app_… App ID, plugin_asdk_app_… ID, or https://chatgpt.com/plugins/… URL.\n' +
+        'The registered app must already be available to the current account; the build cannot verify access.')
     } else {
       const profile = args[0] || 'submission'
       if (args.length > 2 || (args[1] && !args[1].startsWith('--plugin-id='))) throw new Error('Invalid arguments; use --help')

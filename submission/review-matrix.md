@@ -1,4 +1,10 @@
-# Current release: 0.2.29
+# Current release: 0.2.31
+
+Version 0.2.31 adds client-specific installation instructions and accepts a copied App ID, personal plugin ID or ChatGPT plugin URL for the connected development build. The public submission remains free of personal app mappings. This release changes packaging and documentation only; it does not deploy or change the MCP server's tool catalog.
+
+For connected-app acceptance, use a current registration accessible to the testing account/workspace. Verify one app, all 15 enabled skills, the selected OAuth account and a read-only profile request in a fresh conversation. A registration deleted during cleanup cannot be reused. Input validation and packaging tests do not verify a fresh registration's account access or consent.
+
+## Backend operation contracts retained from 0.2.29
 
 Deploy the production server and verify the 327-tool catalog before uploading the ZIP and rescanning. All 321 previous public names and 70 Clients operations remain. Six fixed product operations are added; tenant resource names/counts never affect discovery.
 

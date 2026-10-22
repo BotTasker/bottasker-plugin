@@ -4,6 +4,64 @@ Installable BotTasker plugin for Codex and Claude Code. It bundles 15 Tasky skil
 
 > **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
+## Instalación para Codex, ChatGPT, Claude Code y otros agentes
+
+Elige **una sola vía por cliente**. Tasky incluye 15 skills y usa el MCP de producción `https://api.bottasker.ai/mcp` con OAuth. Tener el repositorio descargado o ver una skill no demuestra que las herramientas estén conectadas.
+
+| Cliente y objetivo | Vía de instalación | Qué comprobar |
+| --- | --- | --- |
+| Codex CLI o una instalación directa del MCP con skills | [Comandos de Codex](#codex) | Plugin habilitado, 15 skills y OAuth completo |
+| ChatGPT desktop, Work o Codex con **Apps** y cuentas vinculadas | [App nativa conectada](#native-app-connection-in-codex) | Una app accesible, 15 skills y cuenta visible en Manage |
+| Claude Code | [Comandos de Claude Code](#claude-code) | Plugin habilitado y MCP autenticado desde `/mcp` |
+| Otro agente compatible con plugins | [Guía de compatibilidad](#other-agents-and-mcp-clients) | Soporte real de manifiestos, skills, transporte HTTP y OAuth |
+
+Antes de instalar, consulta el inventario del cliente y comprueba si ya existe Tasky como plugin, MCP manual o app conectada. Actualiza la instalación elegida; si hay variantes duplicadas, pide al usuario que elija cuál conservar antes de retirarlas. Un usuario puede usar Tasky en varios clientes: evita los duplicados dentro de cada cliente.
+
+### Prompt para que un agente haga la instalación
+
+Copia este mensaje en Codex, ChatGPT, Claude Code u otro agente:
+
+```text
+Instala Tasky by BotTasker desde https://github.com/BotTasker/bottasker-plugin.
+Lee primero su README y detecta el cliente y la versión que estoy usando.
+Revisa las instalaciones existentes y elige una sola vía compatible:
+- Codex: usa su marketplace nativo e instala bottasker-tasky@bottasker-tasky.
+- ChatGPT desktop/Work o Codex con Apps y cuentas vinculadas: sigue la guía
+  de app nativa conectada y usa el registro accesible a mi cuenta/workspace.
+- Claude Code: agrega el marketplace e instala bottasker-tasky@bottasker-tasky.
+- Otro cliente: comprueba su soporte de plugins y OAuth; si solo admite MCP,
+  explica que eso no instala automáticamente las 15 skills.
+Usa producción: https://api.bottasker.ai/mcp. No adivines IDs de apps,
+no reutilices un registro eliminado y no sustituyas OAuth por una API key.
+Para la instalación normal usa las funciones o comandos del cliente;
+el checkout local solo es necesario para generar un paquete conectado propio.
+Si detectas duplicados, muéstramelos y pregunta cuál conservar.
+Deja que yo complete el login, elija mi organización y autorice la conexión.
+Después verifica el plugin, las 15 skills cuando el cliente las admita,
+y el perfil/cuenta de la conexión con una consulta de solo lectura.
+No ejecutes workflows ni crees o modifiques datos para probar la instalación.
+Si necesitas que yo reinicie la app o abra un chat nuevo, indícalo.
+No afirmes que OAuth funciona hasta comprobarlo en una sesión autenticada.
+```
+
+ChatGPT en la web o en el móvil no puede ejecutar comandos de tu terminal por sí solo. Si la sesión no dispone de un entorno local conectado y acceso a los archivos, debe guiar al usuario por la interfaz o indicar qué paso debe ejecutar en desktop. No debe afirmar que ha instalado un paquete local sin herramientas para hacerlo.
+
+### Other agents and MCP clients
+
+Tasky publishes a portable root `plugin.json`, `mcp.json` and `skills/`, plus Codex and Claude compatibility manifests. An agent must check its host's documented installation format before importing the package; there is no universal installation command for every agent.
+
+For a client that only supports remote MCP, configure the production URL `https://api.bottasker.ai/mcp`, Streamable HTTP transport and native OAuth. Let the host discover the authorization metadata and complete the browser consent. Use that client's actual configuration syntax; do not assume Codex, Claude and other hosts share the same JSON or TOML format. If the host cannot perform OAuth, this integration is not supported there through an API-key workaround.
+
+An MCP-only connection exposes server tools, not automatically the 15 packaged skills or OpenAI's account-management UI. Import skills through the host's supported mechanism when available, or use the server's advertised skill-discovery tools. Those tools are not proof that the client installed the plugin bundle. Report tools and packaged skills as separate verification results.
+
+### Verificación después de instalar
+
+1. Reinicia la aplicación o abre una sesión nueva cuando el cliente lo requiera.
+2. Comprueba una sola variante activa de Tasky y el endpoint de producción.
+3. Completa OAuth y confirma la organización seleccionada; no compartas tokens o contraseñas con el agente.
+4. Verifica las 15 skills en los clientes que admiten el paquete. Para la variante conectada de OpenAI, comprueba también **Apps 1**, **Skills 15** y la cuenta en **Manage → Connected accounts**.
+5. Pide: «Muestra el perfil y la organización de mi conexión BotTasker, sin hacer cambios». Comprueba que usa herramientas reales y devuelve la identidad esperada. La lista completa de herramientas puede cargarse bajo demanda; un chat abierto antes de instalar puede conservar herramientas antiguas.
+
 ## Languages
 
 Tasky's 15 skills include guidance for Spanish, Brazilian Portuguese and English. They follow an explicitly requested response language or the user's current request, retaining the established preference for ambiguous short messages. Plans, questions, confirmations and summaries follow that language. Generated content can use a separately requested language; changing the conversation language does not authorize translating existing records. Tool identifiers, payload keys, enum values and error codes keep their exact values.
@@ -21,12 +79,21 @@ For the private development route:
 1. Sign in at [ChatGPT Plugins](https://chatgpt.com/plugins) with the account/workspace used by Codex.
 2. Choose **+ → Add custom MCP server**, name it **Tasky by BotTasker**, and enter `https://api.bottasker.ai/mcp` with OAuth authentication. Complete the host's warning and **Create as a plugin** flow.
 3. Sign in to BotTasker, choose an organization, approve the safe grant, and verify the discovered tools. Account/workspace policies can restrict custom MCP registration.
-4. Copy the exact `plugin_asdk_app_…` technical ID from that personal plugin's URL. An old developer registration is not proof that an app is available to the current account.
+4. Copy the exact `plugin_asdk_app_…` technical ID or URL from that personal plugin's page, or its `asdk_app_…` App ID from Manage. An old developer registration is not proof that an app is available to the current account. After deleting a personal app, create a new one and copy its new identifier; do not reuse the deleted registration.
 5. Build the connected package with that ID:
 
 ```bash
 node scripts/build-codex-package.mjs connected --plugin-id=plugin_asdk_app_<actual-id>
 ```
+
+The same flag also accepts the exact App ID shown in Manage or the personal plugin URL:
+
+```bash
+node scripts/build-codex-package.mjs connected --plugin-id=asdk_app_<actual-id>
+node scripts/build-codex-package.mjs connected --plugin-id='https://chatgpt.com/plugins/plugin_asdk_app_<actual-id>?directoryTab=personal'
+```
+
+Replace `<actual-id>` with the value from your own registered app. These are alternative commands: run just one. The generator validates the input format; it cannot establish account access or OAuth success. Keep personal IDs and generated packages out of the public repository.
 
 The command prints a generated marketplace directory and ZIP; it does not install or publish. Add that directory through `codex plugin marketplace add <generated-directory>` and install `bottasker-tasky@bottasker-tasky-connected`. In Codex's plugin settings, enable the connected variant and disable any other Tasky variant for this acceptance test, preserving the chosen environment. Open a new chat and verify **Connect/Authenticate**, account display, setup, and read-only tools. Do not enable an app mapping that the current account cannot access: the host can suppress the otherwise usable bundled MCP.
 
@@ -68,25 +135,14 @@ codex mcp login bottasker-tasky
 
 ```bash
 claude plugin marketplace add BotTasker/bottasker-plugin
-claude plugin install bottasker-tasky@bottasker-tasky
+claude plugin install bottasker-tasky@bottasker-tasky --scope user
 ```
 
-Start a new Claude Code session after installation. Use `/mcp` if browser authentication does not start automatically.
+Start a new Claude Code session after installation. Use `/mcp` if browser authentication does not start automatically. In your shell, `claude plugin list --json` checks the user installation; inside a session, `/plugin` shows the plugin's components. Do not add the same endpoint separately with `claude mcp add` when it is already supplied by the plugin. See [Claude Code's installation documentation](https://code.claude.com/docs/en/discover-plugins).
 
 ### Ask an LLM to install it
 
-Give the assistant this instruction:
-
-```text
-Install Tasky by BotTasker from https://github.com/BotTasker/bottasker-plugin.
-Use the repository as a plugin marketplace, then install
-bottasker-tasky@bottasker-tasky. Do not clone or copy plugin files manually
-unless the native marketplace command is unavailable. Verify that both the
-plugin and the bottasker-tasky MCP server are enabled, then ask me to complete
-OAuth if authentication is required. Start a new task/session before using it.
-```
-
-The assistant should use the native commands for the active client. It must not request a BotTasker API key, edit user configuration by hand, claim authentication succeeded before verification, or execute destructive BotTasker tools without explicit approval.
+Use the [installation prompt above](#prompt-para-que-un-agente-haga-la-instalación), which selects the correct path for Codex, ChatGPT, Claude Code or another host. Installation, authenticated connection and availability in the current conversation are separate checks.
 
 ## Machine-readable installation facts
 
