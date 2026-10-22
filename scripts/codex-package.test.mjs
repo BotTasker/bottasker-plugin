@@ -19,6 +19,82 @@ function fixture(t) {
   return root
 }
 
+function cloudArchive(root, mutate = () => {}) {
+  const directory = path.join(root, 'downloaded-cloud-plugin')
+  fs.mkdirSync(path.join(directory, '.codex-plugin'), { recursive: true })
+  const manifest = { name: 'dev-test-cloud-plugin', version: '1.0.0', apps: './.app.json' }
+  const apps = { apps: { 'dev-test-cloud-plugin': { id: pluginId.replace(/^plugin_/, '') } } }
+  mutate(manifest, apps)
+  fs.writeFileSync(path.join(directory, '.codex-plugin/plugin.json'), JSON.stringify(manifest))
+  fs.writeFileSync(path.join(directory, '.app.json'), JSON.stringify(apps))
+  // The downloaded package is identity input, never a source of runtime code.
+  fs.writeFileSync(path.join(directory, 'untrusted-script.sh'), 'echo must-not-be-copied')
+  const zip = path.join(root, 'downloaded-plugin.zip')
+  execFileSync('zip', ['-qr', zip, '.'], { cwd: directory })
+  return { zip, manifest, apps }
+}
+
+test('ChatGPT update adds skills to the same cloud plugin without duplicating MCP or importing portal review cases', (t) => {
+  const root = fixture(t)
+  const original = fs.readFileSync(path.join(root, 'plugins/bottasker-tasky/plugin.json'), 'utf8')
+  const downloaded = cloudArchive(root)
+  const result = buildPackage({ root, profile: 'chatgpt-update', existingPluginZip: downloaded.zip })
+  const entries = execFileSync('unzip', ['-Z1', result.zip], { encoding: 'utf8' }).trim().split('\n')
+  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 15)
+  assert.equal(result.existingPluginName, downloaded.manifest.name)
+  assert.equal(result.appId, pluginId.replace(/^plugin_/, ''))
+  assert.deepEqual(readJson(path.join(result.plugin, '.app.json')), downloaded.apps)
+  const portable = readJson(path.join(result.plugin, 'plugin.json'))
+  const compatibility = readJson(path.join(result.plugin, '.codex-plugin/plugin.json'))
+  assert.equal(portable.name, downloaded.manifest.name)
+  assert.equal(compatibility.name, downloaded.manifest.name)
+  assert.equal(portable.version, JSON.parse(original).version)
+  assert.equal(compatibility.version, portable.version)
+  assert.equal(portable.extensions['com.openai'].apps, './.app.json')
+  assert.equal(compatibility.apps, './.app.json')
+  assert.equal(compatibility.skills, './skills/')
+  assert.equal(compatibility.mcpServers, undefined)
+  for (const manifest of [portable, compatibility]) {
+    assert.equal(manifest.extensions['com.openai'].review, undefined)
+    assert.equal(manifest.extensions['com.openai'].onboardingSkill, './skills/bottasker-connection-guide/SKILL.md')
+    assert.deepEqual(Object.keys(manifest.extensions['com.openai'].publication.translations).sort(), ['en-US', 'es-PE', 'pt-BR'])
+  }
+  assert.ok(!entries.some((entry) => /(^|\/)(mcp\.json|\.mcp\.json|claude\.mcp\.json|\.claude-plugin|untrusted-script\.sh)(\/|$)/.test(entry)))
+  assert.equal(fs.existsSync(path.join(result.directory, '.agents/plugins/marketplace.json')), false)
+  assert.equal(fs.readFileSync(path.join(root, 'plugins/bottasker-tasky/plugin.json'), 'utf8'), original)
+  // The updated cloud ZIP can supply identity again for subsequent releases.
+  const rebuilt = buildPackage({ root, profile: 'chatgpt-update', existingPluginZip: result.zip })
+  assert.deepEqual(readJson(path.join(rebuilt.plugin, '.app.json')), downloaded.apps)
+})
+
+for (const [label, mutate] of [
+  ['missing name', (manifest) => { delete manifest.name }],
+  ['invalid name', (manifest) => { manifest.name = '../other-plugin' }],
+  ['undeclared app file', (manifest) => { delete manifest.apps }],
+  ['wrong app path', (manifest) => { manifest.apps = '../.app.json' }],
+  ['multiple apps', (_, apps) => { apps.apps.other = { id: pluginId.replace(/^plugin_/, '') } }],
+  ['unregistered ID', (_, apps) => { apps.apps['dev-test-cloud-plugin'].id = 'Tasky' }],
+  ['unexpected credentials', (_, apps) => { apps.apps['dev-test-cloud-plugin'].clientSecret = 'do-not-import' }],
+  ['unexpected top-level data', (_, apps) => { apps.accessToken = 'do-not-import' }],
+]) {
+  test(`ChatGPT update rejects invalid downloaded identity before creating output: ${label}`, (t) => {
+    const root = fixture(t)
+    const downloaded = cloudArchive(root, mutate)
+    assert.throws(() => buildPackage({ root, profile: 'chatgpt-update', existingPluginZip: downloaded.zip }))
+    assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
+  })
+}
+
+test('cloud identity input cannot be applied to the public submission or connected profile', (t) => {
+  const root = fixture(t)
+  const { zip } = cloudArchive(root)
+  assert.throws(() => buildPackage({ root, profile: 'submission', existingPluginZip: zip }), /Only chatgpt-update/)
+  assert.throws(() => buildPackage({ root, profile: 'connected', pluginId, existingPluginZip: zip }), /Only chatgpt-update/)
+  assert.throws(() => buildPackage({ root, profile: 'chatgpt-update', pluginId }), /Only connected/)
+  assert.throws(() => buildPackage({ root, profile: 'chatgpt-update' }), /existing-plugin-zip/)
+  assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
+})
+
 test('submission ZIP contains skills, OAuth, legal metadata and onboarding, without app references or development files', (t) => {
   const root = fixture(t)
   // A loose development file must not accidentally become part of the upload.

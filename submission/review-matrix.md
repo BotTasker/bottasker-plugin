@@ -1,4 +1,12 @@
-# Current release: 0.2.31
+# Current release: 0.2.32
+
+Version 0.2.32 makes the ChatGPT cloud update reproducible: download the existing personal plugin ZIP, run `chatgpt-update --existing-plugin-zip=<absolute-path>`, and upload the generated ZIP using **Upload new version** on that same record. It preserves the technical plugin name and app mapping while adding the 15 repository skills. It excludes duplicate MCP declarations and portal-only MCP review cases from that personal package. A local Codex installation is not evidence of cloud skill installation.
+
+The public `submission` ZIP remains a separate **With MCP** upload: canonical name `bottasker-tasky`, production endpoint and explicit OAuth settings, 15 skills, three listing translations and the demonstration video. It contains no personal app references. This release changes packaging and documentation; it requires no MCP backend deployment and does not resolve or suppress findings about dynamic tool execution. Production must already be ready before uploading and scanning.
+
+Acceptance performed on the personal cloud plugin with 0.2.31: ChatGPT visibly displayed **Apps 1**, **Skills 15**, version **0.2.31**, the linked OAuth account and the production endpoint. The earlier app-only wrapper had shown version 1.0.0 with no Skills section. That observation establishes the cloud update route; it is not a public directory approval or a recorded test of the new 0.2.32 ZIP. Verify the release version and account again after each upload.
+
+## Previous release: 0.2.31
 
 Version 0.2.31 adds client-specific installation instructions and accepts a copied App ID, personal plugin ID or ChatGPT plugin URL for the connected development build. The public submission remains free of personal app mappings. This release changes packaging and documentation only; it does not deploy or change the MCP server's tool catalog.
 
@@ -47,11 +55,11 @@ The sections below record earlier scans and superseded approaches; they are not 
 
 Build the public submission ZIP with `node scripts/build-codex-package.mjs submission`. It contains no registered-app references or hooks. The manifest includes five positive and three negative review scenarios; those definitions are not recorded pass results.
 
-For private connected-app acceptance, use the exact personal `plugin_asdk_app_…` identifier and `node scripts/build-codex-package.mjs connected --plugin-id=<id>`. This package is for account-aware local testing and must not be uploaded as the public submission ZIP.
+For local Codex connected-app acceptance, use the exact personal `plugin_asdk_app_…` identifier and `node scripts/build-codex-package.mjs connected --plugin-id=<id>`. This does not update ChatGPT's cloud plugin. To add skills to that cloud record, use `node scripts/build-codex-package.mjs chatgpt-update --existing-plugin-zip=<downloaded-plugin.zip>` and **Upload new version** on the existing personal plugin. Neither personal package belongs in the public submission.
 
 ## Demonstration recording
 
-[Tasky demonstration video](https://youtu.be/GE1NGw_v7jc) is declared in both manifests at `extensions.com.openai.review.demo_recording_url` and retained by both package profiles. The supplementary PDF is `output/pdf/tasky-review.pdf`; the portal imports the URL from the ZIP manifest. The link is supplied by the publisher; language acceptance results must still be recorded separately.
+[Tasky demonstration video](https://youtu.be/GE1NGw_v7jc) is declared in both source manifests at `extensions.com.openai.review.demo_recording_url` and retained by the submission and local connected profiles. The personal `chatgpt-update` profile omits portal review metadata because its tools come from the existing app. The supplementary PDF is `output/pdf/tasky-review.pdf`; the public portal imports the URL from the submission ZIP manifest. The link is supplied by the publisher; language acceptance results must still be recorded separately.
 
 ## Submission portal OAuth acceptance
 

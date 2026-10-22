@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.32
+
+- Add `chatgpt-update --existing-plugin-zip=…` to package the 15 skills into an existing ChatGPT cloud plugin while preserving its technical name and registered OAuth app mapping.
+- Keep the cloud update free of duplicate MCP declarations and portal-only review cases; preserve those review cases, the demonstration video and explicit production OAuth in the separate public submission ZIP.
+- Correct installation instructions: installing a local Codex marketplace package does not update the ChatGPT cloud plugin. Verify Apps 1, Skills 15, the release version and the linked account in the actual cloud UI.
+- Preserve the direct GitHub Codex/Claude installation paths, Spanish, Brazilian Portuguese, English, and dynamic workflows without organization-specific tools.
+
 ## 0.2.31
 
 - Accept the registered App ID, personal plugin ID or exact ChatGPT plugin URL when building an OAuth-connected app package; reject unrelated hosts and callback URLs.
