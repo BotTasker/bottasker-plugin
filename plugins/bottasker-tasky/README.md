@@ -6,6 +6,8 @@ Tasky's skills follow the user's conversation in Spanish, Brazilian Portuguese o
 
 The standard package loads the hosted BotTasker MCP directly and declares the connection guide as its setup skill. A separate connected build links a personal registered app available to the current Codex account; linking an unavailable app can hide the bundled MCP from the plugin UI. Personal registration and button-based connection can be tested before public marketplace publication.
 
+For client-specific commands and an installation prompt for Codex, ChatGPT, Claude Code and other agents, read the [repository installation guide](https://github.com/BotTasker/bottasker-plugin#instalación-para-codex-chatgpt-claude-code-y-otros-agentes). Choose one Tasky variant per client. The connected OpenAI package should resolve one registered app, 15 enabled skills and its OAuth account; an MCP-only client does not automatically install the skills or provide that account UI. A deleted app requires a new accessible registration before rebuilding the connected package.
+
 Repository installations use native OAuth discovery and a transport-only portable MCP declaration compatible with the current desktop loader. The portal submission ZIP separately includes explicit OAuth registration, resource and scope settings; it is intended for upload to OpenAI rather than installation as a local desktop marketplace.
 
 After installing from the client plugin catalog, sign in to BotTasker, select an organization, and approve **Trabajo seguro**. No repository clone, terminal setup, environment variable, or API key is required.

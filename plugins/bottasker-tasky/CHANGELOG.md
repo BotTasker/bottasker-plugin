@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.31
+
+- Accept the registered App ID, personal plugin ID or exact ChatGPT plugin URL when building an OAuth-connected app package; reject unrelated hosts and callback URLs.
+- Document installation and verification for Codex, ChatGPT desktop/web, Claude Code and other agents, including one active variant per client and the difference between MCP tools and packaged skills.
+- Keep personal app mappings in generated connected packages, preserve the public submission package without private app references, and require fresh identifiers after deleting an app.
+- Retain production OAuth, 15 skills, Spanish/Brazilian Portuguese/English, dynamic workflows and the demonstration video.
+
 ## 0.2.30
 
 - Require a valid due date when creating client follow-up tasks; never clear a task deadline.

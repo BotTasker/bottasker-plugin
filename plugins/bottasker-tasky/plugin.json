@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bottasker-tasky",
-  "version": "0.2.30",
+  "version": "0.2.31",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -118,7 +118,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Separate workflow configuration edits, activation/deactivation and test-listener controls into stable product operations. Add read-only endpoint, trigger and board-button validation without dispatch. Preserve dynamic workflows, all 70 Clients tools, production OAuth, three languages and the demonstration video. No organization-specific or per-workflow tool names.",
+        "release_notes": "Improve connected app packaging with copied ChatGPT App IDs and plugin URLs. Add client-specific installation and verification instructions for Codex, ChatGPT, Claude Code and other agents. Preserve production OAuth, 15 skills, three languages, dynamic workflows and the demonstration video; personal app references remain excluded from public submission.",
         "translations": {
           "en-US": {
             "subtitle": "Build and run BotTasker apps",
