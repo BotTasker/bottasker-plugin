@@ -11,7 +11,8 @@ Elige **una sola vía por cliente**. Tasky incluye 15 skills y usa el MCP de pro
 | Cliente y objetivo | Vía de instalación | Qué comprobar |
 | --- | --- | --- |
 | Codex CLI o una instalación directa del MCP con skills | [Comandos de Codex](#codex) | Plugin habilitado, 15 skills y OAuth completo |
-| ChatGPT desktop, Work o Codex con **Apps** y cuentas vinculadas | [App nativa conectada](#native-app-connection-in-codex) | Una app accesible, 15 skills y cuenta visible en Manage |
+| ChatGPT con **Apps** y cuentas vinculadas | [Actualización del plugin en ChatGPT](#chatgpt-app-oauth-y-15-skills) | **Apps 1**, **Skills 15**, versión y cuenta visibles en la misma ficha |
+| Codex con una app personal ya registrada | [Paquete conectado local](#native-app-connection-in-codex) | App accesible y 15 skills en esa instalación de Codex |
 | Claude Code | [Comandos de Claude Code](#claude-code) | Plugin habilitado y MCP autenticado desde `/mcp` |
 | Otro agente compatible con plugins | [Guía de compatibilidad](#other-agents-and-mcp-clients) | Soporte real de manifiestos, skills, transporte HTTP y OAuth |
 
@@ -26,8 +27,9 @@ Instala Tasky by BotTasker desde https://github.com/BotTasker/bottasker-plugin.
 Lee primero su README y detecta el cliente y la versión que estoy usando.
 Revisa las instalaciones existentes y elige una sola vía compatible:
 - Codex: usa su marketplace nativo e instala bottasker-tasky@bottasker-tasky.
-- ChatGPT desktop/Work o Codex con Apps y cuentas vinculadas: sigue la guía
-  de app nativa conectada y usa el registro accesible a mi cuenta/workspace.
+- ChatGPT con Apps y cuentas vinculadas: descarga el ZIP de mi plugin personal,
+  genera chatgpt-update y usa Upload new version en ese mismo registro.
+- Codex con una app registrada: usa el paquete conectado local cuando corresponda.
 - Claude Code: agrega el marketplace e instala bottasker-tasky@bottasker-tasky.
 - Otro cliente: comprueba su soporte de plugins y OAuth; si solo admite MCP,
   explica que eso no instala automáticamente las 15 skills.
@@ -37,6 +39,7 @@ Para la instalación normal usa las funciones o comandos del cliente;
 el checkout local solo es necesario para generar un paquete conectado propio.
 Si detectas duplicados, muéstramelos y pregunta cuál conservar.
 Deja que yo complete el login, elija mi organización y autorice la conexión.
+Una instalación local de Codex no actualiza el plugin de ChatGPT en la nube.
 Después verifica el plugin, las 15 skills cuando el cliente las admita,
 y el perfil/cuenta de la conexión con una consulta de solo lectura.
 No ejecutes workflows ni crees o modifiques datos para probar la instalación.
@@ -70,11 +73,30 @@ The submission includes listing translations for `en-US`, `es-PE` and `pt-BR`, w
 
 These changes apply to the packaged assistant guidance and listing metadata. BotTasker's login/consent pages and other web UI use their own application translations. Language switching should be evaluated with the scenarios in `submission/review-matrix.md`; packaging checks do not prove model output quality.
 
+## ChatGPT: app, OAuth y 15 skills
+
+Un **Custom MCP** creado con **Create as a plugin** puede mostrar **Apps 1** y una cuenta OAuth sin incluir ninguna skill. La descripción que dice «15 skills», las herramientas MCP que cargan guías y un paquete instalado localmente no demuestran que estén en esa ficha de ChatGPT. Para añadirlas al mismo registro:
+
+1. En [ChatGPT Plugins](https://chatgpt.com/plugins), abre tu Tasky existente. Si aún no existe, usa **Add → Add custom MCP server**, nombre **Tasky by BotTasker**, URL `https://api.bottasker.ai/mcp`, autenticación **OAuth**, y completa **Create as a plugin**. Selecciona tu organización en el consentimiento de BotTasker y verifica la cuenta en **Manage**.
+2. En la ficha del plugin, abre **More actions → Download plugin ZIP**. Conserva esa descarga como copia del registro actual; contiene su nombre técnico y el vínculo a su app.
+3. Desde un checkout de este repositorio, con Node.js 22+, `zip` y `unzip` disponibles, ejecuta:
+
+```bash
+node scripts/build-codex-package.mjs chatgpt-update --existing-plugin-zip=/ruta/absoluta/plugin.zip
+```
+
+4. El comando devuelve la ruta de un ZIP `bottasker-tasky-<versión>-chatgpt-update.zip`. En **ese mismo plugin de ChatGPT**, elige **More actions → Upload new version → Choose file**, selecciona el ZIP generado y completa la actualización. No uses el ZIP público `submission` aquí ni crees otro Custom MCP.
+5. Pulsa **View plugin** y comprueba **Apps 1**, **Skills 15** y la versión actual (0.2.32). En **Manage → Connected accounts**, verifica que la cuenta elegida sigue conectada por OAuth y la URL es `https://api.bottasker.ai/mcp`. Abre un chat nuevo para probar una consulta de solo lectura.
+
+El generador conserva exactamente el nombre técnico y la referencia a la app del ZIP descargado, pero toma las skills y los recursos de este repositorio. No copia credenciales, no vuelve a registrar la app ni solicita permisos nuevos. Excluye los servidores MCP duplicados y los casos de revisión del portal, que solo corresponden al paquete público con su servidor declarado. Una actualización de habilidades puede requerir un chat nuevo; ni generar el archivo ni instalar un marketplace local publica esta actualización en ChatGPT.
+
+Los ZIP que contienen la app personal quedan en `.tasky-runtime/`, excluido de Git. No subas esos archivos al repositorio ni a la solicitud pública del marketplace. No reutilices un ZIP de una app eliminada o de otra cuenta: el generador verifica el formato, pero solo el cliente autenticado puede confirmar el acceso y el consentimiento.
+
 ## Native app connection in Codex
 
 Tasky can be tested as a personal connected plugin before public marketplace publication. The registered app supplies the host's connection/account buttons; bundled skills supply Tasky's workflows. A custom HTML widget is optional and does not create those authentication controls.
 
-For the private development route:
+This is a **local Codex installation**, separate from updating the ChatGPT cloud plugin above. For the private development route:
 
 1. Sign in at [ChatGPT Plugins](https://chatgpt.com/plugins) with the account/workspace used by Codex.
 2. Choose **+ → Add custom MCP server**, name it **Tasky by BotTasker**, and enter `https://api.bottasker.ai/mcp` with OAuth authentication. Complete the host's warning and **Create as a plugin** flow.
@@ -95,7 +117,7 @@ node scripts/build-codex-package.mjs connected --plugin-id='https://chatgpt.com/
 
 Replace `<actual-id>` with the value from your own registered app. These are alternative commands: run just one. The generator validates the input format; it cannot establish account access or OAuth success. Keep personal IDs and generated packages out of the public repository.
 
-The command prints a generated marketplace directory and ZIP; it does not install or publish. Add that directory through `codex plugin marketplace add <generated-directory>` and install `bottasker-tasky@bottasker-tasky-connected`. In Codex's plugin settings, enable the connected variant and disable any other Tasky variant for this acceptance test, preserving the chosen environment. Open a new chat and verify **Connect/Authenticate**, account display, setup, and read-only tools. Do not enable an app mapping that the current account cannot access: the host can suppress the otherwise usable bundled MCP.
+The command prints a generated marketplace directory and ZIP; it does not install or publish. Add that directory through `codex plugin marketplace add <generated-directory>` and install `bottasker-tasky@bottasker-tasky-connected`. In Codex's plugin settings, enable the connected variant and disable any other Tasky variant for this acceptance test, preserving the chosen environment. Open a new chat and verify **Connect/Authenticate**, account display, setup, and read-only tools. Do not enable an app mapping that the current account cannot access: the host can suppress the otherwise usable bundled MCP. This does not upload skills to the corresponding ChatGPT cloud plugin; use `chatgpt-update` for that record.
 
 The connected build follows the registered-app wiring used by installed Linear and Cloudflare plugins: `.app.json` plus skills and the bundled MCP declaration. It sets the supplied app dependency as required. Only an actual signed-in client test establishes availability and successful authentication.
 
@@ -175,6 +197,21 @@ Restart Codex and open a new task after updating so it loads the refreshed skill
 Pushing this repository and its marketplace manifest to the public `main` branch makes Tasky installable from GitHub with the commands above. It does **not** automatically add Tasky to the universal plugin directory.
 
 To publish it in the public directory, submit it through the OpenAI Platform as a **With MCP** plugin. Public submission requires a stable HTTPS MCP endpoint, verified developer or business identity, listing assets, tool annotations, test cases, and review approval. Until that process is complete, describe Tasky as “installable from GitHub,” not as “available in the built-in catalog.”
+
+### ZIP para actualizar la solicitud oficial de OpenAI
+
+```bash
+node scripts/validate-plugin.mjs
+node scripts/build-codex-package.mjs submission
+```
+
+Usa el archivo `bottasker-tasky-<versión>-submission.zip` que imprime el comando para actualizar **la solicitud existente** en [OpenAI Platform Plugins](https://platform.openai.com/plugins), mediante la vía **With MCP**. Incluye las 15 skills, las traducciones de publicación para español, portugués de Brasil e inglés, el enlace de demostración `https://youtu.be/GE1NGw_v7jc`, los casos de revisión y la configuración OAuth de `https://api.bottasker.ai/mcp`. Conserva el nombre público `bottasker-tasky` para actualizar esa solicitud.
+
+El workflow **Validate Tasky plugin** también genera este ZIP como artefacto **tasky-openai-submission** en GitHub Actions después de pasar las pruebas. Descarga el artefacto del commit que quieres revisar y extrae el archivo `*-submission.zip` de su interior; ese archivo es el que se sube a OpenAI.
+
+La publicación pública recibe directamente el servidor MCP; no acepta la referencia a una app personal mediante `apps` o `.app.json`. Por eso este ZIP es distinto del `chatgpt-update`. Consulta la [documentación de envío de OpenAI](https://developers.openai.com/plugins/deploy/submission).
+
+Si cambias el servidor, despliega y verifica primero producción; después sube el ZIP y vuelve a escanear las herramientas. Una corrección solo de empaquetado no modifica el catálogo MCP ni resuelve por sí sola observaciones sobre herramientas. Antes de solicitar revisión comprueba metadatos, **15 skills**, autenticación, escaneo, idiomas y video. El titular introduce sus credenciales de demostración y revisa las declaraciones legales en el portal.
 
 ## Prerequisites and authentication
 

@@ -1,5 +1,15 @@
 # Integración de Tasky como aplicación de Codex
 
+## Actualización del 22 de octubre de 2026
+
+La aceptación visual del plugin personal en ChatGPT confirmó **Apps 1**, **Skills 15**, versión **0.2.31**, cuenta OAuth vinculada y URL de producción. Antes de actualizar la ficha, el ZIP descargado del Custom MCP contenía solamente `.app.json` y `.codex-plugin/plugin.json`: la descripción mencionaba skills, pero el registro no las incluía. La verificación de una instalación local se había confundido con la instalación en la nube.
+
+La versión 0.2.32 automatiza la corrección mediante `chatgpt-update --existing-plugin-zip=<archivo>`. Lee del ZIP descargado solo el nombre técnico y la referencia a la app existente; incorpora las 15 skills desde el repositorio, conserva el vínculo OAuth y elimina las declaraciones MCP duplicadas y los casos de revisión del portal del paquete personal. El ZIP se carga con **Upload new version** en la misma ficha. Los pasos reproducibles y los criterios de verificación están en el README.
+
+La distribución pública sigue siendo independiente: `submission` declara directamente el MCP HTTPS de producción, incluye las skills y la revisión y excluye referencias a apps personales. La aprobación pública y los resultados del escaneo no se deducen de la aceptación de la instalación personal. Los apartados que siguen documentan el estudio histórico del 18 de octubre, no el estado actual de sesión ni de publicación.
+
+## Estudio histórico del 18 de octubre de 2026
+
 Revisión del 18 de octubre de 2026. Base del plugin: `origin/main`, commit `7afe2c7`. Rama de implementación: `feat/codex-native-app-integration`. La revisión del backend corresponde al código del checkout `bottasker-core`; los cambios de esta rama pertenecen al repositorio del plugin.
 
 Tasky ya tiene las piezas principales: 15 skills, herramientas MCP, OAuth y consentimiento por organización. Para conseguir la experiencia de aplicación con botones de conexión, hace falta vincular un registro de MCP accesible para la cuenta de Codex. La publicación pública es un paso de distribución separado. El código del plugin puede preparar ese vínculo, pero la existencia de un manifiesto no demuestra que OpenAI permita usar la aplicación con una cuenta concreta.

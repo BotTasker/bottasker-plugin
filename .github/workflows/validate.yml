@@ -17,3 +17,9 @@ jobs:
       - run: node --test scripts/environment/environment.test.mjs
       - run: node --test scripts/codex-package.test.mjs
       - run: node scripts/build-codex-package.mjs submission
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tasky-openai-submission
+          path: .tasky-runtime/packages/submission-*/*-submission.zip
+          include-hidden-files: true
+          if-no-files-found: error

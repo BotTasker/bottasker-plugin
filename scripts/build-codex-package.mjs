@@ -26,9 +26,38 @@ export function normalizeAppId(value) {
   return identifier.replace(/^plugin_/, '')
 }
 
-export function buildPackage({ root = repository, profile = 'submission', pluginId } = {}) {
-  if (!['submission', 'connected'].includes(profile)) throw new Error('Profile must be submission or connected')
-  if (profile === 'submission' && pluginId) throw new Error('The submission ZIP cannot contain app references')
+// Read only the two known JSON members. Never extract or copy executable content
+// from the downloaded plugin; all skills and assets come from this repository.
+function readExistingCloudPlugin(zip) {
+  if (typeof zip !== 'string' || !zip.trim()) throw new Error('chatgpt-update requires --existing-plugin-zip=<downloaded-plugin.zip>')
+  const archive = path.resolve(zip)
+  const entries = execFileSync('unzip', ['-Z1', archive], { encoding: 'utf8', maxBuffer: 1024 * 1024 }).trim().split('\n')
+  const readMember = (name) => {
+    if (entries.filter((entry) => entry === name).length !== 1) throw new Error(`Existing plugin ZIP must contain exactly one ${name}`)
+    return JSON.parse(execFileSync('unzip', ['-p', archive, name], { encoding: 'utf8', maxBuffer: 1024 * 1024 }))
+  }
+  const existing = readMember('.codex-plugin/plugin.json')
+  const appManifest = readMember('.app.json')
+  if (!existing || typeof existing.name !== 'string' || !/^[a-z0-9][a-z0-9_-]{0,127}$/.test(existing.name) ||
+      existing.apps !== './.app.json') throw new Error('Existing cloud plugin must declare its name and apps: "./.app.json"')
+  const apps = appManifest?.apps
+  if (!apps || typeof apps !== 'object' || Array.isArray(apps) || Object.keys(apps).length !== 1 ||
+      Object.keys(appManifest).some((key) => key !== 'apps')) throw new Error('Existing cloud plugin must reference exactly one registered app')
+  const [alias, app] = Object.entries(apps)[0]
+  if (!/^[a-z0-9][a-z0-9_-]{0,127}$/.test(alias) || !app || typeof app !== 'object' || Array.isArray(app) ||
+      Object.keys(app).some((key) => !['id', 'required'].includes(key)) ||
+      (app.required !== undefined && typeof app.required !== 'boolean') ||
+      typeof app.id !== 'string' || !/^asdk_app_[a-f0-9]{32}$/.test(app.id)) {
+    throw new Error('Existing cloud app mapping must contain a registered App ID and no credentials')
+  }
+  return { name: existing.name, appManifest, appId: app.id }
+}
+
+export function buildPackage({ root = repository, profile = 'submission', pluginId, existingPluginZip } = {}) {
+  if (!['submission', 'connected', 'chatgpt-update'].includes(profile)) throw new Error('Profile must be submission, connected or chatgpt-update')
+  if (profile !== 'connected' && pluginId !== undefined) throw new Error('Only connected accepts --plugin-id; submission cannot contain app references')
+  if (profile !== 'chatgpt-update' && existingPluginZip !== undefined) throw new Error('Only chatgpt-update accepts --existing-plugin-zip')
+  const cloud = profile === 'chatgpt-update' ? readExistingCloudPlugin(existingPluginZip) : undefined
   const appId = profile === 'connected' ? normalizeAppId(pluginId) : undefined
   const source = path.join(root, 'plugins', 'bottasker-tasky')
   const builds = path.join(root, '.tasky-runtime', 'packages')
@@ -73,8 +102,26 @@ export function buildPackage({ root = repository, profile = 'submission', plugin
     writeJson(manifestPath, manifest)
     writeJson(compatibilityPath, compatibility)
   }
+  if (cloud) {
+    // Updating the existing cloud plugin must keep BOTH its technical name and
+    // app mapping. A local marketplace install never updates this cloud record.
+    manifest.name = compatibility.name = cloud.name
+    manifest.extensions['com.openai'].apps = './.app.json'
+    compatibility.apps = './.app.json'
+    delete compatibility.mcpServers
+    // Portal review cases require a bundled MCP server. This personal package
+    // uses the existing registered app; keep review metadata in submission only.
+    delete manifest.extensions['com.openai'].review
+    delete compatibility.extensions['com.openai'].review
+    for (const entry of ['mcp.json', '.mcp.json', 'claude.mcp.json', '.claude-plugin']) {
+      fs.rmSync(path.join(target, entry), { recursive: true, force: true })
+    }
+    writeJson(path.join(target, '.app.json'), cloud.appManifest)
+    writeJson(manifestPath, manifest)
+    writeJson(compatibilityPath, compatibility)
+  }
   const marketplace = profile === 'connected' ? 'bottasker-tasky-connected' : 'bottasker-tasky'
-  writeJson(path.join(directory, '.agents', 'plugins', 'marketplace.json'), {
+  if (!cloud) writeJson(path.join(directory, '.agents', 'plugins', 'marketplace.json'), {
     name: marketplace,
     interface: { displayName: profile === 'connected' ? 'Tasky — Connected app' : 'Tasky by BotTasker' },
     plugins: [{
@@ -86,22 +133,27 @@ export function buildPackage({ root = repository, profile = 'submission', plugin
   })
   const zip = path.join(directory, `bottasker-tasky-${manifest.version}-${profile}.zip`)
   execFileSync('zip', ['-qr', zip, '.'], { cwd: target })
-  return { profile, directory, plugin: target, zip, ...(appId ? { appId } : {}) }
+  return { profile, directory, plugin: target, zip, ...(appId ? { appId } : {}),
+    ...(cloud ? { existingPluginName: cloud.name, appId: cloud.appId } : {}) }
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const args = process.argv.slice(2)
     if (args.length === 1 && args[0] === '--help') {
-      console.log('node scripts/build-codex-package.mjs [submission|connected --plugin-id=<registered-app-id-or-plugin-url>]\n' +
-        'Builds a ZIP and a local marketplace. Does not install, register, authenticate, or publish.\n' +
+      console.log('node scripts/build-codex-package.mjs [submission|connected --plugin-id=<registered-app-id-or-plugin-url>|chatgpt-update --existing-plugin-zip=<downloaded-plugin.zip>]\n' +
+        'Builds a ZIP; submission/connected also generate a local marketplace. Does not install, register, authenticate, or publish.\n' +
         'Connected accepts an asdk_app_… App ID, plugin_asdk_app_… ID, or https://chatgpt.com/plugins/… URL.\n' +
+        'ChatGPT update preserves the name and app mapping from Download plugin ZIP; upload its output with Upload new version.\n' +
         'The registered app must already be available to the current account; the build cannot verify access.')
     } else {
       const profile = args[0] || 'submission'
-      if (args.length > 2 || (args[1] && !args[1].startsWith('--plugin-id='))) throw new Error('Invalid arguments; use --help')
+      const option = profile === 'chatgpt-update' ? '--existing-plugin-zip=' : '--plugin-id='
+      if (args.length > 2 || (args[1] && !args[1].startsWith(option))) throw new Error('Invalid arguments; use --help')
       execFileSync(process.execPath, [path.join(repository, 'scripts', 'validate-plugin.mjs')], { stdio: 'inherit' })
-      console.log(JSON.stringify(buildPackage({ profile, pluginId: args[1]?.slice('--plugin-id='.length) }), null, 2))
+      const value = args[1]?.slice(option.length)
+      console.log(JSON.stringify(buildPackage({ profile, ...(profile === 'chatgpt-update'
+        ? { existingPluginZip: value } : { pluginId: value }) }), null, 2))
     }
   } catch (error) {
     console.error(error.message)
