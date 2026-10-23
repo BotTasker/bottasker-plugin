@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.34
+
+- Add native MCP booking administration guidance: read and save full calendar configuration, publish/pause pages and regenerate public reservation links.
+- Use exact booking tool schemas, current versions and real returned links, with organization/app permissions, execution consent and pending-action approvals.
+- Remove the UI fallback for booking administration; preserve participant availability and notification defaults.
+
+## 0.2.33
+
+- Teach the Calendario skill to configure and publish public booking links, split weekly availability, blocked dates, booking rules, guest fields and email invitations enabled by default.
+- Explain invited people, provider and domain access requirements, availability checks enabled by default, all-participant or rotating N-person assignment and configurable simultaneous reservations.
+- Distinguish draft, publication, preview and confirmed reservation; discover available tools and guide users through booking settings when MCP administration is not exposed.
+
 ## 0.2.32
 
 - Add `chatgpt-update --existing-plugin-zip=…` to package the 15 skills into an existing ChatGPT cloud plugin while preserving its technical name and registered OAuth app mapping.
