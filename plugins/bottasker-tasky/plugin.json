@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bottasker-tasky",
-  "version": "0.2.32",
+  "version": "0.2.34",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -118,7 +118,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Fix ChatGPT cloud plugin updates to include all 15 skills alongside the existing OAuth app. Add a reproducible chatgpt-update package that preserves the downloaded plugin name and app mapping. Clarify cloud versus local installation and retain production OAuth, Spanish, Brazilian Portuguese, English, dynamic workflows and the demonstration video in public submission.",
+        "release_notes": "Add dedicated calendar booking MCP tools to read/save complete configuration, publish or pause pages and regenerate public links. Teach Tasky to execute those tools with version checks, scoped authorization and approval metadata instead of delegating booking administration to the UI.",
         "translations": {
           "en-US": {
             "subtitle": "Build and run BotTasker apps",
