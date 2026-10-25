@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.35
+
+- Teach Tasky native cart search, cart editing, verified paid state and optional private payment evidence before or after payment.
+- Document the unified Carritos / sales-tools family, eleven workflow actions, opt-in agent payment tools and the native paid-event input.
+- Preserve explicit role/OAuth permissions, stable event identity, idempotent service grants and synthetic-only testing without activating follow-ups or submitting templates.
+- Synchronize five updated skills with the in-app assistant while keeping all 15 skills and production OAuth packaging.
+
 ## 0.2.34
 
 - Add native MCP booking administration guidance: read and save full calendar configuration, publish/pause pages and regenerate public reservation links.
