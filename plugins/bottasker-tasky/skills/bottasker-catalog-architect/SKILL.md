@@ -204,3 +204,32 @@ Use:
 - `bt_sales_carts_set_status`
 
 For app context use `bt_apps_list` and `bt_apps_get`. For agent tool configuration use the `bt_ai_agent_*` discovery, prepare, and validate tools.
+
+## Cart payments, evidence and direct operations
+
+Use the native cart as the source of truth for `status`, `paidAt`, `items`, `summary` and `paymentEvidence`. `checked_out` means checkout completed, not verified payment. Only `bt_sales_carts_mark_paid` confirms `paid`; never write payment fields through generic update/status tools. It records an already verified payment, not a charge or a provider verification. A photo alone does not prove payment. Use the existing execution approval flow; the user's explicit payment confirmation can authorize it, subject to role permission.
+
+Discover the deployed MCP inventory before using these operations. All new direct tools below take flat `appId` and named fields, with no caller-supplied organization, actor or runtime context:
+
+| Tool | Inputs beyond appId | Result / rule |
+| --- | --- | --- |
+| `bt_sales_carts_find` | Optional search, customerId, catalogId, status, page, pageSize | Literal name/phone/email/product search; status also accepts unpaid; 1–100 results per page, newest first. Returns found, carts, total, page, pageSize, hasMore. |
+| `bt_sales_carts_get` | cartId | Returns found, cartId, cart in any state, including paid. Missing ID returns found=false and null cart, without creating a cart; forbidden access remains an error. |
+| `bt_sales_carts_update_item_quantity` | cartId, lineId, quantity | Positive integer absolute quantity; preserves catalog prices. |
+| `bt_sales_carts_remove_item` | cartId, lineId | Use the real lineId from items, not productId. |
+| `bt_sales_carts_set_customer` | cartId; at least one of fullName, phone, email | Changes cart contact details only; omitted fields remain. Does not edit Clientes. |
+| `bt_sales_carts_set_delivery` | cartId; address and/or latitude + longitude | Coordinates must be supplied together; zero is valid. Does not check coverage or book services. |
+| `bt_sales_carts_set_adjustments` | cartId; at least one of discountTotal, taxTotal, shippingTotal | Nonnegative absolute amounts in cart currency, not percentages; recalculates totals. |
+| `bt_sales_carts_set_checkout` | cartId, url; optional ctaLabel | Stores an existing HTTP(S) payment link without credentials; does not generate a charge, send it or confirm payment. |
+| `bt_sales_carts_mark_paid` | cartId; optional paymentEvidenceFileId | Requires sales-carts:markPaid; reread paid state after confirmation. |
+| `bt_sales_carts_add_payment_evidence` | cartId, fileId | Requires sales-carts:managePaymentEvidence; attaches evidence before or after payment without changing status or re-emitting payment. |
+
+The existing `bt_sales_carts_get_or_create_active`, `bt_sales_carts_add_item` and `bt_sales_carts_set_status` retain their discovered `payload` schema: include appId inside payload. Recover/create takes customerId and optional catalogId/currency; add takes cartId, catalogId and item with real productId, quantity and optional variantId/modifierSelections; status takes cartId and status. Read live schemas for the exact accepted shape. Add-item increases quantity and is not safe to retry blindly. Creating a cart does not create a record in Clientes. Use the Clients specialist to create/link the real customer when authorized.
+
+The new edit operations require an open cart. Explicitly reopen ready_for_checkout before editing; paid carts are immutable and cannot be reopened through status changes. Route confirmed payments only through the dedicated payment operation. After a mutation, read the cart and report the saved result, not an intended result.
+
+Evidence is optional. Upload the actual authorized photo/document through Archivos in the same organization/app, then attach its returned fileId; never invent file IDs or persist signed download URLs as evidence. The native flow organizes private files under `Carritos/Carrito <cartId> - <customer> - <phone>/Evidencias de pago`, keyed by the stable cartId. Supported evidence includes images, PDF and Word, up to 20 MB per file and 20 files per cart; use the live validation as authority. The cart UI supports drag/drop or selection in a compact upload modal and file-type previews through Ver archivo. For MCP previews use authorized file download access, respecting its expiry and permissions. Attaching evidence later must preserve paidAt and must not trigger another purchase.
+
+Do not infer role access from a role name: payment confirmation and evidence upload are separate permissions. Do not broaden roles to work around a denial. A successful local backend test or plugin installation does not prove production MCP deployment or OAuth authentication.
+
+For payment-triggered automation or AI inputs, hand off to Automation Engineer / AI Agent Architect with cartId and the real app, keeping follow-ups inactive unless explicitly authorized. Purchasing services/packages does not automatically create appointments or service balances: that requires the app's explicitly configured, idempotent workflow.

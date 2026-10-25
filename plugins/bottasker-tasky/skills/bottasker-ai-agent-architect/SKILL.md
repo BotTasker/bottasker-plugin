@@ -415,3 +415,13 @@ Execution tools:
 - `bt_ai_agents_get`
 - `bt_action_instances_update_config`
 - `bt_action_instances_get_details`
+
+## Carritos and payment tools
+
+Discover one native **Carritos** family, workerKey `sales-tools`, icon `shopping_cart`. Keep the existing `shopping_cart` tool for commerce; equip `payment_tools` only when payment confirmation/evidence management is part of the approved role. Discover and validate its current schema before saving. Its enableMarkPaid and enableAddEvidence switches default false: enable only the explicitly needed capability, using the real user's saved authorization and sales-carts:markPaid / sales-carts:managePaymentEvidence permissions. Never manufacture authorizedBy or widen roles. The runtime tools are `cart_mark_paid` and `cart_add_payment_evidence`.
+
+A payment tool records payment already verified by a person or trusted authorized integration; it does not charge or verify a provider and must not infer a successful payment from an uploaded image. Evidence takes a real private Archivos file ID, remains optional, and can be attached after paid without another payment event. Reread the canonical cart after a successful tool call; do not claim success when the call fails.
+
+For an agent invoked by payment, use the discovered `on_cart_paid` input on `sales-tools`. The input carries event cart.paid, stable eventId, cartId and canonical cart. agentSessionMode is by_cart by default, or by_event when explicitly selected; input dispatch requires the agent active and node enabled. Use existing discovery/prepare/validate/config tools, and keep activation separate from configuration. Do not attach a second retired cart-events family.
+
+The eleven general cart work actions (find_carts through set_cart_status) are workflow-only, not agent tool addons. Use shopping_cart for the conversational cart capabilities it actually exposes, payment_tools for its two opt-in writes, and an explicitly configured workflow when additional work operations are needed. Route package grants to an idempotent approved workflow; payment does not itself create service balances. Leave follow-ups disabled unless separately authorized.
