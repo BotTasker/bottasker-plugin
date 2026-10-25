@@ -133,3 +133,33 @@ For workflows triggered by forms, provide the target workflow id and trigger act
 
 
 Read the stable workflow operation description and the selected workflow configuration before execution to identify its event input, saved actions and real effects. Branches decide which saved actions run. A successful dispatch with `workflowRunnerId` and `triggeredTargets` does not establish that downstream work has finished. Test mode can perform real writes, execute saved custom functions and send messages; never describe it as a simulation.
+
+## Native Carritos workflow actions and paid event
+
+Discover workers and action schemas first. The single native family is **Carritos**, workerKey `sales-tools`, icon `shopping_cart` (same as the main menu). Do not create a duplicate payment family or select retired `cart-events` for new nodes; historical nodes remain compatible.
+
+| actionKey | Use / important inputs |
+| --- | --- |
+| `find_carts` | Optional search, customerId, catalogId, status (including unpaid), page, pageSize 1–100. Returns found, carts, total and hasMore. |
+| `get_cart` | cartId; any state, missing => found=false/cart=null without creating. |
+| `get_or_create_cart` | customerId, optional catalogId/currency. Does not create Clientes. |
+| `add_cart_item` | cartId, productId, quantity, optional variantId/catalogId; catalog required when cart has none. Adds quantity; do not blindly retry. |
+| `update_cart_item_quantity` | cartId, lineId, positive integer quantity; absolute quantity. |
+| `remove_cart_item` | cartId, lineId. |
+| `set_cart_customer` | cartId, at least one contact field fullName/phone/email; does not edit Clientes. |
+| `set_cart_delivery` | cartId, address and/or latitude + longitude together; does not check coverage. |
+| `set_cart_adjustments` | cartId, discountTotal/taxTotal/shippingTotal absolute nonnegative amounts. |
+| `set_cart_checkout` | cartId, existing HTTP(S) url, optional ctaLabel; no charge or message. |
+| `set_cart_status` | cartId, open/ready_for_checkout/checked_out/abandoned; optional requiredFields customer/deliveryAddress when preparing checkout. Never paid. |
+| `mark_cart_paid` | cartId, optional paymentEvidenceFileId; confirms an already verified payment with the saved author's permission. |
+| `add_payment_evidence` | cartId, fileId; optional before/after paid, no new payment event. |
+| `get_paid_cart` | cartId; rereads canonical paid status and paidAt within the app. |
+| `on_cart_paid` | Native input trigger for workflows and agents. |
+
+The eleven general work actions return found/cartId/cart for single-cart operations; `find_carts` returns a paginated list. Inspect actual payment-node output schemas separately. Branch on found before using results. Map real IDs using the variable picker, e.g. `{{2.cartId}}` and `{{2.cart.items[0].lineId}}`, not manually guessed IDs. Config supports literal/wrapped values and native droppable fields. These eleven general actions are workflow-only (`work`, ignored in agent discovery), not agent tool addons. Edits require open; explicitly reopen ready_for_checkout first. Paid carts remain immutable.
+
+Marking a cart paid emits backend `sales_cart.paid`; the native trigger exposes `event: "cart.paid"`, stable `eventId: "sales_cart.paid:<cartId>"`, cartId, canonical cart, organization and appId. Reconfirming payment preserves paidAt and the stable event identity; consumers must deduplicate by eventId (or cartId + lineId for per-line service grants), since event delivery/retries must not duplicate business records. Evidence attachment does not emit this event. Never simulate payment with generic field/DB updates or treat checked_out as paid.
+
+A trigger dispatches only when its parent workflow/agent is active and the input node is enabled. Saving an inactive graph or manually testing nodes does not prove the native event was delivered. When explicitly authorized to test the real event, use only a clearly labeled synthetic cart and isolated test automation, temporarily activate only that test input, mark paid from the cart module, inspect every node's persisted execution/output and repeat confirmation to check duplicate protection. Disable the test automation afterward. Keep real carts, existing follow-ups, messaging and Meta submissions unchanged. Do not mark tests passed from graph creation alone.
+
+For paid services/packages, configure the approved domain model and downstream grants explicitly; payment itself does not book appointments or create service entitlements. Add app-scoped idempotency before creating balances/records. Do not activate follow-ups as part of wiring a payment trigger.
