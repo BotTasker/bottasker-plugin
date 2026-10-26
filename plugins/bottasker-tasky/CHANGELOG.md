@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.37
+
+- Make App + 15 skills the default OpenAI package, requiring an explicit registered app identity and never falling back to a direct MCP connection.
+- Remove duplicate MCP declarations and portal-only review metadata from connected Codex packages, matching the ChatGPT update package.
+- Make the GitHub installation guide and agent installation prompt select App + skills for Codex and ChatGPT; retain direct MCP as an explicit compatibility option.
+
 ## 0.2.36
 
 - Teach Clientes predefined and agent-defined follow-up: contextual timing/messages, one dated pending task, review and bounded cycles.
