@@ -140,7 +140,7 @@ La instalación predeterminada es **MCP directo + las 15 skills**, con OAuth nat
 ```bash
 codex plugin marketplace add BotTasker/bottasker-plugin --ref main
 codex plugin add bottasker-tasky@bottasker-tasky
-codex mcp login bottasker-tasky
+codex mcp login bottasker-tasky --scopes mcp:read,mcp:write
 ```
 
 Completa el inicio de sesión de BotTasker y elige tu organización. Abre un chat nuevo y comprueba una sola variante habilitada, las 15 skills y el MCP `bottasker-tasky` en `https://api.bottasker.ai/mcp`. Verifica el perfil con una consulta de solo lectura antes de afirmar que la conexión funciona.
@@ -297,7 +297,7 @@ Status shows environment, URL, version, enablement and scope for each selected c
 
 After a change:
 
-- Codex: open a new session and use the native **Authenticate** action, or `codex mcp login bottasker-tasky-local` for Local / `codex mcp login bottasker-tasky` for PROD.
+- Codex: open a new session and use the native **Authenticate** action, or `codex mcp login bottasker-tasky-local --scopes mcp:read,mcp:write` for Local / `codex mcp login bottasker-tasky --scopes mcp:read,mcp:write` for PROD.
 - Claude Code: run `/reload-plugins` or open a new session, then use `/mcp` to authenticate the matching Tasky server if necessary.
 - Run the read-only `bt_context_get_profile` tool and verify the expected organization. Confirm the MCP endpoint with `status`; a profile alone may not distinguish two environments containing the same organization.
 
@@ -330,7 +330,7 @@ Check MCP configuration:
 
 ```bash
 codex mcp list
-codex mcp login bottasker-tasky
+codex mcp login bottasker-tasky --scopes mcp:read,mcp:write
 ```
 
 In Codex, verify the BotTasker MCP tools:

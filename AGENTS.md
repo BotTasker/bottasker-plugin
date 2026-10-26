@@ -6,7 +6,7 @@ repository by default. Follow the README's Codex commands:
 ```sh
 codex plugin marketplace add BotTasker/bottasker-plugin --ref main
 codex plugin add bottasker-tasky@bottasker-tasky
-codex mcp login bottasker-tasky
+codex mcp login bottasker-tasky --scopes mcp:read,mcp:write
 ```
 
 Use the production endpoint `https://api.bottasker.ai/mcp` with native OAuth.
