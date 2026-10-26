@@ -34,6 +34,28 @@ function cloudArchive(root, mutate = () => {}) {
   return { zip, manifest, apps }
 }
 
+test('default build requires a registered app and never falls back to a direct MCP package', (t) => {
+  const root = fixture(t)
+  assert.throws(() => buildPackage({ root }), /registered asdk_app/)
+  assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
+  const result = buildPackage({ root, pluginId })
+  assert.equal(result.profile, 'connected')
+  assert.equal(fs.existsSync(path.join(result.plugin, 'mcp.json')), false)
+})
+
+test('CLI without an explicit profile builds App plus skills and requires an app identity', (t) => {
+  const root = fixture(t)
+  const script = path.join(root, 'scripts/build-codex-package.mjs')
+  const missing = spawnSync(process.execPath, [script], { encoding: 'utf8' })
+  assert.equal(missing.status, 1)
+  assert.match(missing.stderr, /registered asdk_app/)
+  assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
+  const built = spawnSync(process.execPath, [script, `--plugin-id=${pluginId}`], { encoding: 'utf8' })
+  assert.equal(built.status, 0, built.stderr)
+  assert.match(built.stdout, /"profile": "connected"/)
+  assert.match(built.stdout, /"appId": "asdk_app_0123456789abcdef0123456789abcdef"/)
+})
+
 test('ChatGPT update adds skills to the same cloud plugin without duplicating MCP or importing portal review cases', (t) => {
   const root = fixture(t)
   const original = fs.readFileSync(path.join(root, 'plugins/bottasker-tasky/plugin.json'), 'utf8')
@@ -99,7 +121,7 @@ test('submission ZIP contains skills, OAuth, legal metadata and onboarding, with
   const root = fixture(t)
   // A loose development file must not accidentally become part of the upload.
   fs.writeFileSync(path.join(root, 'plugins/bottasker-tasky', '.env'), 'DEVELOPMENT_ONLY=true')
-  const result = buildPackage({ root })
+  const result = buildPackage({ root, profile: 'submission' })
   const entries = execFileSync('unzip', ['-Z1', result.zip], { encoding: 'utf8' }).trim().split('\n')
   assert.ok(entries.includes('plugin.json'))
   assert.ok(entries.includes('mcp.json'))
@@ -134,11 +156,11 @@ test('connected package uses only the supplied registered app and leaves canonic
     readJson(path.join(root, 'plugins/bottasker-tasky/plugin.json')).extensions['com.openai'].publication)
   assert.equal(fs.readFileSync(path.join(root, 'plugins/bottasker-tasky/plugin.json'), 'utf8'), original)
   assert.equal(fs.existsSync(path.join(root, 'plugins/bottasker-tasky/.app.json')), false)
-  assert.equal(readJson(path.join(result.plugin, 'plugin.json')).extensions['com.openai'].review.demo_recording_url,
-    'https://youtu.be/GE1NGw_v7jc')
-  assert.deepEqual(readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky'], {
-    type: 'streamable-http', url: 'https://api.bottasker.ai/mcp',
-  })
+  const entries = execFileSync('unzip', ['-Z1', result.zip], { encoding: 'utf8' }).trim().split('\n')
+  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 15)
+  assert.equal(readJson(path.join(result.plugin, '.codex-plugin/plugin.json')).mcpServers, undefined)
+  assert.equal(readJson(path.join(result.plugin, 'plugin.json')).extensions['com.openai'].review, undefined)
+  assert.ok(!entries.some((entry) => /(^|\/)(mcp\.json|\.mcp\.json|claude\.mcp\.json|\.claude-plugin)(\/|$)/.test(entry)))
 })
 
 for (const identity of [
@@ -153,7 +175,7 @@ for (const identity of [
     assert.equal(result.appId, 'asdk_app_0123456789abcdef0123456789abcdef')
     assert.equal(readJson(path.join(result.plugin, '.app.json')).apps['bottasker-tasky'].id, result.appId)
     assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 15)
-    assert.equal(readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky'].url, 'https://api.bottasker.ai/mcp')
+    assert.equal(fs.existsSync(path.join(result.plugin, 'mcp.json')), false)
     assert.throws(() => buildPackage({ root, profile: 'submission', pluginId: identity }))
   })
 }
@@ -177,7 +199,7 @@ test('repository runtime stays desktop-compatible while submission preserves exp
   assert.deepEqual(runtime.mcpServers['bottasker-tasky'], {
     type: 'streamable-http', url: 'https://api.bottasker.ai/mcp',
   })
-  const result = buildPackage({ root })
+  const result = buildPackage({ root, profile: 'submission' })
   const server = readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky']
   assert.equal(server.url, runtime.mcpServers['bottasker-tasky'].url)
   assert.deepEqual(server.extensions['com.openai'].auth, {
@@ -227,7 +249,7 @@ test('submission packaging rejects an OAuth template pointing at another environ
   const mcp = readJson(file)
   mcp.mcpServers['bottasker-tasky'].url = 'http://localhost:3200/mcp'
   fs.writeFileSync(file, JSON.stringify(mcp))
-  assert.throws(() => buildPackage({ root }), /Submission MCP endpoint/)
+  assert.throws(() => buildPackage({ root, profile: 'submission' }), /Submission MCP endpoint/)
 })
 
 for (const [label, mutate] of [
