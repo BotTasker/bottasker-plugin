@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.38
+
+- Restore direct MCP + all 15 skills as the default local Codex installation and package profile, with native production OAuth and no registered-app dependency.
+- Keep connected App + skills, ChatGPT updates and public submissions explicit; local installation never requires or modifies Platform.
+- Document targeted Tasky cleanup and preserve Bottasker Developer and unrelated plugins.
+
 ## 0.2.37
 
 - Make App + 15 skills the default OpenAI package, requiring an explicit registered app identity and never falling back to a direct MCP connection.
