@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.36
+
+- Teach Clientes predefined and agent-defined follow-up: contextual timing/messages, one dated pending task, review and bounded cycles.
+- Discover approved WhatsApp templates and configure allowed templates/variable mappings; preserve existing cycles and sending authorization.
+
 ## 0.2.35
 
 - Teach Tasky native cart search, cart editing, verified paid state and optional private payment evidence before or after payment.
