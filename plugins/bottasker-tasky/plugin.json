@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bottasker-tasky",
-  "version": "0.2.37",
+  "version": "0.2.38",
   "description": "Tasky helps build and operate BotTasker apps through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -118,7 +118,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Add native cart search and editing MCP tools, verified-payment and private-evidence guidance, and the unified Carritos workflow/agent family with a paid event. Keep role/OAuth scope checks, explicit activation and synthetic-only verification; do not charge, send messages or submit templates implicitly.",
+        "release_notes": "Add complete native Files operations and practical asset migration guidance: browse/search metadata, import private files from URLs, finish signed uploads, rename, move and delete with scope checks and explicit destructive consent. Distinguish client tool exposure, agent configuration and channel delivery; verify copies before changing agent references.",
         "translations": {
           "en-US": {
             "subtitle": "Build and run BotTasker apps",

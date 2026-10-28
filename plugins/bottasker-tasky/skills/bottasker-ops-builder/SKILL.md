@@ -1,6 +1,6 @@
 ---
 name: bottasker-ops-builder
-description: Use for BotTasker calendars and public booking configuration, availability and meeting participants, or for files, knowledge, conversations, messages, calls, WhatsApp templates and general operational modules.
+description: Use for BotTasker Files/Archivos operations, calendars and public bookings, conversations, messages, calls, and general operational modules. Route Knowledge Base and WhatsApp templates to their specialists.
 ---
 
 # BotTasker Ops Builder
@@ -22,7 +22,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - forms: delegate to `bottasker-forms-architect`
    - catalogs/products/categories/variants/sales carts: delegate to `bottasker-catalog-architect`
    - calendar, public booking links, booking rules and meeting participants: follow Calendar and public bookings below; discover `bt_calendar_*` capabilities before acting.
-   - files: `bt_files_*`
+   - files: follow Files below; discover the concrete `bt_files_*` operations before acting.
    - knowledge: delegate to `bottasker-knowledge-base-assistant` for Knowledge Base documents, queries, ingestion state, and agent attachments.
    - conversations/messages/calls: `bt_conversations_*`, `bt_messages_*`, `bt_calls_*`
    - WhatsApp templates: delegate to `bottasker-whatsapp-template-architect` for classification, content, components, examples, media, buttons, draft creation, and Meta submission.
@@ -43,6 +43,56 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 - Filter conversations with tag IDs, not visible names. Multiple tag IDs use OR semantics: a conversation matches when it has at least one selected label.
 - Use `bt_conversations_get_tags` before changing a conversation when its current labels are unknown. Use `bt_conversations_add_tags` with `names` to create/reuse and assign labels, and `bt_conversations_remove_tag` to unassign them. `bt_conversations_add_tag` remains only as the legacy single-label alias. Removing a label from a conversation does not delete it from the app catalog.
 - AI Agents that receive WhatsApp, Telegram, or WebChat input with automatic conversation registration enabled receive `manage_conversation_tags` at runtime. This tool is already bound to the current conversation; never ask for or invent an internal conversation ID.
+
+## Files
+
+Use this section for the **Archivos** module: browse/search, inspect metadata, create folders, import assets, finish an upload, rename, move or delete. This is separate from configuring an AI Agent's Files tool and from sending media through a conversation channel.
+
+### Discover access and resolve scope
+
+Resolve the target app, then call `bt_mcp_find_tools` with `moduleKey: "files"`, the user's natural-language intent and the required effect. Search reads with `effect: "read"`; ordinary creates/imports with `"write"`; deletion and signed upload initialization with `"destructive"`. Discovering an editor component with `bt_ai_agent_tools_discover` only explains how to equip an agent; it does not execute file operations from this chat.
+
+Use the real callable tool inventory. If discovery returns an operation that the client did not load, distinguish **implemented/discovered** from **callable in this session**. If the discovery tool itself is unavailable, say the available inventory is incomplete/unverified; do not conclude that the backend has no Files capability. Skills explain operations but cannot load missing callable tools by themselves. Never bypass an authorization failure using a worker executor, API integration or another identity.
+
+Use explicit `appId` for an app's files. Do not fall back to the organization root when an app result is empty or forbidden. Organization is supplied by the authenticated connection. Carry real file/folder IDs between operations; names and paths are for discovery, not invented identifiers.
+
+### MCP operation contracts
+
+The four historical operations retain `payload` for compatibility. New operations use top-level fields. Do not infer one shape from the other; inspect discovery's current input schema.
+
+| Operation | Input and observable result |
+| --- | --- |
+| `bt_files_list` | `{ appId, payload: { parentId? } }`. Omit `parentId` for root. Returns `items`, `parent`, `breadcrumbs` for direct children only. |
+| `bt_files_get` | `{ appId, id }`. Reads one file/folder's metadata; does not read the bytes or describe an image. |
+| `bt_files_search` | `{ appId, search?, type?, parentId?, limit?, offset? }`. Searches literal case-insensitive names across the app, with optional `type: "file"` or `"folder"`. Omitting `parentId` searches all folders; `parentId: ""` restricts to root. Default limit 25, maximum 100. Continue with returned `nextOffset` only while `hasMore`. Searches names, not document contents. |
+| `bt_files_create_folder` | `{ appId, payload: { name, parentId?, reuseExisting? } }`. Read first; `reuseExisting: true` reuses an existing same-named folder and requires read permission. |
+| `bt_files_upload_from_url` | `{ appId, url, fileName?, mimeType?, parentId? }`. Downloads and copies a source into **private** Files storage, up to 50 MiB. Requires read/create/update permissions. Rejects private-network URLs and duplicate names. Returns the saved file metadata and ID; never deletes the original or sends it. |
+| `bt_files_upload_init` | `{ appId, payload: { name, size, mimeType, parentId?, public? } }`. Reserves metadata and returns `file` plus a signed `uploadUrl`. Size is bytes. `public` defaults false; true is public sharing and needs explicit authorization. This operation requires destructive execution consent because its historical contract supports public uploads. |
+| `bt_files_upload_complete` | `{ appId, id }`. Finalizes metadata after a successful PUT of bytes; additionally requires read/update permissions and preserves reserved visibility. It neither transfers bytes nor independently verifies object presence. |
+| `bt_files_get_download_url` | `{ appId, payload: { id } }`. Returns `url` and, for private files, `expiresAt` (currently 15 minutes). Does not download, parse or send the file. |
+| `bt_files_rename` | `{ appId, id, newName }`. Renames the entry; folder descendant paths change, IDs/bytes remain. Read back the new name/path. |
+| `bt_files_move` | `{ appId, id, newParentId? }`. Moves within the same app; omit the destination for root. Folder descendant paths change. Cycles and duplicate destination names are rejected. |
+| `bt_files_delete` | `{ appId, ids }`, 1–100 real IDs. Permanent: folder deletion includes descendants and stored bytes. Requires explicit approval/destructive consent. Returns only deleted `ids`; compare with the request and report partial results. Folder deletion is not atomic: an interrupted attempt can already have removed some descendant objects. |
+
+Read/get/search/download need Files read permission; create/import/upload need create (imports and upload finalization also need read/update), rename/move need update, delete needs remove. Backend app/organization authorization remains authoritative. Respect returned pending actions and OAuth scope errors; do not claim that confirmation grants permissions.
+
+### Browse and share existing assets
+
+List root or search by the business name (for example a clinic), inspect candidate folders/files and resolve ambiguous names using actual IDs and paths. Browse the matching folder to locate each intended asset. Metadata is not evidence of image contents. Keep file IDs as durable references and request a fresh download URL when needed; signed links expire and must not be persisted as permanent agent instructions.
+
+To let an agent use these assets, discover, prepare and validate the Files component through `bottasker-ai-agent-architect`. Configure only fields actually exposed by the component: current Files settings include `base_folder`, `enable_list_folder`, `enable_create_folder`, `enable_upload_from_url`, `enable_get_download_url`, `enable_move_entry`, `enable_delete_files`, and `enable_delete_folder`. For a read/send agent, enable listing and download links, and disable unneeded create/import/move/delete capabilities. The base folder is the default starting folder; do not present it as a verified security sandbox. Do not promise OCR, transcription or content parsing unless independently discovered.
+
+Storage is separate from delivery. Sending an image/document needs the appropriate channel's enabled Response or legacy Actions sending tool. A download URL, equipped Files tool, final chat reply or saved prompt alone does not prove a message was delivered.
+
+### Copy assets from Base de datos or a URL
+
+For a migration such as three images per clinic, read the existing record references and agent configuration first. Build a source-to-destination mapping (record/clinic, original reference, destination folder, destination file ID and verification state). Search/list the destination to avoid duplicates and reuse verified existing files; a matching name alone does not prove identical contents.
+
+When the source is a durable file ID, resolve it in its authorized source context; when it is an expiring link, obtain a fresh authorized source URL. Use `bt_files_upload_from_url` to copy each supported source, then reread the destination and obtain its download URL. Preserve original records/assets unless the user separately requested removal. Do not rewrite the agent's instructions to require files that have not been verified. After the required copies are verified, update only the intended tool configuration and file references; preserve the agent's existing active/inactive state.
+
+For a local binary, use signed upload initialization only when the client has an authorized HTTP PUT/file-transfer capability. PUT the actual bytes with the reserved MIME type to the returned upload URL, require HTTP success, then complete the upload. Initialization alone is not an uploaded file. If this client cannot transfer bytes, report that precise remaining step rather than claiming completion or constructing a public source URL.
+
+On `FILE_DUPLICATE_NAME`, inspect the existing destination; do not overwrite or invent a new filename silently. On `FILE_IMPORT_INCOMPLETE`, retain the returned `fileId` and `uploadPerformed`, reconcile the destination before retrying, and report the partial state. Do not automatically delete reserved entries or repeat a failed batch. A failed/expired source, denied permission or unsupported format is a real failure, not a successful migration.
 
 ## Calendar and public bookings
 
