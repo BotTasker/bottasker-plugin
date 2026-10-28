@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.38
+
+- Teach native Files browsing, bounded name search, metadata, private URL import, signed uploads, rename/move and permanent deletion with exact MCP inputs and verification.
+- Separate Tasky file operations, agent Files configuration and conversation delivery; verify migrated assets before changing agent references and preserve activation state.
+- Distinguish missing client tool exposure from absent backend capability, and explain partial-import reconciliation, expiring links and least-privilege permissions.
+
 ## 0.2.37
 
 - Make App + 15 skills the default OpenAI package, requiring an explicit registered app identity and never falling back to a direct MCP connection.

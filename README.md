@@ -90,7 +90,7 @@ node scripts/build-codex-package.mjs chatgpt-update --existing-plugin-zip=/ruta/
 ```
 
 4. El comando devuelve la ruta de un ZIP `bottasker-tasky-<versión>-chatgpt-update.zip`. En **ese mismo plugin de ChatGPT**, elige **More actions → Upload new version → Choose file**, selecciona el ZIP generado y completa la actualización. No uses el ZIP público `submission` aquí ni crees otro Custom MCP.
-5. Pulsa **View plugin** y comprueba **Apps 1**, **Skills 15** y la versión actual (0.2.37). En **Manage → Connected accounts**, verifica que la cuenta elegida sigue conectada por OAuth y la URL es `https://api.bottasker.ai/mcp`. Abre un chat nuevo para probar una consulta de solo lectura.
+5. Pulsa **View plugin** y comprueba **Apps 1**, **Skills 15** y la versión actual (0.2.38). En **Manage → Connected accounts**, verifica que la cuenta elegida sigue conectada por OAuth y la URL es `https://api.bottasker.ai/mcp`. Abre un chat nuevo para probar una consulta de solo lectura.
 
 El generador conserva exactamente el nombre técnico y la referencia a la app del ZIP descargado, pero toma las skills y los recursos de este repositorio. No copia credenciales, no vuelve a registrar la app ni solicita permisos nuevos. Excluye los servidores MCP duplicados y los casos de revisión del portal, que solo corresponden al paquete público con su servidor declarado. Una actualización de habilidades puede requerir un chat nuevo; ni generar el archivo ni instalar un marketplace local publica esta actualización en ChatGPT.
 
