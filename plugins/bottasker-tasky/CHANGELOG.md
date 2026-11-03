@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.40
+
+- Add the native Support Tickets specialist for apps, permissions, configuration, activity, private files and optional AI notifications.
+- Teach native Boards visual tracking with shared ticket records, detail and forms; avoid duplicate database models.
+- Teach Dashboard KPIs, breakdowns and time trends through the native provider and typed discovery tools.
+- Route Router, App Builder, Board Architect and Dashboard Architect to the specialist; package all 16 skills.
+
 ## 0.2.36
 
 - Teach Clientes predefined and agent-defined follow-up: contextual timing/messages, one dated pending task, review and bounded cycles.

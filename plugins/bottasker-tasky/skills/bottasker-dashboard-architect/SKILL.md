@@ -103,6 +103,7 @@ Use the app's real source of truth:
 - Dynamic Tables for simpler operational tables.
 - Catalogs/products/sales carts for commerce metrics.
 - Conversations/messages/calls for communication metrics.
+- Native Support Tickets for ticket counts, open/overdue/unassigned work, state/priority/owner breakdowns and resolution/age metrics. No Database replica is required.
 - AI Agents/workflows/runs for automation metrics.
 - Calendar/appointments for availability and scheduling metrics.
 
@@ -116,7 +117,7 @@ Before proposing a widget, identify:
 - required filters;
 - whether data quality is sufficient.
 
-If the required source field does not exist, hand off to `bottasker-data-architect` before creating the dashboard.
+If the required source field does not exist, inspect the native module’s field configuration with its specialist, or use `bottasker-data-architect` for a Database model. Do not copy a native module into a generic table merely to report on it.
 
 ## Native Conversations Source
 
@@ -165,11 +166,33 @@ BotTasker dashboards can query conversations and messages directly from the curr
 4. Exercise the relevant drill-down and confirm that it stays within the same app and source dataset without revealing private message content.
 5. If the result is `stale`, refresh it and verify the new `generatedAt` and effective range. Do not report success from a cached, stale, ambiguous, or empty result unless an independently verified source count proves that zero is correct for that exact range and filters.
 
+## Native Support Tickets Source
+
+Coordinate with `bottasker-support-tickets-architect` for native ticket behavior. Use Dashboards for metrics and trends; use Boards to work the same tickets visually with their canonical detail/form. Automatic AI notifications are a separate opt-in capability.
+
+Discover the source through the provider-aware read tools: `bt_dashboards_list_providers` → `bt_dashboards_list_provider_sources` → `bt_dashboards_list_provider_datasets` → `bt_dashboards_list_provider_fields`, with the authorized `appId` at each step. Discover these tools first; a deployment may not yet expose them. Legacy `bt_dashboards_list_sources`, `bt_dashboards_list_available_fields` and `bt_dashboards_generate_from_data_hub` are Database-specific and do not discover/generate this native source.
+
+- `providerKey: "support-tickets"`; `sourceId`: actual default inbox ID returned for this app; `datasetId: "tickets"`. Additional inbox selection/creation is currently hidden.
+- No Base de datos tables, data imports, mirrors or synchronizations are required. Query the native source directly.
+- Dimensions/filters include current `status`, semantic `status_group`, `priority`, `request_type`, `category`, `impact`, `urgency`, `assignee_user_id`, `assignee_name`, `team_name`, `is_open`, `is_assigned`, `is_overdue` and supported active custom fields. Prefer stable assignee IDs when names may collide. Metadata supplies actual states/options and preserves authored labels.
+- Dates include `createdAt`, `updatedAt`, `due_at`, `response_due_at`, `resolution_due_at`, `resolved_at`, `closed_at` and supported active custom dates. Discovery is authoritative.
+- Count tickets, or use `sum`, `avg`, `min`, `max` on `resolution_hours`, `age_hours` and discovered numeric custom fields. These durations are in **hours**, not milliseconds. Resolution is creation to a valid `resolved_at`; missing/negative durations are excluded. Empty averages are unavailable, not zero-hour performance.
+- Open means a semantic stage other than resolved/closed/cancelled. Overdue means open with `due_at < now`; do not present it as first-response or resolution SLA compliance. Deadline fields alone do not prove first-response duration, reopen rate or reminder delivery.
+- KPI mode `metric`; bar/donut/funnel mode `grouped` with one non-date dimension; line/area/heatmap mode `timeseries` with hour/day/week/month; `table` with explicit allowed fields. Limits: five measures, twenty filters, one grouped dimension, at most 100 grouped rows, 400 time buckets, twelve table fields, page size at most 100. Keep ordinary operational dashboards comfortably below these limits.
+- Ranges: today/yesterday/this week/last 7, 30 or 90 days/this month/custom up to 366 days; persist the business timezone. The default date field is `createdAt`. Dashboard date selection overrides a widget’s range, so an “open” KPI is open tickets within that effective creation range unless a different date field was chosen. State the cohort clearly.
+- General filters: `equals`, `not_equals`, `in`, `not_in`, `contains`, `gt`, `gte`, `lt`, `lte`, `exists`, subject to field type. Preserve native enum keys and use boolean values (or the supported true/false strings) for derived flags.
+
+A useful proposal is total/open/overdue/unassigned KPIs, a current-state breakdown, workload by team or assignee, created-ticket trend, and average resolution hours with a clear resolution cohort. Do not automatically add every metric.
+
+Preview through `bt_dashboards_preview_widget`; after the user-authorized save, read the dashboard and run each saved widget through `bt_dashboards_run_widget_query`. Verify effective range, timezone, source and counts against the same native scope. Test a genuine zero against the source before claiming that no work exists. Ticket changes invalidate metrics and refetch as the viewer; clock-dependent values can require manual refresh even when no record changed.
+
+Ticket metrics are **internal/authenticated**: both native `support-tickets:read` and Dashboard permissions are checked on each query, even with a warm cache. Public/restricted external links do not confer native Ticket access; do not promise these widgets can be publicly shared. Private ticket activity, descriptions, contact information and internal notes are excluded. Use only discovered safe table fields. Do not invent a ticket drill-down action or replace its canonical detail with a generic dashboard form.
+
 ## Public Dashboard Access
 
 Dashboards can be shared with people who are not signed in and do not have a BotTasker account. The public view is read-only: visitors may change the dashboard date range and refresh its data, but they cannot edit the dashboard, change widgets, or open internal modules and actions.
 
-Public sharing is a security-sensitive operation. Before enabling it:
+Native Support Tickets metrics remain internal and cannot be made public by this sharing mechanism. For other supported sources, public sharing is a security-sensitive operation. Before enabling it:
 
 1. Read the exact dashboard and confirm its `appId` and intended audience.
 2. Review every visible title, metric, dimension, table field, filter, and empty/error state for confidential or identifying information.
@@ -270,6 +293,10 @@ Use dashboard tools when available:
 - `bt_dashboards_generate_from_data_hub`
 - `bt_dashboards_preview_widget`
 - `bt_dashboards_run_widget_query`
+- `bt_dashboards_list_providers`
+- `bt_dashboards_list_provider_sources`
+- `bt_dashboards_list_provider_datasets`
+- `bt_dashboards_list_provider_fields`
 - `bt_dashboards_list_sources`
 - `bt_dashboards_list_available_fields`
 
