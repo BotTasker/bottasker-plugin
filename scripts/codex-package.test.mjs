@@ -34,23 +34,38 @@ function cloudArchive(root, mutate = () => {}) {
   return { zip, manifest, apps }
 }
 
-test('default build requires a registered app and never falls back to a direct MCP package', (t) => {
+test('default build includes direct MCP and 15 skills without a registered app', (t) => {
   const root = fixture(t)
-  assert.throws(() => buildPackage({ root }), /registered asdk_app/)
-  assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
-  const result = buildPackage({ root, pluginId })
-  assert.equal(result.profile, 'connected')
-  assert.equal(fs.existsSync(path.join(result.plugin, 'mcp.json')), false)
+  const result = buildPackage({ root })
+  assert.equal(result.profile, 'direct')
+  assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 15)
+  assert.equal(fs.existsSync(path.join(result.plugin, '.app.json')), false)
+  const portable = readJson(path.join(result.plugin, 'plugin.json'))
+  const compatibility = readJson(path.join(result.plugin, '.codex-plugin/plugin.json'))
+  assert.equal(portable.extensions['com.openai'].apps, undefined)
+  assert.equal(compatibility.apps, undefined)
+  assert.equal(compatibility.mcpServers, './.mcp.json')
+  assert.equal(readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky'].url,
+    'https://api.bottasker.ai/mcp')
+  assert.equal(readJson(path.join(result.plugin, '.mcp.json')).mcpServers['bottasker-tasky'].oauth_resource,
+    'https://api.bottasker.ai/mcp')
+  assert.equal(readJson(path.join(result.directory, '.agents/plugins/marketplace.json')).name, 'bottasker-tasky')
+  assert.throws(() => buildPackage({ root, pluginId }), /Only connected/)
 })
 
-test('CLI without an explicit profile builds App plus skills and requires an app identity', (t) => {
+test('CLI defaults to direct MCP and requires an explicit profile for App plus skills', (t) => {
   const root = fixture(t)
   const script = path.join(root, 'scripts/build-codex-package.mjs')
-  const missing = spawnSync(process.execPath, [script], { encoding: 'utf8' })
+  const direct = spawnSync(process.execPath, [script], { encoding: 'utf8' })
+  assert.equal(direct.status, 0, direct.stderr)
+  assert.match(direct.stdout, /"profile": "direct"/)
+  const implicitApp = spawnSync(process.execPath, [script, `--plugin-id=${pluginId}`], { encoding: 'utf8' })
+  assert.equal(implicitApp.status, 1)
+  assert.match(implicitApp.stderr, /Only connected/)
+  const missing = spawnSync(process.execPath, [script, 'connected'], { encoding: 'utf8' })
   assert.equal(missing.status, 1)
   assert.match(missing.stderr, /registered asdk_app/)
-  assert.equal(fs.existsSync(path.join(root, '.tasky-runtime')), false)
-  const built = spawnSync(process.execPath, [script, `--plugin-id=${pluginId}`], { encoding: 'utf8' })
+  const built = spawnSync(process.execPath, [script, 'connected', `--plugin-id=${pluginId}`], { encoding: 'utf8' })
   assert.equal(built.status, 0, built.stderr)
   assert.match(built.stdout, /"profile": "connected"/)
   assert.match(built.stdout, /"appId": "asdk_app_0123456789abcdef0123456789abcdef"/)

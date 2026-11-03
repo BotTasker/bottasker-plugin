@@ -53,9 +53,9 @@ function readExistingCloudPlugin(zip) {
   return { name: existing.name, appManifest, appId: app.id }
 }
 
-export function buildPackage({ root = repository, profile = 'connected', pluginId, existingPluginZip } = {}) {
-  if (!['submission', 'connected', 'chatgpt-update'].includes(profile)) throw new Error('Profile must be submission, connected or chatgpt-update')
-  if (profile !== 'connected' && pluginId !== undefined) throw new Error('Only connected accepts --plugin-id; submission cannot contain app references')
+export function buildPackage({ root = repository, profile = 'direct', pluginId, existingPluginZip } = {}) {
+  if (!['direct', 'submission', 'connected', 'chatgpt-update'].includes(profile)) throw new Error('Profile must be direct, submission, connected or chatgpt-update')
+  if (profile !== 'connected' && pluginId !== undefined) throw new Error('Only connected accepts --plugin-id; direct and submission cannot contain app references')
   if (profile !== 'chatgpt-update' && existingPluginZip !== undefined) throw new Error('Only chatgpt-update accepts --existing-plugin-zip')
   const cloud = profile === 'chatgpt-update' ? readExistingCloudPlugin(existingPluginZip) : undefined
   const appId = profile === 'connected' ? normalizeAppId(pluginId) : undefined
@@ -142,16 +142,17 @@ if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import
   try {
     const args = process.argv.slice(2)
     if (args.length === 1 && args[0] === '--help') {
-      console.log('node scripts/build-codex-package.mjs [connected] --plugin-id=<registered-app-id-or-plugin-url>\n' +
+      console.log('node scripts/build-codex-package.mjs [direct]\n' +
+        'node scripts/build-codex-package.mjs connected --plugin-id=<registered-app-id-or-plugin-url>\n' +
         'node scripts/build-codex-package.mjs chatgpt-update --existing-plugin-zip=<downloaded-plugin.zip>\n' +
         'node scripts/build-codex-package.mjs submission\n' +
-        'Builds a ZIP; submission/connected also generate a local marketplace. Does not install, register, authenticate, or publish.\n' +
-        'Default: connected (App + 15 skills, no bundled MCP). A registered app is required; there is no direct-MCP fallback.\n' +
+        'Builds a ZIP; direct/submission/connected also generate a local marketplace. Does not install, register, authenticate, or publish.\n' +
+        'Default: direct (MCP + 15 skills with native OAuth, no registered app required).\n' +
         'Connected accepts an asdk_app_… App ID, plugin_asdk_app_… ID, or https://chatgpt.com/plugins/… URL.\n' +
         'ChatGPT update preserves the name and app mapping from Download plugin ZIP; upload its output with Upload new version.\n' +
         'The registered app must already be available to the current account; the build cannot verify access.')
     } else {
-      const profile = args[0]?.startsWith('--') ? 'connected' : (args.shift() || 'connected')
+      const profile = args[0]?.startsWith('--') ? 'direct' : (args.shift() || 'direct')
       const option = profile === 'chatgpt-update' ? '--existing-plugin-zip=' : '--plugin-id='
       if (args.length > 1 || (args[0] && !args[0].startsWith(option))) throw new Error('Invalid arguments; use --help')
       execFileSync(process.execPath, [path.join(repository, 'scripts', 'validate-plugin.mjs')], { stdio: 'inherit' })
