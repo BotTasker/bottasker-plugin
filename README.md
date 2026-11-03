@@ -1,18 +1,18 @@
 # Tasky by BotTasker
 
-Installable BotTasker plugin for Codex and Claude Code. It bundles 15 Tasky skills and connects them to the hosted BotTasker MCP so an authenticated user can design, create, inspect, and operate BotTasker apps.
+Installable BotTasker plugin for Codex and Claude Code. It bundles 16 Tasky skills and connects them to the hosted BotTasker MCP so an authenticated user can design, create, inspect, and operate BotTasker apps.
 
 > **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
 ## Instalación para Codex, ChatGPT, Claude Code y otros agentes
 
-Elige **una sola vía por cliente**. Tasky incluye 15 skills y usa el MCP de producción `https://api.bottasker.ai/mcp` con OAuth. Tener el repositorio descargado o ver una skill no demuestra que las herramientas estén conectadas.
+Elige **una sola vía por cliente**. Tasky incluye 16 skills y usa el MCP de producción `https://api.bottasker.ai/mcp` con OAuth. Tener el repositorio descargado o ver una skill no demuestra que las herramientas estén conectadas.
 
 | Cliente y objetivo | Vía de instalación | Qué comprobar |
 | --- | --- | --- |
-| Codex CLI o una instalación directa del MCP con skills | [Comandos de Codex](#codex) | Plugin habilitado, 15 skills y OAuth completo |
-| ChatGPT con **Apps** y cuentas vinculadas | [Actualización del plugin en ChatGPT](#chatgpt-app-oauth-y-15-skills) | **Apps 1**, **Skills 15**, versión y cuenta visibles en la misma ficha |
-| Codex con una app personal ya registrada | [Paquete conectado local](#native-app-connection-in-codex) | App accesible y 15 skills en esa instalación de Codex |
+| Codex CLI o una instalación directa del MCP con skills | [Comandos de Codex](#codex) | Plugin habilitado, 16 skills y OAuth completo |
+| ChatGPT con **Apps** y cuentas vinculadas | [Actualización del plugin en ChatGPT](#chatgpt-app-oauth-y-16-skills) | **Apps 1**, **Skills 16**, versión y cuenta visibles en la misma ficha |
+| Codex con una app personal ya registrada | [Paquete conectado local](#native-app-connection-in-codex) | App accesible y 16 skills en esa instalación de Codex |
 | Claude Code | [Comandos de Claude Code](#claude-code) | Plugin habilitado y MCP autenticado desde `/mcp` |
 | Otro agente compatible con plugins | [Guía de compatibilidad](#other-agents-and-mcp-clients) | Soporte real de manifiestos, skills, transporte HTTP y OAuth |
 
@@ -32,7 +32,7 @@ Revisa las instalaciones existentes y elige una sola vía compatible:
 - Codex con una app registrada: usa el paquete conectado local cuando corresponda.
 - Claude Code: agrega el marketplace e instala bottasker-tasky@bottasker-tasky.
 - Otro cliente: comprueba su soporte de plugins y OAuth; si solo admite MCP,
-  explica que eso no instala automáticamente las 15 skills.
+  explica que eso no instala automáticamente las 16 skills.
 Usa producción: https://api.bottasker.ai/mcp. No adivines IDs de apps,
 no reutilices un registro eliminado y no sustituyas OAuth por una API key.
 Para la instalación normal usa las funciones o comandos del cliente;
@@ -40,7 +40,7 @@ el checkout local solo es necesario para generar un paquete conectado propio.
 Si detectas duplicados, muéstramelos y pregunta cuál conservar.
 Deja que yo complete el login, elija mi organización y autorice la conexión.
 Una instalación local de Codex no actualiza el plugin de ChatGPT en la nube.
-Después verifica el plugin, las 15 skills cuando el cliente las admita,
+Después verifica el plugin, las 16 skills cuando el cliente las admita,
 y el perfil/cuenta de la conexión con una consulta de solo lectura.
 No ejecutes workflows ni crees o modifiques datos para probar la instalación.
 Si necesitas que yo reinicie la app o abra un chat nuevo, indícalo.
@@ -55,27 +55,27 @@ Tasky publishes a portable root `plugin.json`, `mcp.json` and `skills/`, plus Co
 
 For a client that only supports remote MCP, configure the production URL `https://api.bottasker.ai/mcp`, Streamable HTTP transport and native OAuth. Let the host discover the authorization metadata and complete the browser consent. Use that client's actual configuration syntax; do not assume Codex, Claude and other hosts share the same JSON or TOML format. If the host cannot perform OAuth, this integration is not supported there through an API-key workaround.
 
-An MCP-only connection exposes server tools, not automatically the 15 packaged skills or OpenAI's account-management UI. Import skills through the host's supported mechanism when available, or use the server's advertised skill-discovery tools. Those tools are not proof that the client installed the plugin bundle. Report tools and packaged skills as separate verification results.
+An MCP-only connection exposes server tools, not automatically the 16 packaged skills or OpenAI's account-management UI. Import skills through the host's supported mechanism when available, or use the server's advertised skill-discovery tools. Those tools are not proof that the client installed the plugin bundle. Report tools and packaged skills as separate verification results.
 
 ### Verificación después de instalar
 
 1. Reinicia la aplicación o abre una sesión nueva cuando el cliente lo requiera.
 2. Comprueba una sola variante activa de Tasky y el endpoint de producción.
 3. Completa OAuth y confirma la organización seleccionada; no compartas tokens o contraseñas con el agente.
-4. Verifica las 15 skills en los clientes que admiten el paquete. Para la variante conectada de OpenAI, comprueba también **Apps 1**, **Skills 15** y la cuenta en **Manage → Connected accounts**.
+4. Verifica las 16 skills en los clientes que admiten el paquete. Para la variante conectada de OpenAI, comprueba también **Apps 1**, **Skills 16** y la cuenta en **Manage → Connected accounts**.
 5. Pide: «Muestra el perfil y la organización de mi conexión BotTasker, sin hacer cambios». Comprueba que usa herramientas reales y devuelve la identidad esperada. La lista completa de herramientas puede cargarse bajo demanda; un chat abierto antes de instalar puede conservar herramientas antiguas.
 
 ## Languages
 
-Tasky's 15 skills include guidance for Spanish, Brazilian Portuguese and English. They follow an explicitly requested response language or the user's current request, retaining the established preference for ambiguous short messages. Plans, questions, confirmations and summaries follow that language. Generated content can use a separately requested language; changing the conversation language does not authorize translating existing records. Tool identifiers, payload keys, enum values and error codes keep their exact values.
+Tasky's 16 skills include guidance for Spanish, Brazilian Portuguese and English. They follow an explicitly requested response language or the user's current request, retaining the established preference for ambiguous short messages. Plans, questions, confirmations and summaries follow that language. Generated content can use a separately requested language; changing the conversation language does not authorize translating existing records. Tool identifiers, payload keys, enum values and error codes keep their exact values.
 
 The submission includes listing translations for `en-US`, `es-PE` and `pt-BR`, with English in the base listing fields. Both manifests and package profiles retain these translations. OpenAI currently imports and retains translations without changing visible directory text or listing API responses; see [Translate listing text](https://developers.openai.com/plugins/deploy/submission#translate-listing-text).
 
 These changes apply to the packaged assistant guidance and listing metadata. BotTasker's login/consent pages and other web UI use their own application translations. Language switching should be evaluated with the scenarios in `submission/review-matrix.md`; packaging checks do not prove model output quality.
 
-## ChatGPT: app, OAuth y 15 skills
+## ChatGPT: app, OAuth y 16 skills
 
-Un **Custom MCP** creado con **Create as a plugin** puede mostrar **Apps 1** y una cuenta OAuth sin incluir ninguna skill. La descripción que dice «15 skills», las herramientas MCP que cargan guías y un paquete instalado localmente no demuestran que estén en esa ficha de ChatGPT. Para añadirlas al mismo registro:
+Un **Custom MCP** creado con **Create as a plugin** puede mostrar **Apps 1** y una cuenta OAuth sin incluir ninguna skill. La descripción que dice «16 skills», las herramientas MCP que cargan guías y un paquete instalado localmente no demuestran que estén en esa ficha de ChatGPT. Para añadirlas al mismo registro:
 
 1. En [ChatGPT Plugins](https://chatgpt.com/plugins), abre tu Tasky existente. Si aún no existe, usa **Add → Add custom MCP server**, nombre **Tasky by BotTasker**, URL `https://api.bottasker.ai/mcp`, autenticación **OAuth**, y completa **Create as a plugin**. Selecciona tu organización en el consentimiento de BotTasker y verifica la cuenta en **Manage**.
 2. En la ficha del plugin, abre **More actions → Download plugin ZIP**. Conserva esa descarga como copia del registro actual; contiene su nombre técnico y el vínculo a su app.
@@ -86,7 +86,7 @@ node scripts/build-codex-package.mjs chatgpt-update --existing-plugin-zip=/ruta/
 ```
 
 4. El comando devuelve la ruta de un ZIP `bottasker-tasky-<versión>-chatgpt-update.zip`. En **ese mismo plugin de ChatGPT**, elige **More actions → Upload new version → Choose file**, selecciona el ZIP generado y completa la actualización. No uses el ZIP público `submission` aquí ni crees otro Custom MCP.
-5. Pulsa **View plugin** y comprueba **Apps 1**, **Skills 15** y la versión actual (0.2.32). En **Manage → Connected accounts**, verifica que la cuenta elegida sigue conectada por OAuth y la URL es `https://api.bottasker.ai/mcp`. Abre un chat nuevo para probar una consulta de solo lectura.
+5. Pulsa **View plugin** y comprueba **Apps 1**, **Skills 16** y la versión actual (0.2.32). En **Manage → Connected accounts**, verifica que la cuenta elegida sigue conectada por OAuth y la URL es `https://api.bottasker.ai/mcp`. Abre un chat nuevo para probar una consulta de solo lectura.
 
 El generador conserva exactamente el nombre técnico y la referencia a la app del ZIP descargado, pero toma las skills y los recursos de este repositorio. No copia credenciales, no vuelve a registrar la app ni solicita permisos nuevos. Excluye los servidores MCP duplicados y los casos de revisión del portal, que solo corresponden al paquete público con su servidor declarado. Una actualización de habilidades puede requerir un chat nuevo; ni generar el archivo ni instalar un marketplace local publica esta actualización en ChatGPT.
 
@@ -205,13 +205,13 @@ node scripts/validate-plugin.mjs
 node scripts/build-codex-package.mjs submission
 ```
 
-Usa el archivo `bottasker-tasky-<versión>-submission.zip` que imprime el comando para actualizar **la solicitud existente** en [OpenAI Platform Plugins](https://platform.openai.com/plugins), mediante la vía **With MCP**. Incluye las 15 skills, las traducciones de publicación para español, portugués de Brasil e inglés, el enlace de demostración `https://youtu.be/GE1NGw_v7jc`, los casos de revisión y la configuración OAuth de `https://api.bottasker.ai/mcp`. Conserva el nombre público `bottasker-tasky` para actualizar esa solicitud.
+Usa el archivo `bottasker-tasky-<versión>-submission.zip` que imprime el comando para actualizar **la solicitud existente** en [OpenAI Platform Plugins](https://platform.openai.com/plugins), mediante la vía **With MCP**. Incluye las 16 skills, las traducciones de publicación para español, portugués de Brasil e inglés, el enlace de demostración `https://youtu.be/GE1NGw_v7jc`, los casos de revisión y la configuración OAuth de `https://api.bottasker.ai/mcp`. Conserva el nombre público `bottasker-tasky` para actualizar esa solicitud.
 
 El workflow **Validate Tasky plugin** también genera este ZIP como artefacto **tasky-openai-submission** en GitHub Actions después de pasar las pruebas. Descarga el artefacto del commit que quieres revisar y extrae el archivo `*-submission.zip` de su interior; ese archivo es el que se sube a OpenAI.
 
 La publicación pública recibe directamente el servidor MCP; no acepta la referencia a una app personal mediante `apps` o `.app.json`. Por eso este ZIP es distinto del `chatgpt-update`. Consulta la [documentación de envío de OpenAI](https://developers.openai.com/plugins/deploy/submission).
 
-Si cambias el servidor, despliega y verifica primero producción; después sube el ZIP y vuelve a escanear las herramientas. Una corrección solo de empaquetado no modifica el catálogo MCP ni resuelve por sí sola observaciones sobre herramientas. Antes de solicitar revisión comprueba metadatos, **15 skills**, autenticación, escaneo, idiomas y video. El titular introduce sus credenciales de demostración y revisa las declaraciones legales en el portal.
+Si cambias el servidor, despliega y verifica primero producción; después sube el ZIP y vuelve a escanear las herramientas. Una corrección solo de empaquetado no modifica el catálogo MCP ni resuelve por sí sola observaciones sobre herramientas. Antes de solicitar revisión comprueba metadatos, **16 skills**, autenticación, escaneo, idiomas y video. El titular introduce sus credenciales de demostración y revisa las declaraciones legales en el portal.
 
 ## Prerequisites and authentication
 
@@ -386,7 +386,7 @@ node --test scripts/codex-package.test.mjs scripts/environment/environment.test.
 node scripts/build-codex-package.mjs submission
 ```
 
-The last command creates a ZIP under `.tasky-runtime/packages/`, containing the portable `plugin.json`, `mcp.json`, 15 skills, assets, license and compatibility files. Portal submission uses a registered public OAuth client (`provided`, `tokenEndpointAuthMethod: "none"`) with PKCE and no client secret. Initial scopes are `mcp:read mcp:write`; destructive scope is excluded. The existing connection guide is declared as the setup skill. Generated builds stay out of Git.
+The last command creates a ZIP under `.tasky-runtime/packages/`, containing the portable `plugin.json`, `mcp.json`, 16 skills, assets, license and compatibility files. Portal submission uses a registered public OAuth client (`provided`, `tokenEndpointAuthMethod: "none"`) with PKCE and no client secret. Initial scopes are `mcp:read mcp:write`; destructive scope is excluded. The existing connection guide is declared as the setup skill. Generated builds stay out of Git.
 
 Repository and connected installs use a transport-only `mcp.json` with native OAuth discovery. The current Codex desktop parser rejects per-server `extensions` in that file and otherwise drops the server. The portal submission build replaces it with `submission/mcp.json`, which contains the explicit OAuth configuration required for importing the connection settings. Use the submission ZIP for the portal, not as a desktop test marketplace. Keep both endpoints aligned; validation rejects a mismatched submission endpoint or unsafe initial scopes.
 
@@ -445,3 +445,7 @@ Tasky, Codex, and Claude can inspect and manage the authenticated user's board-c
 - Claude Code plugins: https://code.claude.com/docs/en/plugins
 - Claude Code plugin reference: https://code.claude.com/docs/en/plugins-reference
 - Claude Code plugin marketplaces: https://code.claude.com/docs/en/plugin-marketplaces
+
+## Native Support Tickets
+
+Use `bottasker-support-tickets-architect` to include and operate native Tickets in an app. Represent the same tickets in Boards for visual follow-up and in Dashboards for authorized metrics, without creating duplicate Base de datos records.
