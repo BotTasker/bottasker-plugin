@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.41
+
+- Present BotTasker apps as solutions in all 16 skills and starter prompts.
+- Update English, Spanish and Brazilian Portuguese listing text.
+- Preserve technical tool/skill names, routes, authorization and authored content.
+
 ## 0.2.40
 
 - Add the native Support Tickets specialist for apps, permissions, configuration, activity, private files and optional AI notifications.

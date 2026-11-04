@@ -7,7 +7,11 @@ description: Use when the user wants to design, create, configure, filter, share
 
 Use this skill as the specialist for the BotTasker `boards` module. It owns board source design, permanent source scope, columns, per-user column alerts, card fields, detail views, widgets, button automations, public/restricted access, permissions, file fields, and operational safety.
 
-If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here after App Builder selects boards as part of the approved app blueprint.
+If the user asks to create a complete solution, route to `bottasker-app-builder` first. Return here after Solution Builder selects boards as part of the approved solution blueprint.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -49,9 +53,9 @@ Do not call create, update, move, delete, public link, role, user, file, or auto
 Prefer structured sources:
 
 - `support-tickets`: native support operations, incidents and requests. Read the native source rules below; do not duplicate records in another source or use the generic detail designer.
-- `data-hub-model`: best for durable app entities, relationships, app records, and AI-written data.
+- `data-hub-model`: best for durable solution entities, relationships, solution records, and AI-written data.
 - `dynamic-table`: best for simple table-backed operational tracking.
-- `manual`: only for small standalone boards or legacy use; avoid for apps that need reporting or automation.
+- `manual`: only for small standalone boards or legacy use; avoid for solutions that need reporting or automation.
 
 For source-backed boards:
 
@@ -107,7 +111,7 @@ Creation and mutation behavior:
 
 Tickets can be represented directly in Boards for visual follow-up. Load `bottasker-support-tickets-architect` for the ticket lifecycle, fields, optional AI notifications and agent/workflow tools. Visual tracking does not by itself activate reminder sending.
 
-- Native source type: `support-tickets`, same app and default inbox. Read current source metadata and `groupable` flags; typical dimensions are status, priority, request type, category, assignee, team, impact and urgency, plus supported active custom fields.
+- Native source type: `support-tickets`, same solution and default inbox. Read current source metadata and `groupable` flags; typical dimensions are status, priority, request type, category, assignee, team, impact and urgency, plus supported active custom fields.
 - Propose subject as title and ticket number, state, priority, responsible user and due date as scannable card fields. Use current technical field names and option values. Preserve approved permanent scope; temporary filters are separate.
 - Opening a card uses the same native ticket detail as the Tickets module; creation/editing uses its shared form. Skip the generic detail widget designer for this source. Moving a card updates the native grouping field through native permissions and validation; resolving/closing still needs resolution information.
 - Native ticket boards currently require authenticated internal access; public sharing is unsupported. Board access does not grant missing ticket/history/file permissions.
@@ -271,7 +275,7 @@ Use `bt_boards_configure_column_alert` to select any combination of:
 
 Entry and exit sounds can be different. Supported tone IDs are `chime`, `crystal`, `pulse`, `soft-pop`, `double-tap`, and `soft-bell`. Push delivery still requires the user to grant notification permission in a supported browser; never claim push is active merely because the preference was saved. Use `bt_boards_remove_column_alert` when the user asks to disable the entire column subscription.
 
-These preferences belong to the authenticated user. Never attempt to configure another user's subscription, pass `organization`, expose Firebase installation IDs, or manipulate push registration records. Board, column, app, user, and organization deletion cleanup is automatic.
+These preferences belong to the authenticated user. Never attempt to configure another user's subscription, pass `organization`, expose Firebase installation IDs, or manipulate push registration records. Board, column, solution, user, and organization deletion cleanup is automatic.
 
 ## Public Link And Security
 
@@ -316,7 +320,7 @@ When an AI Agent needs board capabilities, hand off to `bottasker-ai-agent-archi
 - detail buttons and their automation contracts;
 - intended least-privilege worker action: `read_board`, `manage_items`, or `invoke_board_action`.
 
-Agents must not change public access, roles, users, or sharing settings unless the app blueprint explicitly approves an administrative tool.
+Agents must not change public access, roles, users, or sharing settings unless the solution blueprint explicitly approves an administrative tool.
 
 ## Configured button execution
 

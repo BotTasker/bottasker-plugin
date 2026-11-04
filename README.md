@@ -1,6 +1,8 @@
 # Tasky by BotTasker
 
-Installable BotTasker plugin for Codex and Claude Code. It bundles 16 Tasky skills and connects them to the hosted BotTasker MCP so an authenticated user can design, create, inspect, and operate BotTasker apps.
+BotTasker business containers are called **solutions** (**soluciones** in Spanish; **soluções** in Portuguese). Internal names such as `apps`, `appId`, `bt_apps_*` and `bottasker-app-builder` remain unchanged. References to ChatGPT/OpenAI app registrations describe the host integration and retain that terminology.
+
+Installable BotTasker plugin for Codex and Claude Code. It bundles 16 Tasky skills and connects them to the hosted BotTasker MCP so an authenticated user can design, create, inspect, and operate BotTasker solutions.
 
 > **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
@@ -357,24 +359,24 @@ Use BotTasker to run bt_mcp_list_skills.
 
 ## Plan-First Flow
 
-For app creation or advanced automation, the plugin must discover capabilities, create a plan, resolve relevant doubts, and wait for explicit approval before calling write tools.
+For solution creation or advanced automation, the plugin must discover capabilities, create a plan, resolve relevant doubts, and wait for explicit approval before calling write tools.
 
 Expected flow:
 
 1. `bt_context_get_profile`
 2. `bt_apps_list_modules`
 3. `bt_apps_blueprint_plan`
-4. Specialist discovery as needed, for example `bt_ai_agent_tools_discover` when AI Agents are part of the approved app blueprint
+4. Specialist discovery as needed, for example `bt_ai_agent_tools_discover` when AI Agents are part of the approved solution blueprint
 5. Ask for approval
 6. Execute with `bt_apps_*`, `bt_data_hub_*`, `bt_ai_agents_*`, `bt_action_instances_*`, `bt_workflows_*`, and module tools from the approved plan
 
 Example prompt:
 
 ```text
-Quiero una app para llevar registro de gastos por Telegram, con dashboard mensual y un agente que registre los gastos automaticamente.
+Quiero una solución para llevar registro de gastos por Telegram, con dashboard mensual y un agente que registre los gastos automaticamente.
 ```
 
-Codex should use `bottasker-app-builder` to propose the app structure, module combination, specialist handoffs, risks, and execution plan before making changes. If AI Agents are included, `bottasker-ai-agent-architect` then designs the agent principal, subagents, tools, inputs, outputs, and required configuration inside the approved app.
+Codex should use `bottasker-app-builder` to propose the solution structure, module combination, specialist handoffs, risks, and execution plan before making changes. If AI Agents are included, `bottasker-ai-agent-architect` then designs the agent principal, subagents, tools, inputs, outputs, and required configuration inside the approved solution.
 
 ## Validate Plugin
 
@@ -423,10 +425,10 @@ claude plugin validate /Users/this/Documents/projects/bottasker/app/bottasker-ta
 
 - `bottasker-router`: entrypoint and workflow router.
 - `bottasker-connection-guide`: OAuth sign-in, organization selection, scope elevation, explicit errors, reauthorization, and revocation.
-- `bottasker-app-builder`: complete app design, module selection, specialist handoffs, apps, modules, menus, and templates.
-- `bottasker-clients-architect`: native Clientes apps, prospects, contacts, states, fields, history, tasks, segments, import/export and contextual AI follow-up.
+- `bottasker-app-builder`: complete solution design, module selection, specialist handoffs, solutions, modules, menus, and templates.
+- `bottasker-clients-architect`: native Clientes solutions, prospects, contacts, states, fields, history, tasks, segments, import/export and contextual AI follow-up.
 - `bottasker-data-architect`: Base de datos (Data Hub) and Dynamic Tables.
-- `bottasker-ai-agent-architect`: AI Agents module specialist for agents, subagents, dynamic tools, tool schemas, inputs, and outputs inside an app.
+- `bottasker-ai-agent-architect`: AI Agents module specialist for agents, subagents, dynamic tools, tool schemas, inputs, and outputs inside a solution.
 - `bottasker-knowledge-base-assistant`: Knowledge Base specialist for documents, URL/text sources, semantic queries, ingestion state, and Knowledge Base tools attached to agents.
 - `bottasker-automation-engineer`: AI agents, workflows, workers, and tests.
 - `bottasker-dashboard-architect`: useful dashboards for tracking, control, KPIs, reporting, and area-specific follow-up.
@@ -448,4 +450,4 @@ Tasky, Codex, and Claude can inspect and manage the authenticated user's board-c
 
 ## Native Support Tickets
 
-Use `bottasker-support-tickets-architect` to include and operate native Tickets in an app. Represent the same tickets in Boards for visual follow-up and in Dashboards for authorized metrics, without creating duplicate Base de datos records.
+Use `bottasker-support-tickets-architect` to include and operate native Tickets in a solution. Represent the same tickets in Boards for visual follow-up and in Dashboards for authorized metrics, without creating duplicate Base de datos records.

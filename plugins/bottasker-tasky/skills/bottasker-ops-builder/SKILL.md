@@ -5,7 +5,11 @@ description: Use for BotTasker calendars and public booking configuration, avail
 
 # BotTasker Ops Builder
 
-Use this skill for operational modules after the app and data foundation are known.
+Use this skill for operational modules after the solution and data foundation are known.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -14,7 +18,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 ## Workflow
 
 1. Call `bt_context_get_profile`.
-2. Resolve `appId` for app-scoped modules.
+2. Resolve `appId` for solution-scoped modules.
 3. List existing resources before creating new ones.
 4. Use the module-specific tools:
    - dashboards, tracking, KPIs, control, reporting: delegate to `bottasker-dashboard-architect`
@@ -39,14 +43,14 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 - Use `bottasker-knowledge-base-assistant` for Knowledge Base creation, querying, troubleshooting, and adding Knowledge Base tools to AI Agents.
 - Use `bottasker-whatsapp-template-architect` for every WhatsApp template request. It owns Meta rules and the exact tool contracts.
 - Ask for confirmation before archive/remove/delete tools or broad status changes.
-- Treat conversation tags as app-scoped labels with a reusable catalog. List the catalog before filtering or removing a tag; adding by name creates or reuses the label and assigns its generated color automatically when it is new.
+- Treat conversation tags as solution-scoped labels with a reusable catalog. List the catalog before filtering or removing a tag; adding by name creates or reuses the label and assigns its generated color automatically when it is new.
 - Filter conversations with tag IDs, not visible names. Multiple tag IDs use OR semantics: a conversation matches when it has at least one selected label.
-- Use `bt_conversations_get_tags` before changing a conversation when its current labels are unknown. Use `bt_conversations_add_tags` with `names` to create/reuse and assign labels, and `bt_conversations_remove_tag` to unassign them. `bt_conversations_add_tag` remains only as the legacy single-label alias. Removing a label from a conversation does not delete it from the app catalog.
+- Use `bt_conversations_get_tags` before changing a conversation when its current labels are unknown. Use `bt_conversations_add_tags` with `names` to create/reuse and assign labels, and `bt_conversations_remove_tag` to unassign them. `bt_conversations_add_tag` remains only as the legacy single-label alias. Removing a label from a conversation does not delete it from the solution catalog.
 - AI Agents that receive WhatsApp, Telegram, or WebChat input with automatic conversation registration enabled receive `manage_conversation_tags` at runtime. This tool is already bound to the current conversation; never ask for or invent an internal conversation ID.
 
 ## Calendar and public bookings
 
-Use the native Calendario module and an existing authorized calendar. One public booking page belongs to one calendar; do not create an unrelated Forms page or treat the meeting's invited people as additional calendars. Resolve the calendar, app scope, connected provider and current configuration before proposing changes. For a new calendar, use the discovered create tool and supported provider connection; never invent a connected account or credential.
+Use the native Calendario module and an existing authorized calendar. One public booking page belongs to one calendar; do not create an unrelated Forms page or treat the meeting's invited people as additional calendars. Resolve the calendar, solution scope, connected provider and current configuration before proposing changes. For a new calendar, use the discovered create tool and supported provider connection; never invent a connected account or credential.
 
 ### Tools and configuration access
 
@@ -54,7 +58,7 @@ Call `bt_mcp_find_tools` with `moduleKey: "calendar"` and the requested intent. 
 
 | Tool | Inputs and effect |
 | --- | --- |
-| `bt_calendar_get_booking_settings` | `calendarId`, plus `appId` for an app calendar. Reads complete `config`, current `version`, provider capabilities, publication state, `publicPath` and `publicUrl` when the application base URL is configured. A new page has version 0, defaults and no link. |
+| `bt_calendar_get_booking_settings` | `calendarId`, plus `appId` for a solution calendar. Reads complete `config`, current `version`, provider capabilities, publication state, `publicPath` and `publicUrl` when the solution base URL is configured. A new page has version 0, defaults and no link. |
 | `bt_calendar_save_booking_settings` | Same target, latest `version`, complete reviewed `config` and `confirmation: "APPROVED"`. Saves the rules without changing publication state. Editing a published page updates its live rules; saving a new page leaves it in draft. |
 | `bt_calendar_set_booking_state` | Same target, latest `version`, `state: "published"` or `"paused"`, and `confirmation: "APPROVED"`. Publishes/resumes or pauses the saved page. |
 | `bt_calendar_regenerate_booking_link` | Same target, latest `version` and `confirmation: "APPROVED"`. Invalidates the previous link, returning the new server-issued link without cancelling reservations or changing publication state. |
@@ -107,7 +111,7 @@ Edits/cancellations made through BotTasker update reservation occupancy. Automat
 
 ## Conversation Read Capabilities
 
-Use the Conversaciones worker when an agent or workflow must inspect customer conversations without changing them. This capability is always scoped to the current organization and `appId`; never ask the user for organization scope and never try to override either scope through tool input. The app role needs both `conversations:read` and `messages:read`.
+Use the Conversaciones worker when an agent or workflow must inspect customer conversations without changing them. This capability is always scoped to the current organization and `appId`; never ask the user for organization scope and never try to override either scope through tool input. The solution role needs both `conversations:read` and `messages:read`.
 
 For AI Agents, discover and equip the single `conversation_tools` action. It exposes these runtime tools:
 

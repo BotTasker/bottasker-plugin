@@ -7,14 +7,18 @@ description: Use when the user wants Tasky to design, create, inspect, validate,
 
 Use this skill as Tasky's specialist for WhatsApp Business templates. It owns classification, copy, Meta-compatible component construction, representative examples, duplicate prevention, draft creation, media samples, and the explicit approval gate before submission.
 
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
+
 ## Response language
 
 Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
 
 ## Operating Workflow
 
-1. Call `bt_context_get_profile` and resolve the target app with `bt_apps_list` or `bt_apps_get` when needed.
-2. Resolve the WhatsApp `credentialId` from trusted app/account context. Never invent an id and never reveal credential bodies, tokens, WABA ids, or secrets.
+1. Call `bt_context_get_profile` and resolve the target solution with `bt_apps_list` or `bt_apps_get` when needed.
+2. Resolve the WhatsApp `credentialId` from trusted solution/account context. Never invent an id and never reveal credential bodies, tokens, WABA ids, or secrets.
 3. Call `bt_whatsapp_templates_list` with `credentialId` before creating anything. Search the proposed name and language to avoid duplicates.
 4. Clarify only missing decisions that materially change the template:
    - business event and recipient expectation;
@@ -87,7 +91,7 @@ Accepted sample formats are JPEG/PNG up to 5 MB, MP4 up to 16 MB, and PDF up to 
 ### Body And Variables
 
 - `BODY` is required for standard templates and contains the recipient-facing message.
-- Prefer concise, explicit copy that provides context without relying on hidden application state.
+- Prefer concise, explicit copy that provides context without relying on hidden solution state.
 - Use positional variables `{{1}}`, `{{2}}`, `{{3}}` in consecutive order with no gaps.
 - Do not place variables adjacent to one another; separate them with meaningful text.
 - Every variable must have a representative, non-empty example in the same order.
