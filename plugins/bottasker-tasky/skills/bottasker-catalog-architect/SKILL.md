@@ -7,7 +7,11 @@ description: "Use when the user wants to design, create, import, update, or oper
 
 Use this skill as the specialist for the BotTasker `catalogs` and `sales-carts` modules. It owns catalog structure, categories, product payloads, variants, modifier groups, channel visibility, availability, and cart configuration.
 
-If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here after App Builder selects catalog/commerce as part of the approved app blueprint.
+If the user asks to create a complete solution, route to `bottasker-app-builder` first. Return here after Solution Builder selects catalog/commerce as part of the approved solution blueprint.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -176,14 +180,14 @@ For the cart tool, ensure `initialConfig` includes catalog and checkout settings
 
 ## Operating Rules
 
-- Use existing catalog/category/product records when they match the target app.
+- Use existing catalog/category/product records when they match the target solution.
 - Prefer native catalogs/products over simulating products in Base de datos (Data Hub) when the `catalogs` module is available.
 - Prefer `bt_products_bulk_upsert` for importing many products.
 - Validate bulk products first with `bt_products_validate_bulk`; do not retry blindly after a bulk validation failure.
 - Use stable slugs and IDs for variants/modifier options when possible.
 - Ask before archiving/removing categories, products, catalogs, or changing active cart status.
 - Do not expose credential values or checkout provider secrets.
-- Keep catalog writes app-scoped with `appId`.
+- Keep catalog writes solution-scoped with `appId`.
 
 ## Expected MCP Tools
 
@@ -203,7 +207,7 @@ Use:
 - `bt_sales_carts_add_item`
 - `bt_sales_carts_set_status`
 
-For app context use `bt_apps_list` and `bt_apps_get`. For agent tool configuration use the `bt_ai_agent_*` discovery, prepare, and validate tools.
+For solution context use `bt_apps_list` and `bt_apps_get`. For agent tool configuration use the `bt_ai_agent_*` discovery, prepare, and validate tools.
 
 ## Cart payments, evidence and direct operations
 
@@ -232,4 +236,4 @@ Evidence is optional. Upload the actual authorized photo/document through Archiv
 
 Do not infer role access from a role name: payment confirmation and evidence upload are separate permissions. Do not broaden roles to work around a denial. A successful local backend test or plugin installation does not prove production MCP deployment or OAuth authentication.
 
-For payment-triggered automation or AI inputs, hand off to Automation Engineer / AI Agent Architect with cartId and the real app, keeping follow-ups inactive unless explicitly authorized. Purchasing services/packages does not automatically create appointments or service balances: that requires the app's explicitly configured, idempotent workflow.
+For payment-triggered automation or AI inputs, hand off to Automation Engineer / AI Agent Architect with cartId and the real solution, keeping follow-ups inactive unless explicitly authorized. Purchasing services/packages does not automatically create appointments or service balances: that requires the solution's explicitly configured, idempotent workflow.

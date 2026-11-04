@@ -1,7 +1,7 @@
 interface:
-  display_name: "BotTasker App Builder"
-  short_description: "Design complete apps by selecting modules and delegating specialists."
+  display_name: "BotTasker Solution Builder"
+  short_description: "Design complete solutions by selecting modules and delegating specialists."
   brand_color: "#2563EB"
-  default_prompt: "Design a complete BotTasker app blueprint with the right modules, specialists, and execution plan."
+  default_prompt: "Design a complete BotTasker solution blueprint with the right modules, specialists, and execution plan."
 policy:
   allow_implicit_invocation: true

@@ -13,7 +13,7 @@ Valid processing states are:
 - `ready`
 - `error`
 
-Reads and writes are scoped by organization and, when available, by app. Creation requires a scoped app id.
+Reads and writes are scoped by organization and, when available, by solution. Creation requires a scoped solution id.
 
 ## Creation Paths
 
@@ -50,7 +50,7 @@ Querying embeds the user query with `text-embedding-3-small`, filters embeddings
 
 When diagnosing weak answers, check:
 
-- the knowledge record exists in the same organization and app scope;
+- the knowledge record exists in the same organization and solution scope;
 - the record state is `ready`;
 - embeddings exist for the selected `knowledgeId`;
 - the runtime sends the correct organization id;

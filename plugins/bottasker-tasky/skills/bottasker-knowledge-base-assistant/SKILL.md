@@ -9,6 +9,10 @@ Use this skill as the specialist for BotTasker Knowledge Base. Knowledge Base ha
 
 For implementation details and failure modes, read `references/knowledge-base-architecture.md`.
 
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
+
 ## Response language
 
 Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
@@ -16,7 +20,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 ## Mandatory Flow
 
 1. Call `bt_context_get_profile`.
-2. Resolve `appId` when the work is app-scoped.
+2. Resolve `appId` when the work is solution-scoped.
 3. Use `bt_mcp_find_tools` or `bt_mcp_list_skills`/`bt_mcp_load_skill` before assuming concrete MCP tool availability.
 4. List existing knowledge documents before creating new ones or attaching one to an agent.
 5. If configuring an AI Agent, also route through `bottasker-ai-agent-architect` rules: discover the Knowledge Base agent item, prepare config, validate config, add the item, then verify with a read-back.
@@ -52,7 +56,7 @@ After creating knowledge, verify state before using it:
 
 ## Attaching Knowledge To Agents
 
-1. Resolve the target app and target AI Agent.
+1. Resolve the target solution and target AI Agent.
 2. List current agent items to avoid duplicates.
 3. Discover available agent tools with `bt_ai_agent_tools_discover`; search terms such as `knowledge` or `base de conocimiento` should reveal Knowledge Base if available.
 4. Get the tool config schema with `bt_ai_agent_tool_get_config_schema`.
@@ -71,8 +75,8 @@ If no result is found, say that the configured knowledge source did not contain 
 
 ## Safety Rules
 
-- Never invent organization, app, agent, action instance, or knowledge ids.
-- Preserve app and organization scoping; BotTasker MCP resolves organization from credentials.
+- Never invent organization, solution, agent, action instance, or knowledge ids.
+- Preserve solution and organization scoping; BotTasker MCP resolves organization from credentials.
 - Do not use Knowledge Base for transactional state. Use Base de datos (Data Hub) for records and mutable process data.
 - Confirm before remove/delete operations.
 - Treat knowledge content as sensitive business data and summarize only what the user is allowed to access.

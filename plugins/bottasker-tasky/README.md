@@ -1,5 +1,7 @@
 # Tasky by BotTasker
 
+BotTasker business containers are called **solutions** (**soluciones** in Spanish; **soluções** in Portuguese). Internal names such as `apps`, `appId`, `bt_apps_*` and `bottasker-app-builder` remain unchanged. References to ChatGPT/OpenAI app registrations describe the host integration and retain that terminology.
+
 Tasky combines BotTasker skills with the hosted MCP at `https://api.bottasker.ai/mcp` for Codex and Claude Code.
 
 Tasky's skills follow the user's conversation in Spanish, Brazilian Portuguese or English, including explicit language changes. Content can use a separately requested language. Existing resource names, technical identifiers and stored values remain unchanged unless the user requests their translation. The package includes listing translations for `en-US`, `es-PE` and `pt-BR`; their display in the directory depends on OpenAI's localization support. BotTasker web pages use their own UI translations.
@@ -20,7 +22,7 @@ The initial connection includes reading, planning, and reversible writes allowed
 
 Authentication, permission, module, validation, and tool failures remain explicit errors. Tasky does not silently fall back to an API key or report simulated progress or success.
 
-The Clientes skill covers native client apps, prospects, contacts, history, tasks, segments, imports and contextual AI follow-up. Its canonical `bt_clients_*` tools are shared with in-app Tasky and require the companion backend release. Updating the plugin alone does not add tools to an older MCP server. Existing organization/app roles remain authoritative; configuration does not start retroactive campaigns.
+The Clientes skill covers native client solutions, prospects, contacts, history, tasks, segments, imports and contextual AI follow-up. Its canonical `bt_clients_*` tools are shared with in-app Tasky and require the companion backend release. Updating the plugin alone does not add tools to an older MCP server. Existing organization/app roles remain authoritative; configuration does not start retroactive campaigns.
 
 - Website: https://bottasker.ai
 - Support: https://bottasker.ai/es/contacto/

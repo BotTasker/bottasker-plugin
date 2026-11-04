@@ -1,13 +1,17 @@
 ---
 name: bottasker-clients-architect
-description: "Use when the user wants to build an app with BotTasker Clientes or configure and operate its client records, prospects, contacts, interactions, tasks, segments, imports, and contextual AI follow-up."
+description: "Use when the user wants to build a solution with BotTasker Clientes or configure and operate its client records, prospects, contacts, interactions, tasks, segments, imports, and contextual AI follow-up."
 ---
 
 # BotTasker Clients Architect
 
-Own the native `clients` module inside the selected app. Use it as the source of truth for people, companies, prospects, contacts, commercial status, interaction history, tasks, and client follow-up. Do not recreate those native entities in Base de datos or invent a CRM with duplicate tables.
+Own the native `clients` module inside the selected solution. Use it as the source of truth for people, companies, prospects, contacts, commercial status, interaction history, tasks, and client follow-up. Do not recreate those native entities in Base de datos or invent a CRM with duplicate tables.
 
-For a complete application, coordinate with `bottasker-app-builder`: select modules and approve the app blueprint there, then return here to implement Clientes. Add other modules only for needs Clientes does not cover. For example, a health insurance sales app can keep leads, coverage preferences, qualification notes, and follow-up in Clientes; products belong in Catalogs when a real sellable catalog is needed. A quote/policy transaction may need its own model, but must reference the real client rather than duplicate their identity.
+For a complete solution, coordinate with `bottasker-app-builder`: select modules and approve the solution blueprint there, then return here to implement Clientes. Add other modules only for needs Clientes does not cover. For example, a health insurance sales solution can keep leads, coverage preferences, qualification notes, and follow-up in Clientes; products belong in Catalogs when a real sellable catalog is needed. A quote/policy transaction may need its own model, but must reference the real client rather than duplicate their identity.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -15,19 +19,19 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 
 ## Discovery and execution
 
-1. Call `bt_context_get_profile`, `bt_apps_list_modules`, and resolve the exact app with `bt_apps_list` / `bt_apps_get`. Do not infer access from the app name or a supplied record ID.
+1. Call `bt_context_get_profile`, `bt_apps_list_modules`, and resolve the exact solution with `bt_apps_list` / `bt_apps_get`. Do not infer access from the solution name or a supplied record ID.
 2. Call `bt_mcp_find_tools` with `moduleKey: "clients"`, the requested intent, and effect. Use the returned schemas, policies, and approval metadata. The canonical Clients tools are `bt_clients_*`; these are Tasky's administration/operation tools, distinct from the contextual tool equipped on a sales agent.
-3. Read `bt_clients_get_state`. After the app module is enabled, `bt_clients_enable` initializes its activation boundary. This never imports old conversations or starts follow-up for all existing clients.
+3. Read `bt_clients_get_state`. After the solution module is enabled, `bt_clients_enable` initializes its activation boundary. This never imports old conversations or starts follow-up for all existing clients.
 4. Read current states with `bt_clients_get_statuses`, fields with `bt_clients_list_fields`, and existing records with `bt_clients_list` before writes. Use the enriched paginated list instead of loading every contact, interaction, and task separately per client.
-5. For a narrow authorized non-destructive change, perform it and verify it. For a new app or broad redesign, present the business flow, states/fields, intake, daily work screens, follow-up rules, unresolved decisions, and execution order first. Follow the existing App Builder approval workflow; do not ask twice for a plan already approved.
+5. For a narrow authorized non-destructive change, perform it and verify it. For a new solution or broad redesign, present the business flow, states/fields, intake, daily work screens, follow-up rules, unresolved decisions, and execution order first. Follow the existing Solution Builder approval workflow; do not ask twice for a plan already approved.
 6. Preserve real IDs and `revision` from read results. Updates require `expectedRevision`. Status configuration and field order have their own revision; first configuration can have revision zero. On conflict, reload and reconcile the requested change instead of overwriting someone else's changes.
 7. Use a stable `requestKey` for a logical create/import/reference operation; reuse it for an identical retry and change it for a different operation. Verify the result with a read-back. A timeout or `success:false` is not proof of success; do not create another record blindly.
 
 Never send `organization`, actor identity, delegated permissions, runtime context, or internal scheduler fields in user inputs. The authenticated connection and backend own authorization. Explain missing access in business language, preserving the actual error category; do not change roles to work around it.
 
-## Build an application around Clientes
+## Build a solution around Clientes
 
-Provide App Builder and the agent specialist with `moduleContext.clients` containing:
+Provide Solution Builder and the agent specialist with `moduleContext.clients` containing:
 
 - appId, activation state, actual status keys/default/reporting groups;
 - actual field IDs, types, required values, reference targets, privacy and agent visibility;
@@ -36,7 +40,7 @@ Provide App Builder and the agent specialist with `moduleContext.clients` contai
 - the approved follow-up planningMode (predefined or agent), execution mode, timezone, hours, steps or adaptive limits, response behavior, same/fixed agent and channel, fallback, limits, and explicit send authorization;
 - agent tool scope and enabled operations, human handoff, stop criteria, and verification cases.
 
-Use `bt_apps_create` / `bt_apps_update` / `bt_apps_update_menu` through App Builder to enable the real module key returned by discovery. Preserve the rest of the app and menu. Configure native states and custom fields next; equip agents only after that context exists. Do not create demo leads, enable sending, or backfill historical conversations merely because an app is being configured.
+Use `bt_apps_create` / `bt_apps_update` / `bt_apps_update_menu` through Solution Builder to enable the real module key returned by discovery. Preserve the rest of the solution and menu. Configure native states and custom fields next; equip agents only after that context exists. Do not create demo leads, enable sending, or backfill historical conversations merely because a solution is being configured.
 
 For integrations, discover the real target connector or workflow node. A form is not automatically connected to Clientes: only claim it writes clients after confirming a supported mapping/action and verifying its result. Use `bottasker-forms-architect` and `bottasker-automation-engineer` where needed. Use `bottasker-dashboard-architect` only after verifying a supported Clientes reporting source; never assume a Clients collection is a Base de datos model.
 
@@ -65,13 +69,13 @@ Manual tasks use `bt_clients_list_tasks`, `bt_clients_create_tasks`, `bt_clients
 
 For native AI follow-up, distinguish three levels:
 
-1. **App configuration:** how new follow-up cycles operate.
+1. **solution configuration:** how new follow-up cycles operate.
 2. **Agent capability:** which conversational agent can use that configuration.
 3. **Client cycle:** a particular purpose/contact/conversation and its one next pending task.
 
-Configuring the app is not a command to contact every client. Equipping a tool is not proof a cycle is scheduled. A saved draft is not an active configuration.
+Configuring the solution is not a command to contact every client. Equipping a tool is not proof a cycle is scheduled. A saved draft is not an active configuration.
 
-### Configure the app
+### Configure the solution
 
 1. Read `bt_clients_get_followup_settings` and `bt_clients_followup_options`. Preserve existing settings not being changed and resolve actual available agents/connections.
 2. Prepare a complete configuration matching `bt_clients_preview_followup_settings` / `bt_clients_save_followup_settings`. `mode`: `manual` (person contacts), `review` (AI draft requires approval), or `automatic` (AI sends under the rules). Same conversation agent/channel uses `agentSource: "conversation"`, `channelSource: "conversation"`; fixed sources need the actual IDs. `fallbackAgentId` handles a missing conversation agent; it does not authorize a different recipient/channel.
@@ -81,7 +85,7 @@ Configuring the app is not a command to contact every client. Equipping a tool i
 6. Predefined schedule bases: `activation`, `unanswered`, `previous`, `due`, `date`, `weekday`, `immediate`. Amount/unit, `businessDays`, direction, and conditional anchor matter. First step cannot use `previous`; `unanswered` waits from the last relevant agent message expecting an answer, not the client record creation time. `previous` waits from the preceding successful send. Absolute `at` and dueAt are Unix milliseconds; weekday is 1=Monday through 7=Sunday. A missing required anchor produces an unscheduled/blocked result; do not manufacture a date.
 7. In predefined planning set `responseBehavior` explicitly: `restart`, `continue`, or `stop` on customer reply. Follow the user's choice; do not silently rely on legacy defaults. Repetition has a bounded max/end; total expanded sequence is at most ten sends. `maxPerContactDay` and `minSeparationMinutes` are contact-wide guardrails, not replacements for step frequency; a 60-minute guardrail can override a requested five-minute interval. Explain the effective timing rather than weakening limits silently.
 8. For WhatsApp outside the service window, call `bt_clients_followup_templates` with the real connectionId. Authorize only returned approved templates in `whatsappTemplates: [{id, connectionId, purpose, bindings}]`. `bindings` maps returned variable keys (e.g. `body_1`) only to `nombre`, `contacto`, or `proposito`. This catalog supports text headers/bodies and static buttons; media, carousels and dynamic buttons are excluded. Never confuse a CRM free-text template with a Meta-approved template. For predefined steps select `whatsappTemplateId` from that library; adaptive planning chooses a suitable authorized template at execution. If none is suitable, it requires review rather than sending free text outside the window. Respect template/source-read permissions.
-9. Preview, save with current revision, read back, then use `bt_clients_activate_followup_settings` only when activation/sending is authorized. The UI's Guardar combines save and activation; the underlying tools are separate and require both results to confirm active. Activating automatic/review mode also requires the backend's task/contact/follow-up/send permissions. `bt_clients_pause_followup_settings` pauses/reactivates the app setting; it does not erase history.
+9. Preview, save with current revision, read back, then use `bt_clients_activate_followup_settings` only when activation/sending is authorized. The UI's Guardar combines save and activation; the underlying tools are separate and require both results to confirm active. Activating automatic/review mode also requires the backend's task/contact/follow-up/send permissions. `bt_clients_pause_followup_settings` pauses/reactivates the solution setting; it does not erase history.
 
 Changes apply to new activations; existing cycles retain their configuration snapshot. Do not retrofit or replay old cycles to “apply” new settings.
 
@@ -101,7 +105,7 @@ Automatic work is assigned to the resolved same AI agent (or configured fixed/fa
 - For predefined planning, manual activation uses `bt_clients_start_followup` with real taskId, contactId and purpose plus verified conversation/connection context; it may schedule real sending, so honor explicit authorization and pending approval. Never send `runtimeContext` or call internal wake/delivery actions to impersonate the sales agent.
 - Pause/cancel/resume/take control with `bt_clients_pause_followup`, `bt_clients_cancel_followup`, `bt_clients_resume_followup`, `bt_clients_take_control_followup` using current revision. Review operations: `bt_clients_edit_followup_draft`, `bt_clients_approve_followup` (exact current hash), `bt_clients_classify_followup_response`. `bt_clients_complete_manual_followup` records a contact actually completed by a person; never use it to fake a successful AI send.
 - Cancellation stops future processing and cancels pending steps, clearing future drafts/approvals while preserving sent history and uncertain-delivery evidence. It is not a resumable pause. Resume only a paused cycle after reviewing its next allowed time; it can schedule real outbound sending and requires execution consent.
-- Completing a manual follow-up is only for a real contact already performed by a person in a manual-mode cycle awaiting approval; it can create the next manual task, but never sends an AI message. Classifying a response requires the real incoming message, current revision and an explicitly reviewed decision. Explain that `do_not_contact` restricts contact and stops active follow-up cycles for that client in the app; `postpone` pauses until an agreed date, and a closed purpose does not automatically restart.
+- Completing a manual follow-up is only for a real contact already performed by a person in a manual-mode cycle awaiting approval; it can create the next manual task, but never sends an AI message. Classifying a response requires the real incoming message, current revision and an explicitly reviewed decision. Explain that `do_not_contact` restricts contact and stops active follow-up cycles for that client in the solution; `postpone` pauses until an agreed date, and a closed purpose does not automatically restart.
 - Check effective hours/timezone, step anchor, prior send receipt, response handling, minimum separation/max-per-day, contact validity, live permissions, same agent availability, channel/connection and human takeover before concluding Redis failed. WhatsApp needs a valid attention window or a suitable authorized Meta-approved template; Telegram needs a known chat. Adaptive decisions and failures appear in reason/audit; a model failure, missing date, or exhausted planning budget requires review and never fabricates a fixed fallback date. A phone copied into notes is not proof of a valid messaging connection. Review mode waits for approval; uncertain delivery requires `bt_clients_followup_receipt_options` and reviewed `bt_clients_reconcile_followup_receipt` using the real receipt, not blind resend.
 - If step one succeeded but step two is absent, inspect cycle state and receipt, whether the customer replied/stopped it, the second schedule anchor and current snapshot. Absence of all future pending tasks is expected; absence of the one next eligible task needs diagnosis.
 - Do not test by sending to real clients. Use mocks/previews or an explicitly authorized test conversation; keep restrictions such as no sending or no server startup in force. Never report “sent” when merely scheduled, drafted or attempted.
@@ -114,6 +118,6 @@ Use `bt_clients_import_headers` then `bt_clients_import_preview`; map every exac
 
 ## Verification and handoff
 
-Read back configuration and resources. For a configured follow-up solution, verify enabled app state, actual agent tool config, one scheduled next task assigned to the correct AI agent, effective timezone/date, reply behavior and stop conditions using previews/mocks or an authorized test conversation. Test ordinary client registration still works, repeated turns do not duplicate tasks, a confirmed send chains the next step, and no-follow-up cases stay closed.
+Read back configuration and resources. For a configured follow-up solution, verify enabled solution state, actual agent tool config, one scheduled next task assigned to the correct AI agent, effective timezone/date, reply behavior and stop conditions using previews/mocks or an authorized test conversation. Test ordinary client registration still works, repeated turns do not duplicate tasks, a confirmed send chains the next step, and no-follow-up cases stay closed.
 
 Report actual changes and verified state in product language. Identify remaining gaps honestly: missing permission, contact, channel, approval, unavailable connector or incomplete runtime evidence. Do not present a dry-run implementation plan or a scheduled task as proof of a successful customer delivery.

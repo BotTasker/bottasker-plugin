@@ -7,7 +7,11 @@ description: Use when the user wants to design, create, improve, duplicate, shar
 
 Use this skill as the specialist for BotTasker dashboards. It owns dashboard strategy, useful KPI selection, source mapping, widget design, filters, layouts, area-specific views, public/restricted sharing, and verification.
 
-If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here after App Builder selects dashboards as part of the approved app blueprint.
+If the user asks to create a complete solution, route to `bottasker-app-builder` first. Return here after Solution Builder selects dashboards as part of the approved solution blueprint.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -58,7 +62,7 @@ Do not call create, update, duplicate, archive, remove, public-link, access-mode
 
 ## Dashboard Types
 
-Choose one or more dashboard types based on the app goal:
+Choose one or more dashboard types based on the solution goal:
 
 - Executive control: health summary, revenue/cost, pipeline, SLA, risks, exceptions, trend.
 - Operational control: today queue, overdue items, stage counts, throughput, bottlenecks, owner workload.
@@ -97,7 +101,7 @@ Avoid chart clutter. If the user needs control, prioritize KPI cards, exception 
 
 ## Source Mapping
 
-Use the app's real source of truth:
+Use the solution's real source of truth:
 
 - Base de datos (Data Hub) models for durable structured data.
 - Dynamic Tables for simpler operational tables.
@@ -121,7 +125,7 @@ If the required source field does not exist, inspect the native module’s field
 
 ## Native Conversations Source
 
-BotTasker dashboards can query conversations and messages directly from the current app. Use this native provider for inbox, support, channel, assignment, tag, message-volume, delivery, and activity reporting.
+BotTasker dashboards can query conversations and messages directly from the current solution. Use this native provider for inbox, support, channel, assignment, tag, message-volume, delivery, and activity reporting.
 
 ### Source contract
 
@@ -129,8 +133,8 @@ BotTasker dashboards can query conversations and messages directly from the curr
 - Source shown to the user: `Centro de conversaciones`; internal `sourceId`: `communication`.
 - Dataset `conversations`: one row per conversation.
 - Dataset `messages`: one row per message, without exposing message bodies or previews.
-- The query must always be scoped to the resolved `appId`. Never copy a source identifier from another app or send an organization supplied by the user.
-- Discover providers, sources, datasets, and fields through the dashboard discovery tools before composing a widget. Treat the contract below as configuration guidance, not proof that the module or permission is available in the current app.
+- The query must always be scoped to the resolved `appId`. Never copy a source identifier from another solution or send an organization supplied by the user.
+- Discover providers, sources, datasets, and fields through the dashboard discovery tools before composing a widget. Treat the contract below as configuration guidance, not proof that the module or permission is available in the current solution.
 
 ### Conversation fields
 
@@ -155,7 +159,7 @@ BotTasker dashboards can query conversations and messages directly from the curr
 - Line and area trends use `timeseries` mode with `hour`, `day`, `week`, or `month` grain.
 - Conversation/message activity heatmaps use `timeseries` with `timeGrain: hour`.
 - Investigation views use `table` mode with explicit discovered fields, sorting, and pagination. Conversation and message drill-downs must use their matching drill-down type.
-- Supported ranges are `today`, `yesterday`, `this_week`, `last_7_days`, `last_30_days`, `last_90_days`, `this_month`, and `custom`. Custom ranges cannot exceed 366 days. Use the user's business timezone; default to `UTC` only when no app/user timezone is available.
+- Supported ranges are `today`, `yesterday`, `this_week`, `last_7_days`, `last_30_days`, `last_90_days`, `this_month`, and `custom`. Custom ranges cannot exceed 366 days. Use the user's business timezone; default to `UTC` only when no solution/user timezone is available.
 - General filters support `equals`, `not_equals`, `in`, `not_in`, `contains`, `gt`, `gte`, `lt`, `lte`, and `exists` when compatible with the discovered field type.
 
 ### Verification standard
@@ -163,7 +167,7 @@ BotTasker dashboards can query conversations and messages directly from the curr
 1. Preview the complete widget configuration and require a successful result with the expected dataset shape.
 2. Save or update the dashboard, read it back, and confirm that the stored source, dataset, fields, filters, timezone, and range match the previewed configuration.
 3. Run the saved widget from the dashboard and verify its effective `appliedRange`, status, and visible result. A populated configuration-modal preview alone is not acceptance evidence: the dashboard-level date selector can override the widget range and legitimately produce a different or empty result.
-4. Exercise the relevant drill-down and confirm that it stays within the same app and source dataset without revealing private message content.
+4. Exercise the relevant drill-down and confirm that it stays within the same solution and source dataset without revealing private message content.
 5. If the result is `stale`, refresh it and verify the new `generatedAt` and effective range. Do not report success from a cached, stale, ambiguous, or empty result unless an independently verified source count proves that zero is correct for that exact range and filters.
 
 ## Native Support Tickets Source
@@ -172,7 +176,7 @@ Coordinate with `bottasker-support-tickets-architect` for native ticket behavior
 
 Discover the source through the provider-aware read tools: `bt_dashboards_list_providers` → `bt_dashboards_list_provider_sources` → `bt_dashboards_list_provider_datasets` → `bt_dashboards_list_provider_fields`, with the authorized `appId` at each step. Discover these tools first; a deployment may not yet expose them. Legacy `bt_dashboards_list_sources`, `bt_dashboards_list_available_fields` and `bt_dashboards_generate_from_data_hub` are Database-specific and do not discover/generate this native source.
 
-- `providerKey: "support-tickets"`; `sourceId`: actual default inbox ID returned for this app; `datasetId: "tickets"`. Additional inbox selection/creation is currently hidden.
+- `providerKey: "support-tickets"`; `sourceId`: actual default inbox ID returned for this solution; `datasetId: "tickets"`. Additional inbox selection/creation is currently hidden.
 - No Base de datos tables, data imports, mirrors or synchronizations are required. Query the native source directly.
 - Dimensions/filters include current `status`, semantic `status_group`, `priority`, `request_type`, `category`, `impact`, `urgency`, `assignee_user_id`, `assignee_name`, `team_name`, `is_open`, `is_assigned`, `is_overdue` and supported active custom fields. Prefer stable assignee IDs when names may collide. Metadata supplies actual states/options and preserves authored labels.
 - Dates include `createdAt`, `updatedAt`, `due_at`, `response_due_at`, `resolution_due_at`, `resolved_at`, `closed_at` and supported active custom dates. Discovery is authoritative.
@@ -249,22 +253,22 @@ Do not create multiple dashboards just to split charts. Split only when each das
 
 ## Common Patterns
 
-Expense app:
+Expense solution:
 
 - Executive/finance dashboard: total expenses, monthly trend, category share, payment method, largest expenses, budget variance, missing category/date records.
 - Operational dashboard: recent expenses, pending review, suspicious high amounts, expenses captured by channel/agent.
 
-Sales/catalog app:
+Sales/catalog solution:
 
 - Sales control: carts created, completed checkouts, abandoned carts, revenue, conversion by channel.
 - Product control: top products, low stock, unavailable variants, products missing image/price/category.
 
-Support app:
+Support solution:
 
 - Inbox control: open conversations, overdue responses, assigned workload, tags, channel distribution.
 - Quality control: resolution time, reopened cases, unresolved high-priority issues.
 
-AI automation app:
+AI automation solution:
 
 - Agent control: runs, success rate, tool validation errors, human handoff count, cost/consumption.
 - Workflow control: failed nodes, latency, pending retries, volume by trigger.
@@ -278,7 +282,7 @@ AI automation app:
 - Ask before archive/delete/remove or replacing a dashboard layout.
 - Ask for explicit approval before generating, regenerating, revoking, or changing the mode of a public dashboard link, and before revoking or permanently deleting an allowed external person.
 - Do not expose credentials, tokens, API keys, raw secrets, or private message contents in dashboards.
-- Keep dashboards app-scoped with `appId`.
+- Keep dashboards solution-scoped with `appId`.
 
 ## Expected MCP Tools
 
@@ -302,6 +306,6 @@ Use dashboard tools when available:
 
 For public sharing, use `bt_mcp_find_tools` with the `dashboards` module and the exact sharing or access-management intent. Use only tools returned by live discovery; if none are exposed, provide the verified UI workflow from **Public Dashboard Access** instead of inventing a tool or simulating success.
 
-For app and source context use `bt_apps_list`, `bt_apps_get`, `bt_apps_list_modules`, `bt_data_hub_*`, `bt_dynamic_tables_*`, `bt_catalogs_*`, `bt_sales_carts_*`, `bt_conversations_*`, `bt_ai_agents_*`, and `bt_workflows_*` read tools as needed.
+For solution and source context use `bt_apps_list`, `bt_apps_get`, `bt_apps_list_modules`, `bt_data_hub_*`, `bt_dynamic_tables_*`, `bt_catalogs_*`, `bt_sales_carts_*`, `bt_conversations_*`, `bt_ai_agents_*`, and `bt_workflows_*` read tools as needed.
 
 Use `bt_dashboards_run_widget_query` with `dashboardId`, `widgetId`, optional `range` and `forceRefresh` to read computed data for a saved widget. Refreshing derived cached results does not edit the dashboard configuration. Use `bt_dashboards_preview_widget` with `widget` for an unsaved configuration preview. The legacy `bt_dashboards_run_widget` alias is internal.

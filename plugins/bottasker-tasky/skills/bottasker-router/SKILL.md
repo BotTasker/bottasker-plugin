@@ -1,13 +1,17 @@
 ---
 name: bottasker-router
-description: Use as the main BotTasker workflow router when the user wants Codex to create, inspect, or operate BotTasker apps through the BotTasker MCP.
+description: Use as the main BotTasker workflow router when the user wants Codex to create, inspect, or operate BotTasker solutions through the BotTasker MCP.
 ---
 
 # BotTasker Router
 
-Use this skill as the first stop for BotTasker work. It decides which narrower BotTasker skill should handle the request and establishes the active organization, app, modules, and MCP capability context.
+Use this skill as the first stop for BotTasker work. It decides which narrower BotTasker skill should handle the request and establishes the active organization, solution, modules, and MCP capability context.
 
-For native Support Tickets, incidents, help desks or adding Tickets to an app, route to `bottasker-support-tickets-architect`. Tickets can be represented directly in Boards for visual follow-up, using the same records and native detail/form. Load the ticket specialist together with `bottasker-board-architect` for that case; do not model duplicate tickets in Base de datos. Discover callable native capabilities before promising an operation: the internal agent worker and the external MCP catalog are distinct execution surfaces.
+For native Support Tickets, incidents, help desks or adding Tickets to a solution, route to `bottasker-support-tickets-architect`. Tickets can be represented directly in Boards for visual follow-up, using the same records and native detail/form. Load the ticket specialist together with `bottasker-board-architect` for that case; do not model duplicate tickets in Base de datos. Discover callable native capabilities before promising an operation: the internal agent worker and the external MCP catalog are distinct execution surfaces.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -18,10 +22,10 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 1. Call `bt_context_get_profile`.
 2. Call `bt_apps_list_modules`.
 3. Call `bt_mcp_find_tools` with the target `moduleKey`, `intent`, and expected `effect` before assuming a concrete tool exists.
-4. If the user asks to create a complete app or solution from natural language, route to `bottasker-app-builder` and call `bt_apps_blueprint_plan`.
-5. If the user asks specifically for AI Agents inside an existing or already-approved app, route to `bottasker-ai-agent-architect` and call `bt_ai_agent_tools_discover`.
+4. If the user asks to create a complete solution from natural language, route to `bottasker-app-builder` and call `bt_apps_blueprint_plan`.
+5. If the user asks specifically for AI Agents inside an existing or already-approved solution, route to `bottasker-ai-agent-architect` and call `bt_ai_agent_tools_discover`.
 6. If the user asks for a module-specific operation, call `bt_mcp_list_skills` and load the relevant MCP skill with `bt_mcp_load_skill`.
-7. If the user mentions an existing app but not an `appId`, call `bt_apps_list` and resolve the app by name. If multiple matches are plausible, ask for the target app.
+7. If the user mentions an existing solution but not an `appId`, call `bt_apps_list` and resolve the solution by name. If multiple matches are plausible, ask for the target solution.
 8. For sign-in, revoked access, missing scopes, or connection failures, use `bottasker-connection-guide`, preserve the exact error category, and retry the same configured environment after reauthentication. Never infer that local is offline from an OAuth error or invent a hosted plugin as a fallback.
 
 ## Capability Discovery
@@ -36,7 +40,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 
 ## Risk-Based Execution Rule
 
-For simple, low-risk requests, do the work directly after discovery and validation. A request is simple when it targets an existing app/resource, has the required IDs or can resolve them from context, uses non-destructive write tools, has no unresolved human decision, and no external-send/public-access/credential/security impact.
+For simple, low-risk requests, do the work directly after discovery and validation. A request is simple when it targets an existing solution/resource, has the required IDs or can resolve them from context, uses non-destructive write tools, has no unresolved human decision, and no external-send/public-access/credential/security impact.
 
 Examples of simple requests: add an already validated Knowledge Base tool to an existing agent, create one field, add one record, update a label, attach an existing document/tool, or make an idempotent create/update where duplicate checks are available.
 
@@ -51,7 +55,7 @@ For simple low-risk requests:
 Use a visual plan/blueprint only for complex, broad, ambiguous, or risky work:
 
 1. Discover capabilities first.
-2. Build a clear plan: use `bt_apps_blueprint_plan` for complete apps and `bt_ai_agent_blueprint_plan` only for AI Agents inside an app.
+2. Build a clear plan: use `bt_apps_blueprint_plan` for complete solutions and `bt_ai_agent_blueprint_plan` only for AI Agents inside a solution.
 3. Show a visual blueprint before writes: Mermaid diagram plus component/configuration tables.
 4. Ask only relevant unresolved questions.
 5. Wait for explicit user approval after the visual blueprint before calling risky or broad write tools.
@@ -60,15 +64,15 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 
 ## Routing
 
-- App creation, module enablement, menu structure, templates: use `bottasker-app-builder`.
-- Complete app design from natural language, including module selection and specialist delegation: use `bottasker-app-builder`.
+- Solution creation, module enablement, menu structure, templates: use `bottasker-app-builder`.
+- Complete solution design from natural language, including module selection and specialist delegation: use `bottasker-app-builder`.
 - Base de datos (Data Hub), models, fields, relations, records, Dynamic Tables: use `bottasker-data-architect`.
 - Clientes, CRM, prospects/leads, person/company records, contacts, interactions, tasks, segments, CSV imports and contextual client follow-up: use `bottasker-clients-architect`.
 - Catalogs, product categories, products, variants, modifier groups, product properties, availability, and sales carts: use `bottasker-catalog-architect`.
 - Dashboards, KPIs, tracking, control views, reporting, widget strategy, and area-specific dashboards: use `bottasker-dashboard-architect`.
 - Boards, kanban/pipeline views, permanent source scopes such as “only records for this client”, column alerts, board sources, card detail views, widgets, public/restricted sharing, roles, users, and button automations: use `bottasker-board-architect`.
 - Forms, public/private intake forms, submissions, form fields, connector mappings, and form publishing: use `bottasker-forms-architect`.
-- AI agents inside an app, subagents, tool discovery, and tool config: use `bottasker-ai-agent-architect`.
+- AI agents inside a solution, subagents, tool discovery, and tool config: use `bottasker-ai-agent-architect`.
 - Workflows, action instances, graph edges, and workflow tests: use `bottasker-automation-engineer`.
 - Business process discovery, visual process maps, assumptions, validation, and process documentation: use `bottasker-process-designer`.
 - Knowledge Base, knowledge documents, semantic search, and attaching knowledge to agents: use `bottasker-knowledge-base-assistant`.
@@ -79,7 +83,7 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 ## Safety Rules
 
 - Never send `organization` from user input. BotTasker MCP resolves organization from the authenticated OAuth grant or explicitly configured legacy API key.
-- Use explicit `appId` for app-scoped work.
+- Use explicit `appId` for solution-scoped work.
 - List relevant existing resources before creating new ones.
 - Ask for explicit confirmation before using remove, delete, archive, submit-for-approval, or broad update tools.
 - Do not expose API keys, credential bodies, tokens, cookies, or authorization headers.
@@ -97,7 +101,7 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 
 The public MCP catalog describes stable product operations independent of organization or resource names. Real endpoint, workflow trigger and board-button execution retain `bt_api_tools_test_endpoint`, `bt_workflows_run_trigger_test` and `bt_boards_invoke_detail_widget_action`. Configuration edits use `bt_workflows_update`; activation uses `bt_workflows_activate` / `bt_workflows_deactivate`; test listeners use `bt_workflows_start_testing` / `bt_workflows_stop_testing`. Resource and trigger IDs remain data arguments. New workflows do not add callable tools. Editor component schemas describe saved configuration only.
 
-Listing a public operation is not permission to use it. Each call enforces the OAuth scope, BotTasker policy, organization and app access. Real executions and workflow activation/test-mode changes require explicit approval of their concrete effects before requesting `mcp:destructive`; preserve the initial read/write grant. Do not fall back to an internal executor or another API after an authorization failure.
+Listing a public operation is not permission to use it. Each call enforces the OAuth scope, BotTasker policy, organization and solution access. Real executions and workflow activation/test-mode changes require explicit approval of their concrete effects before requesting `mcp:destructive`; preserve the initial read/write grant. Do not fall back to an internal executor or another API after an authorization failure.
 
 ## Expected MCP Tools
 
