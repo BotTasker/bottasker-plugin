@@ -7,6 +7,11 @@ description: Use when connecting Tasky to BotTasker, selecting an organization, 
 
 Use the client's native OAuth flow. The normal connection requires only installing Tasky, signing in to BotTasker, selecting an organization, and approving the requested access. Never ask a nontechnical user to copy an API key, configure an environment variable, clone a repository, or edit an MCP configuration file.
 
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
 ## Product terminology
 
 Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
@@ -40,6 +45,10 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 
 ## Client Recovery
 
+- Native installations expose the complete stable `bt_*` catalog through remote MCP. Codex tool search and Claude Code `ToolSearch` load deferred schemas without changing OAuth, organization or role permissions. Discover `bt_context_get_profile` natively and execute that read to verify the active connection; installation files or a tool count alone do not prove authentication.
+- A missing native search facility or a stale tool snapshot is a client capability issue. Update/reload the same installed plugin/client as needed, preserve existing credentials and user approval settings, and retry discovery. Do not ask users to install a local executor or supply an API key.
+- When `MCP_PLUGIN_UPDATE_REQUIRED` is returned, stop and tell the user to update Tasky to the latest version and refresh that connection or open a new chat. Preserve the exact error; do not reauthenticate repeatedly or retry operations through the incompatible transport. Follow the user's language: “Actualiza el plugin BotTasker Tasky a la última versión”; “Update the BotTasker Tasky plugin to the latest version”; “Atualize o plugin BotTasker Tasky para a versão mais recente”.
+- Native permission prompts remain separate from OAuth scope consent. Never answer a permission prompt automatically, relax the user's settings, or repeat a rejected/cancelled operation. Ask for `mcp:destructive` only after the concrete effects have been approved.
 - In Codex, use the MCP connection's native **Authenticate** action or run `codex mcp login <installed-server-name>`. Keep the login process alive, ask the user to complete the browser consent, and wait until the process exits successfully. Do not continue implementation that depends on BotTasker while authorization is still pending.
 - In Claude Code, reconnect the same installed MCP server through its native authentication flow and wait for explicit success before continuing work that depends on BotTasker.
 - Authentication is successful only after the native client reports success and the original MCP operation succeeds. An open consent page, a pending CLI process, or a browser callback by itself is not proof that tools are ready.

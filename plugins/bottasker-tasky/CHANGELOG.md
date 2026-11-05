@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.42
+
+- Discover and invoke the 353 stable MCP operations through native Codex tool search or Claude Code ToolSearch, without a local JavaScript executor.
+- Adapt all 16 skills, preserving in-app Tasky behavior, native OAuth, role/solution scope checks, and approvals.
+- Identify the native transport with non-secret version headers; explain incompatible plugin updates without retrying operations.
+
 ## 0.2.41
 
 - Present BotTasker apps as solutions in all 16 skills and starter prompts.

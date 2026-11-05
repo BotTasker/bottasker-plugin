@@ -12,13 +12,15 @@ For client-specific commands and an installation prompt for Codex, ChatGPT, Clau
 
 Installing a local Codex package does not update ChatGPT's cloud plugin. For ChatGPT, download the existing plugin ZIP from its page, generate `chatgpt-update --existing-plugin-zip=/absolute/path/plugin.zip` with the repository's packaging script, and upload that output through **More actions → Upload new version** on the same plugin. This preserves its technical name and registered OAuth app while adding the 16 skills. Verify **Apps 1**, **Skills 16**, the current release version and the connected account in ChatGPT itself. Do not infer cloud skill installation from a description or local files. The separate `submission` ZIP is for the official **With MCP** application and must not contain personal app references.
 
-Repository installations use native OAuth discovery and a transport-only portable MCP declaration compatible with the current desktop loader. The portal submission ZIP separately includes explicit OAuth registration, resource and scope settings; it is intended for upload to OpenAI rather than installation as a local desktop marketplace.
+Repository installations use native OAuth discovery and a portable HTTP declaration with two non-secret protocol/version headers. Codex native tool search or Claude Code `ToolSearch` loads each deferred operation before use. All 353 canonical operations and 16 skills remain available without a local executor. The portal submission ZIP separately includes explicit OAuth registration, resource and scope settings; it is intended for upload to OpenAI rather than installation as a local desktop marketplace.
 
 After installing from the client plugin catalog, sign in to BotTasker, select an organization, and approve **Trabajo seguro**. No repository clone, terminal setup, environment variable, or API key is required.
 
 Codex and Claude Code renew the short-lived access token automatically with a rotating refresh token. A browser login should reappear only for the initial connection, permission elevation, revocation, or a terminal refresh-token failure. The initial browser consent must finish before Tasky-dependent work begins; an open or expired consent page is not an authenticated connection.
 
-The initial connection includes reading, planning, and reversible writes allowed by the user's BotTasker role. Destructive tools stay hidden until a separate permission elevation and still require explicit confirmation before use.
+The initial connection includes reading, planning, and reversible writes allowed by the user's BotTasker role. The catalog also describes destructive operations, but executing them requires a separate permission elevation and explicit confirmation. Visibility is not execution consent. Sensitive operations retain native approval prompts; rejection or cancellation stops the call.
+
+If the client reports `MCP_PLUGIN_UPDATE_REQUIRED`, update this same Tasky plugin to the latest version and refresh its connection or open a new chat. Do not retry through an older executor or replace OAuth with another identity. Native discovery was validated with Claude Code 2.1.318 and the Codex app runtime 0.165.0-alpha.1.2; Codex marks code-mode search as under development.
 
 Authentication, permission, module, validation, and tool failures remain explicit errors. Tasky does not silently fall back to an API key or report simulated progress or success.
 

@@ -3,7 +3,11 @@
   "mcpServers": {
     "bottasker-tasky": {
       "type": "streamable-http",
-      "url": "https://api.bottasker.ai/mcp"
+      "url": "https://api.bottasker.ai/mcp",
+      "headers": {
+        "x-bottasker-native-protocol": "1",
+        "x-bottasker-plugin-version": "0.2.42"
+      }
     }
   }
 }

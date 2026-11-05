@@ -9,6 +9,11 @@ Use this skill as the specialist for the BotTasker `boards` module. It owns boar
 
 If the user asks to create a complete solution, route to `bottasker-app-builder` first. Return here after Solution Builder selects boards as part of the approved solution blueprint.
 
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
 ## Product terminology
 
 Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.

@@ -123,7 +123,7 @@ for (const [label, server] of [
   ['Claude', claudeMcp.mcpServers?.['bottasker-tasky']],
 ]) {
   if (server?.url !== 'https://api.bottasker.ai/mcp') fail(`${label} MCP URL is not canonical`)
-  if (server?.headers || server?.bearer_token_env_var) fail(`${label} MCP config contains manual credentials`)
+  if (server?.bearer_token_env_var) fail(`${label} MCP config contains manual credentials`)
 }
 const codexServer = codexMcp.mcpServers?.['bottasker-tasky']
 if (codexServer?.type !== 'http') fail('Codex MCP transport must be http')
@@ -133,8 +133,17 @@ const submissionServer = submissionMcp.mcpServers?.['bottasker-tasky']
 const auth = submissionServer?.extensions?.['com.openai']?.auth
 if (Object.keys(portableMcp.mcpServers || {}).length !== 1 || portableServer?.type !== 'streamable-http' ||
     portableServer?.url !== codexServer?.url) fail('portable transport and URL must match the hosted MCP')
-if (Object.keys(portableServer || {}).some((field) => !['type', 'url'].includes(field))) {
-  fail('runtime portable MCP must contain only transport and URL for desktop compatibility')
+if (Object.keys(portableServer || {}).some((field) => !['type', 'url', 'headers'].includes(field))) {
+  fail('runtime portable MCP may contain only transport, URL and non-secret native version headers')
+}
+const nativeHeaders = { 'x-bottasker-native-protocol': '1', 'x-bottasker-plugin-version': codexManifest.version }
+for (const [label, server, field] of [
+  ['Codex', codexServer, 'http_headers'], ['Claude', claudeMcp.mcpServers?.['bottasker-tasky'], 'headers'], ['portable', portableServer, 'headers'],
+]) {
+  if (JSON.stringify(server?.[field]) !== JSON.stringify(nativeHeaders)) fail(`${label} must declare only the native protocol and current plugin version headers`)
+  const allowed = label === 'Codex' ? ['type', 'url', 'oauth_resource', 'http_headers'] : ['type', 'url', 'headers']
+  if (Object.keys(server || {}).some(key => !allowed.includes(key))) fail(`${label} MCP contains an unsupported transport or credential override`)
+  if (Object.keys(server || {}).some(key => /token|secret|headers_helper|env_http_headers|headersHelper/i.test(key))) fail(`${label} must use native OAuth without credential overrides`)
 }
 if (submissionMcp.$schema !== portableMcp.$schema || Object.keys(submissionMcp.mcpServers || {}).length !== 1 ||
     submissionServer?.type !== portableServer?.type || submissionServer?.url !== portableServer?.url) {
