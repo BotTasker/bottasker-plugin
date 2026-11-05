@@ -6,6 +6,16 @@ Installable BotTasker plugin for Codex and Claude Code. It bundles 16 Tasky skil
 
 > **Distribution status:** available from this GitHub repository. It is not yet listed in the universal public plugin directory.
 
+## Native discovery — 0.2.42
+
+Tasky uses Codex's native tool search and Claude Code's built-in `ToolSearch` to load the 353 stable BotTasker operations on demand. All 16 skills remain packaged. The default `direct` package connects to remote MCP with native OAuth; it does not install a JavaScript executor, require Cloudflare execution, or require an OpenAI app registration.
+
+Native discovery does not grant access. BotTasker still checks scopes, organization, solution and role permissions on each call. The companion Core release marks all 120 sensitive operations for native consent. Rejecting or cancelling a prompt stops that operation. The initial safe grant remains `mcp:read` and `mcp:write`; destructive execution needs its separate, explicitly approved scope.
+
+Validated clients: the installed Codex app runtime `0.165.0-alpha.1.2` with native code-mode tool search, and Claude Code `2.1.318`. Codex marks that search feature as under development; do not assume every older client supports deferred discovery. Update/reload the same client/plugin if native discovery is unavailable. An incompatible transport returns `MCP_PLUGIN_UPDATE_REQUIRED` with an update instruction; it never executes the requested operation.
+
+For a local review package, run `node scripts/build-codex-package.mjs direct`. The separate `submission`, `connected` and `chatgpt-update` profiles retain their existing purposes. [Release and rollback plan](docs/native-mcp-migration.md).
+
 ## Instalación para Codex, ChatGPT, Claude Code y otros agentes
 
 Elige **una sola vía por cliente**. Tasky incluye 16 skills y usa el MCP de producción `https://api.bottasker.ai/mcp` con OAuth. Tener el repositorio descargado o ver una skill no demuestra que las herramientas estén conectadas.
@@ -88,7 +98,7 @@ node scripts/build-codex-package.mjs chatgpt-update --existing-plugin-zip=/ruta/
 ```
 
 4. El comando devuelve la ruta de un ZIP `bottasker-tasky-<versión>-chatgpt-update.zip`. En **ese mismo plugin de ChatGPT**, elige **More actions → Upload new version → Choose file**, selecciona el ZIP generado y completa la actualización. No uses el ZIP público `submission` aquí ni crees otro Custom MCP.
-5. Pulsa **View plugin** y comprueba **Apps 1**, **Skills 16** y la versión actual (0.2.32). En **Manage → Connected accounts**, verifica que la cuenta elegida sigue conectada por OAuth y la URL es `https://api.bottasker.ai/mcp`. Abre un chat nuevo para probar una consulta de solo lectura.
+5. Pulsa **View plugin** y comprueba **Apps 1**, **Skills 16** y la versión de la publicación elegida. En **Manage → Connected accounts**, verifica que la cuenta elegida sigue conectada por OAuth y la URL es `https://api.bottasker.ai/mcp`. Abre un chat nuevo para probar una consulta de solo lectura.
 
 El generador conserva exactamente el nombre técnico y la referencia a la app del ZIP descargado, pero toma las skills y los recursos de este repositorio. No copia credenciales, no vuelve a registrar la app ni solicita permisos nuevos. Excluye los servidores MCP duplicados y los casos de revisión del portal, que solo corresponden al paquete público con su servidor declarado. Una actualización de habilidades puede requerir un chat nuevo; ni generar el archivo ni instalar un marketplace local publica esta actualización en ChatGPT.
 
@@ -390,7 +400,7 @@ node scripts/build-codex-package.mjs submission
 
 The last command creates a ZIP under `.tasky-runtime/packages/`, containing the portable `plugin.json`, `mcp.json`, 16 skills, assets, license and compatibility files. Portal submission uses a registered public OAuth client (`provided`, `tokenEndpointAuthMethod: "none"`) with PKCE and no client secret. Initial scopes are `mcp:read mcp:write`; destructive scope is excluded. The existing connection guide is declared as the setup skill. Generated builds stay out of Git.
 
-Repository and connected installs use a transport-only `mcp.json` with native OAuth discovery. The current Codex desktop parser rejects per-server `extensions` in that file and otherwise drops the server. The portal submission build replaces it with `submission/mcp.json`, which contains the explicit OAuth configuration required for importing the connection settings. Use the submission ZIP for the portal, not as a desktop test marketplace. Keep both endpoints aligned; validation rejects a mismatched submission endpoint or unsafe initial scopes.
+Direct repository installs use `mcp.json` with native OAuth discovery and only non-secret protocol/version headers; registered-app profiles exclude a duplicate MCP connection. The current Codex desktop parser rejects per-server `extensions` in that file and otherwise drops the server. The portal submission build replaces it with `submission/mcp.json`, which contains the explicit OAuth configuration required for importing the connection settings. Use the submission ZIP for the portal, not as a desktop test marketplace. Keep both endpoints aligned; validation rejects a mismatched submission endpoint or unsafe initial scopes.
 
 ### Stable operations and dynamic resources
 

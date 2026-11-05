@@ -9,6 +9,11 @@ Own native **Tickets de soporte / Support tickets**, module key `support-tickets
 
 **Tickets can be represented in Tableros / Boards.** Offer a native ticket board when the user wants visual tracking, a kanban, assignment queues or a view of pending work. A board shows the same tickets, not copies. Opening a card uses the canonical ticket detail; create/edit use the shared native form. Read the dedicated board section below before choosing a data source or designing card details. **Ticket metrics can also be visualized in Dashboards**, directly from native Tickets; no Base de datos replica is needed.
 
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
 ## Language and scope
 
 Follow the user's requested conversation and generated-content languages; otherwise follow the current request, retaining an established preference for ambiguous replies. Tasky can explain this module in Spanish, English or Brazilian Portuguese; its current product controls are localized in ES/EN. Preserve authored names, notes, technical keys, state values, IDs and error codes. Do not translate existing records or change the user's profile as part of configuration.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "bottasker-tasky",
-  "version": "0.2.41",
+  "version": "0.2.42",
   "description": "Tasky helps build and operate BotTasker solutions through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
@@ -118,7 +118,7 @@
         "demo_recording_url": "https://youtu.be/GE1NGw_v7jc"
       },
       "publication": {
-        "release_notes": "Rename customer-facing BotTasker apps to solutions in assistant guidance, starter prompts and English, Spanish and Brazilian Portuguese listings. Preserve tool/skill identifiers, API fields, OAuth, permissions, external application references and existing user content.",
+        "release_notes": "Use native Codex tool search and Claude Code ToolSearch for all 353 canonical MCP operations. Preserve OAuth, tenant/role policies and sensitive-operation approvals; guide users to update incompatible local-executor plugins.",
         "translations": {
           "en-US": {
             "subtitle": "Build BotTasker solutions",

@@ -9,6 +9,11 @@ Use this skill as the first stop for BotTasker work. It decides which narrower B
 
 For native Support Tickets, incidents, help desks or adding Tickets to a solution, route to `bottasker-support-tickets-architect`. Tickets can be represented directly in Boards for visual follow-up, using the same records and native detail/form. Load the ticket specialist together with `bottasker-board-architect` for that case; do not model duplicate tickets in Base de datos. Discover callable native capabilities before promising an operation: the internal agent worker and the external MCP catalog are distinct execution surfaces.
 
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
 ## Product terminology
 
 Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
@@ -18,6 +23,8 @@ Present the BotTasker business container as **solution/solutions** in English, *
 Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
 
 ## Required First Steps
+
+In Codex and Claude Code, first load the operations below through the client's native tool search. A name in a skill or a capability-discovery response is not yet a callable tool schema. In in-app Tasky, use its supplied runtime tools directly.
 
 1. Call `bt_context_get_profile`.
 2. Call `bt_apps_list_modules`.
@@ -30,6 +37,11 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 
 ## Capability Discovery
 
+- **Codex:** use its native tool-search facility, including `tools.tool_search` when exposed by code mode. Search for the exact canonical `bt_*` name or a specific BotTasker capability, inspect the returned schema and call its returned namespaced function. Load tools just in time; do not require hundreds of schemas in the initial context or assume a missing entry in `ALL_TOOLS` means the operation is unavailable.
+- **Claude Code:** use the built-in `ToolSearch` to load the exact canonical tool or the relevant module's tools, then invoke the returned MCP tool normally. ToolSearch results load schemas; they do not execute BotTasker operations.
+- Native discovery is separate from `bt_mcp_find_tools`: the latter explains product capabilities, workers and verified exposure gaps, but does not register a deferred schema in the client. Load a discovered operation through native search before invoking it.
+- Keep all stable operations available through the same OAuth connection. Do not replace them with `bt_search`/`bt_execute`, generate tools for saved resources, or route around native permissions through shell commands, HTTP requests or another executor.
+- If native search is unavailable, try an already exposed canonical tool only when its real schema is available. Otherwise explain the client's unsupported or stale discovery state and guide an update/reload of this same installation. Do not claim a module is missing or switch environments based on a partial inventory.
 - Use the user's natural-language intent as the discovery query. Do not rely only on literal names, visible labels, or memory of known tools.
 - Capability discovery has two layers: first select/load the relevant BotTasker skill, then search real MCP tools, workers, actions, and automation nodes. A skill match alone is not proof that a concrete capability exists or does not exist.
 - When calling `bt_mcp_find_tools`, pass a specific `intent` sentence that describes the desired capability and the expected `effect`.
@@ -82,6 +94,8 @@ Explicit approval is required before remove, delete, archive, submit-for-approva
 
 ## Safety Rules
 
+- Preserve native permission prompts for the exact operation and current arguments. `requiresApproval` and `anthropic/requiresUserInteraction` metadata identify sensitive operations; a prior approval of a different operation, a plan, or a different payload does not answer a new client prompt. Never synthesize approval or a permission callback. If the user rejects or cancels, stop that operation without retrying, changing tools, or elevating OAuth scopes.
+- On `MCP_PLUGIN_UPDATE_REQUIRED`, explain the returned update instruction in the user's language. Stop dependent operations until the same plugin is updated and its connection refreshed; never retry the old local-executor transport as a workaround.
 - Never send `organization` from user input. BotTasker MCP resolves organization from the authenticated OAuth grant or explicitly configured legacy API key.
 - Use explicit `appId` for solution-scoped work.
 - List relevant existing resources before creating new ones.

@@ -53,8 +53,13 @@ export const verifyCanonicalProduction = (root) => {
   }
   const portableServer = portable.mcpServers?.[productionPluginName]
   if (portableServer?.type !== 'streamable-http' || portableServer.url !== productionMcpUrl ||
-      Object.keys(portableServer).some((field) => !['type', 'url'].includes(field))) {
+      Object.keys(portableServer).some((field) => !['type', 'url', 'headers'].includes(field))) {
     throw new Error('The portable MCP declaration must match the production endpoint and desktop transport format')
+  }
+  const version = readJson(path.join(canonicalPlugin, 'plugin.json')).version
+  const expectedHeaders = { 'x-bottasker-native-protocol': '1', 'x-bottasker-plugin-version': version }
+  for (const headers of [portableServer.headers, codexServer.http_headers, claudeServer.headers]) {
+    if (JSON.stringify(headers) !== JSON.stringify(expectedHeaders)) throw new Error('Native MCP identity headers must match the source plugin without credentials')
   }
 }
 
@@ -110,6 +115,7 @@ export const buildLocalPlugin = (root) => {
   const claudeManifestPath = path.join(pluginTarget, '.claude-plugin', 'plugin.json')
   const codexManifest = readJson(codexManifestPath)
   const claudeManifest = readJson(claudeManifestPath)
+  const nativeHeaders = readJson(path.join(canonicalPlugin, '.mcp.json')).mcpServers[productionPluginName].http_headers
   const localVersion = `${String(codexManifest.version).split('+')[0]}+local.${timestamp()}`
 
   codexManifest.name = localPluginName
@@ -154,12 +160,13 @@ export const buildLocalPlugin = (root) => {
         type: 'http',
         url: localMcpUrl,
         oauth_resource: localMcpUrl,
+        http_headers: nativeHeaders,
       },
     },
   })
   writeJson(path.join(pluginTarget, 'claude.mcp.json'), {
     mcpServers: {
-      'bottasker-tasky-local': { type: 'http', url: localMcpUrl },
+      'bottasker-tasky-local': { type: 'http', url: localMcpUrl, headers: nativeHeaders },
     },
   })
 

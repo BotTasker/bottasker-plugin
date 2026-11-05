@@ -3,7 +3,11 @@
     "bottasker-tasky": {
       "type": "http",
       "url": "https://api.bottasker.ai/mcp",
-      "oauth_resource": "https://api.bottasker.ai/mcp"
+      "oauth_resource": "https://api.bottasker.ai/mcp",
+      "http_headers": {
+        "x-bottasker-native-protocol": "1",
+        "x-bottasker-plugin-version": "0.2.42"
+      }
     }
   }
 }

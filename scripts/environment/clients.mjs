@@ -76,8 +76,13 @@ export function createClient(client, root, run, {
               Object.keys(portableServers || {}).length !== 1 ||
               portableServers[name]?.type !== 'streamable-http' ||
               portableServers[name]?.url !== servers[name]?.url ||
-              Object.keys(portableServers[name] || {}).some((field) => !['type', 'url'].includes(field))) {
+              Object.keys(portableServers[name] || {}).some((field) => !['type', 'url', 'headers'].includes(field))) {
             throw new Error('El manifiesto portable instalado no coincide con el entorno y OAuth del plugin')
+          }
+          const headers = portableServers[name]?.headers
+          if (headers) {
+            const expected = { 'x-bottasker-native-protocol': '1', 'x-bottasker-plugin-version': p.version.split('+')[0] }
+            if (JSON.stringify(headers) !== JSON.stringify(expected)) throw new Error('Los headers nativos no coinciden con la versión instalada o contienen credenciales')
           }
         }
         if (item.enabled !== true && item.enabled !== false) throw new Error('Estado de habilitación desconocido')
