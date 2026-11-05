@@ -1,8 +1,8 @@
 {
   "name": "bottasker-tasky",
   "displayName": "Tasky by BotTasker",
-  "version": "0.2.38",
-  "description": "Tasky helps create and operate BotTasker apps through the BotTasker MCP.",
+  "version": "0.2.42",
+  "description": "Tasky helps create and operate BotTasker solutions through the BotTasker MCP.",
   "author": {
     "name": "BotTasker"
   },

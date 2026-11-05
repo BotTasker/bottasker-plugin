@@ -1,6 +1,6 @@
 # Tasky installation
 
-For local Codex, install **direct MCP + all 15 skills** from this GitHub
+For local Codex, install **direct MCP + all 16 skills** from this GitHub
 repository by default. Follow the README's Codex commands:
 
 ```sh
@@ -16,7 +16,7 @@ Do not change Bottasker Developer or other plugins. Inspect existing Tasky
 variants and respect the user's choice before removing duplicates. Never
 delete an app registration or publication to uninstall a Codex plugin.
 
-The package builder defaults to `direct`: MCP plus 15 skills, without
+The package builder defaults to `direct`: MCP plus 16 skills, without
 `.app.json`. The optional `connected` profile is only for an explicit App +
 skills request and requires an actual accessible registered app identity.
 Never invent an App ID or reuse a deleted registration. The `chatgpt-update`
@@ -24,7 +24,7 @@ profile updates an existing ChatGPT cloud package only when explicitly asked.
 The `submission` profile is separate and must also be requested explicitly.
 
 Installation, OAuth authentication and available tools are separate checks.
-Verify one enabled Tasky variant, all 15 skills, the effective MCP endpoint,
+Verify one enabled Tasky variant, all 16 skills, the effective MCP endpoint,
 and the authenticated profile with a read-only query. Let the user sign in,
 choose the organization and approve OAuth. Do not claim authentication from
 the installed files alone. Keep tokens and generated packages out of Git.

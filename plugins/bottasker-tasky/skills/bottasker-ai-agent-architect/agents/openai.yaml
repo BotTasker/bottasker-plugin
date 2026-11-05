@@ -1,7 +1,7 @@
 interface:
   display_name: "BotTasker AI Agent Architect"
-  short_description: "Design AI Agents module agents, subagents, tools, and configurations inside an app."
+  short_description: "Design AI Agents module agents, subagents, tools, and configurations inside a solution."
   brand_color: "#2563EB"
-  default_prompt: "Design AI agents, subagents, and dynamically discovered tools inside an approved BotTasker app."
+  default_prompt: "Design AI agents, subagents, and dynamically discovered tools inside an approved BotTasker solution."
 policy:
   allow_implicit_invocation: true

@@ -1,11 +1,20 @@
 ---
 name: bottasker-data-architect
-description: Use when the user wants to design Base de datos module (Data Hub service), models, fields, relations, records, Dynamic Tables, or data-backed app structures in BotTasker.
+description: Use when the user wants to design Base de datos module (Data Hub service), models, fields, relations, records, Dynamic Tables, or data-backed solution structures in BotTasker.
 ---
 
 # BotTasker Data Architect
 
-Use this skill to build durable data structures for BotTasker apps.
+Use this skill to build durable data structures for BotTasker solutions.
+
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -18,7 +27,7 @@ The user-facing module name is **Base de datos**. At the service/API level it is
 ## Workflow
 
 1. Call `bt_context_get_profile`.
-2. Resolve `appId` when the data belongs to an app.
+2. Resolve `appId` when the data belongs to a solution.
 3. Call `bt_mcp_list_skills` and `bt_mcp_load_skill` for `data-hub` when model design is complex.
 4. Read current data structures first:
    - `bt_data_hub_list_hubs`
@@ -117,7 +126,7 @@ When the user asks to add or configure the Base de datos tool on an AI Agent, th
 - If the agent already has the Base de datos tool but `modelPermissions` is empty, missing enabled models, or missing per-model permissions, repair the existing action instance with `bt_action_instances_update_config` or prepare/validate a corrected config before saying the tool is ready.
 - Verify with `bt_ai_agents_get`, `bt_ai_agents_list_items`, or `bt_action_instances_get_details` and summarize exactly how many models are enabled and which permissions they have.
 
-For a write-only capture agent, prefer `read/create` on target models and avoid `update` unless the approved app flow requires correction/editing.
+For a write-only capture agent, prefer `read/create` on target models and avoid `update` unless the approved solution flow requires correction/editing.
 
 ## Handoff To Automation Engineer
 
@@ -147,4 +156,4 @@ Do not let the form duplicate model design. Use Forms for capture and mappings; 
 
 ## Expected MCP Tools
 
-Use `bt_data_hub_*`, `bt_dynamic_tables_*`, and `bt_dynamic_records_*` tools. For app discovery use `bt_apps_list` and `bt_apps_get`.
+Use `bt_data_hub_*`, `bt_dynamic_tables_*`, and `bt_dynamic_records_*` tools. For solution discovery use `bt_apps_list` and `bt_apps_get`.

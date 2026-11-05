@@ -7,7 +7,16 @@ description: Use when the user wants to design, create, configure, filter, share
 
 Use this skill as the specialist for the BotTasker `boards` module. It owns board source design, permanent source scope, columns, per-user column alerts, card fields, detail views, widgets, button automations, public/restricted access, permissions, file fields, and operational safety.
 
-If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here after App Builder selects boards as part of the approved app blueprint.
+If the user asks to create a complete solution, route to `bottasker-app-builder` first. Return here after Solution Builder selects boards as part of the approved solution blueprint.
+
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -22,6 +31,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - `bt_boards_get`
    - `bt_boards_get_board_data`
 4. Discover the source before designing:
+   - Native Support Tickets: load `bottasker-support-tickets-architect`, discover ticket source options/groupable fields and callable board tools. Keep the same native records and canonical ticket detail/form; do not require a Base de datos model.
    - Base de datos (Data Hub): `bt_data_hub_list_hubs`, `bt_data_hub_list_models`, `bt_data_hub_list_fields`.
    - Dynamic Tables: `bt_dynamic_tables_list`, `bt_dynamic_tables_get`.
    - Existing board source: `bt_boards_get_source_fields`, `bt_boards_get_available_columns`.
@@ -47,19 +57,20 @@ Do not call create, update, move, delete, public link, role, user, file, or auto
 
 Prefer structured sources:
 
-- `data-hub-model`: best for durable app entities, relationships, app records, and AI-written data.
+- `support-tickets`: native support operations, incidents and requests. Read the native source rules below; do not duplicate records in another source or use the generic detail designer.
+- `data-hub-model`: best for durable solution entities, relationships, solution records, and AI-written data.
 - `dynamic-table`: best for simple table-backed operational tracking.
-- `manual`: only for small standalone boards or legacy use; avoid for apps that need reporting or automation.
+- `manual`: only for small standalone boards or legacy use; avoid for solutions that need reporting or automation.
 
 For source-backed boards:
 
-- `groupByField` defines columns and must be groupable: select, multiselect, boolean, tags, or equivalent status/pipeline fields.
+- `groupByField` defines columns and must be allowed by the source metadata. For native Tickets use its `groupable` flags; other sources may support select, multiselect, boolean, tags or equivalent pipeline fields.
 - `titleField` must be text-like and should identify the card quickly.
 - `descriptionField` is optional but should summarize why the card matters.
 - `displayFields` should be concise: owner, due date, priority, amount, customer, status, channel, or next action.
 - Permanent scope conditions should narrow the operational dataset when one source feeds multiple boards.
 
-If the source lacks a good status/group field, hand off to `bottasker-data-architect` before creating the board.
+If native Tickets lacks the requested grouping, consult `bottasker-support-tickets-architect` about its supported custom fields. For other structured sources, hand off to `bottasker-data-architect` when a suitable group field is missing.
 
 ## Permanent Board Scope
 
@@ -101,6 +112,17 @@ Creation and mutation behavior:
 - Do not attempt to edit or move a card in a way that changes a scoped field or takes it outside the board. Update the source record through the appropriate data workflow only when the user intends to change board membership.
 - A source update can make a record enter or leave the board; treat this as a realtime membership transition, not as data loss.
 
+## Native Support Tickets source
+
+Tickets can be represented directly in Boards for visual follow-up. Load `bottasker-support-tickets-architect` for the ticket lifecycle, fields, optional AI notifications and agent/workflow tools. Visual tracking does not by itself activate reminder sending.
+
+- Native source type: `support-tickets`, same solution and default inbox. Read current source metadata and `groupable` flags; typical dimensions are status, priority, request type, category, assignee, team, impact and urgency, plus supported active custom fields.
+- Propose subject as title and ticket number, state, priority, responsible user and due date as scannable card fields. Use current technical field names and option values. Preserve approved permanent scope; temporary filters are separate.
+- Opening a card uses the same native ticket detail as the Tickets module; creation/editing uses its shared form. Skip the generic detail widget designer for this source. Moving a card updates the native grouping field through native permissions and validation; resolving/closing still needs resolution information.
+- Native ticket boards currently require authenticated internal access; public sharing is unsupported. Board access does not grant missing ticket/history/file permissions.
+- External MCP exposure can lag the platform feature. Discover a callable tool whose schema actually supports this source before creating/updating it. Do not pass it to an older source tool restricted to `dynamic-table` / `data-hub-model`, invent an endpoint, or create duplicate ticket tables as a workaround. Explain a verified exposure gap and offer the native screen without claiming execution.
+- Verify the same ticket ID, columns, membership and intended change in both board and canonical detail. People, agents and automations act on the same source; do not add polling or a second synchronization flow.
+
 ## Board Patterns
 
 Choose the pattern based on the work:
@@ -134,7 +156,7 @@ Rules:
 
 ## Detail View And Widgets
 
-Always design item details from source fields, not from generic widget names.
+For native `support-tickets`, use the canonical Tickets detail and shared create/edit form. Do not call prepare/update detail-view widget tools for this source. Follow the Native Support Tickets source section instead. For other sources, design item details from source fields, not from generic widget names.
 
 Required order:
 
@@ -258,7 +280,7 @@ Use `bt_boards_configure_column_alert` to select any combination of:
 
 Entry and exit sounds can be different. Supported tone IDs are `chime`, `crystal`, `pulse`, `soft-pop`, `double-tap`, and `soft-bell`. Push delivery still requires the user to grant notification permission in a supported browser; never claim push is active merely because the preference was saved. Use `bt_boards_remove_column_alert` when the user asks to disable the entire column subscription.
 
-These preferences belong to the authenticated user. Never attempt to configure another user's subscription, pass `organization`, expose Firebase installation IDs, or manipulate push registration records. Board, column, app, user, and organization deletion cleanup is automatic.
+These preferences belong to the authenticated user. Never attempt to configure another user's subscription, pass `organization`, expose Firebase installation IDs, or manipulate push registration records. Board, column, solution, user, and organization deletion cleanup is automatic.
 
 ## Public Link And Security
 
@@ -303,7 +325,7 @@ When an AI Agent needs board capabilities, hand off to `bottasker-ai-agent-archi
 - detail buttons and their automation contracts;
 - intended least-privilege worker action: `read_board`, `manage_items`, or `invoke_board_action`.
 
-Agents must not change public access, roles, users, or sharing settings unless the app blueprint explicitly approves an administrative tool.
+Agents must not change public access, roles, users, or sharing settings unless the solution blueprint explicitly approves an administrative tool.
 
 ## Configured button execution
 

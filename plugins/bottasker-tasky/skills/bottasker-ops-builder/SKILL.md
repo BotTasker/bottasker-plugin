@@ -5,7 +5,16 @@ description: Use for BotTasker Files/Archivos operations, calendars and public b
 
 # BotTasker Ops Builder
 
-Use this skill for operational modules after the app and data foundation are known.
+Use this skill for operational modules after the solution and data foundation are known.
+
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -14,7 +23,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 ## Workflow
 
 1. Call `bt_context_get_profile`.
-2. Resolve `appId` for app-scoped modules.
+2. Resolve `appId` for solution-scoped modules.
 3. List existing resources before creating new ones.
 4. Use the module-specific tools:
    - dashboards, tracking, KPIs, control, reporting: delegate to `bottasker-dashboard-architect`
@@ -39,9 +48,9 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 - Use `bottasker-knowledge-base-assistant` for Knowledge Base creation, querying, troubleshooting, and adding Knowledge Base tools to AI Agents.
 - Use `bottasker-whatsapp-template-architect` for every WhatsApp template request. It owns Meta rules and the exact tool contracts.
 - Ask for confirmation before archive/remove/delete tools or broad status changes.
-- Treat conversation tags as app-scoped labels with a reusable catalog. List the catalog before filtering or removing a tag; adding by name creates or reuses the label and assigns its generated color automatically when it is new.
+- Treat conversation tags as solution-scoped labels with a reusable catalog. List the catalog before filtering or removing a tag; adding by name creates or reuses the label and assigns its generated color automatically when it is new.
 - Filter conversations with tag IDs, not visible names. Multiple tag IDs use OR semantics: a conversation matches when it has at least one selected label.
-- Use `bt_conversations_get_tags` before changing a conversation when its current labels are unknown. Use `bt_conversations_add_tags` with `names` to create/reuse and assign labels, and `bt_conversations_remove_tag` to unassign them. `bt_conversations_add_tag` remains only as the legacy single-label alias. Removing a label from a conversation does not delete it from the app catalog.
+- Use `bt_conversations_get_tags` before changing a conversation when its current labels are unknown. Use `bt_conversations_add_tags` with `names` to create/reuse and assign labels, and `bt_conversations_remove_tag` to unassign them. `bt_conversations_add_tag` remains only as the legacy single-label alias. Removing a label from a conversation does not delete it from the solution catalog.
 - AI Agents that receive WhatsApp, Telegram, or WebChat input with automatic conversation registration enabled receive `manage_conversation_tags` at runtime. This tool is already bound to the current conversation; never ask for or invent an internal conversation ID.
 
 ## Files
@@ -50,11 +59,11 @@ Use this section for the **Archivos** module: browse/search, inspect metadata, c
 
 ### Discover access and resolve scope
 
-Resolve the target app, then call `bt_mcp_find_tools` with `moduleKey: "files"`, the user's natural-language intent and the required effect. Search reads with `effect: "read"`; ordinary creates/imports with `"write"`; deletion and signed upload initialization with `"destructive"`. Discovering an editor component with `bt_ai_agent_tools_discover` only explains how to equip an agent; it does not execute file operations from this chat.
+Resolve the target solution, then call `bt_mcp_find_tools` with `moduleKey: "files"`, the user's natural-language intent and the required effect. Search reads with `effect: "read"`; ordinary creates/imports with `"write"`; deletion and signed upload initialization with `"destructive"`. Discovering an editor component with `bt_ai_agent_tools_discover` only explains how to equip an agent; it does not execute file operations from this chat.
 
-Use the real callable tool inventory. If discovery returns an operation that the client did not load, distinguish **implemented/discovered** from **callable in this session**. If the discovery tool itself is unavailable, say the available inventory is incomplete/unverified; do not conclude that the backend has no Files capability. Skills explain operations but cannot load missing callable tools by themselves. Never bypass an authorization failure using a worker executor, API integration or another identity.
+Use the real callable tool inventory. If discovery returns an operation that the client did not load, distinguish **implemented/discovered** from **callable in this session**. If the discovery tool itself is unavailable, say the available inventory is incomplete/unverified; do not conclude that the backend has no Files capability. Skills explain operations; in Codex or Claude Code, use native tool search to load each deferred schema before invocation. Never bypass an authorization failure using a worker executor, API integration or another identity.
 
-Use explicit `appId` for an app's files. Do not fall back to the organization root when an app result is empty or forbidden. Organization is supplied by the authenticated connection. Carry real file/folder IDs between operations; names and paths are for discovery, not invented identifiers.
+Use explicit `appId` for a solution's files. Do not fall back to the organization root when a solution result is empty or forbidden. Organization is supplied by the authenticated connection. Carry real file/folder IDs between operations; names and paths are for discovery, not invented identifiers.
 
 ### MCP operation contracts
 
@@ -64,17 +73,17 @@ The four historical operations retain `payload` for compatibility. New operation
 | --- | --- |
 | `bt_files_list` | `{ appId, payload: { parentId? } }`. Omit `parentId` for root. Returns `items`, `parent`, `breadcrumbs` for direct children only. |
 | `bt_files_get` | `{ appId, id }`. Reads one file/folder's metadata; does not read the bytes or describe an image. |
-| `bt_files_search` | `{ appId, search?, type?, parentId?, limit?, offset? }`. Searches literal case-insensitive names across the app, with optional `type: "file"` or `"folder"`. Omitting `parentId` searches all folders; `parentId: ""` restricts to root. Default limit 25, maximum 100. Continue with returned `nextOffset` only while `hasMore`. Searches names, not document contents. |
+| `bt_files_search` | `{ appId, search?, type?, parentId?, limit?, offset? }`. Searches literal case-insensitive names across the solution, with optional `type: "file"` or `"folder"`. Omitting `parentId` searches all folders; `parentId: ""` restricts to root. Default limit 25, maximum 100. Continue with returned `nextOffset` only while `hasMore`. Searches names, not document contents. |
 | `bt_files_create_folder` | `{ appId, payload: { name, parentId?, reuseExisting? } }`. Read first; `reuseExisting: true` reuses an existing same-named folder and requires read permission. |
 | `bt_files_upload_from_url` | `{ appId, url, fileName?, mimeType?, parentId? }`. Downloads and copies a source into **private** Files storage, up to 50 MiB. Requires read/create/update permissions. Rejects private-network URLs and duplicate names. Returns the saved file metadata and ID; never deletes the original or sends it. |
 | `bt_files_upload_init` | `{ appId, payload: { name, size, mimeType, parentId?, public? } }`. Reserves metadata and returns `file` plus a signed `uploadUrl`. Size is bytes. `public` defaults false; true is public sharing and needs explicit authorization. This operation requires destructive execution consent because its historical contract supports public uploads. |
 | `bt_files_upload_complete` | `{ appId, id }`. Finalizes metadata after a successful PUT of bytes; additionally requires read/update permissions and preserves reserved visibility. It neither transfers bytes nor independently verifies object presence. |
 | `bt_files_get_download_url` | `{ appId, payload: { id } }`. Returns `url` and, for private files, `expiresAt` (currently 15 minutes). Does not download, parse or send the file. |
 | `bt_files_rename` | `{ appId, id, newName }`. Renames the entry; folder descendant paths change, IDs/bytes remain. Read back the new name/path. |
-| `bt_files_move` | `{ appId, id, newParentId? }`. Moves within the same app; omit the destination for root. Folder descendant paths change. Cycles and duplicate destination names are rejected. |
+| `bt_files_move` | `{ appId, id, newParentId? }`. Moves within the same solution; omit the destination for root. Folder descendant paths change. Cycles and duplicate destination names are rejected. |
 | `bt_files_delete` | `{ appId, ids }`, 1–100 real IDs. Permanent: folder deletion includes descendants and stored bytes. Requires explicit approval/destructive consent. Returns only deleted `ids`; compare with the request and report partial results. Folder deletion is not atomic: an interrupted attempt can already have removed some descendant objects. |
 
-Read/get/search/download need Files read permission; create/import/upload need create (imports and upload finalization also need read/update), rename/move need update, delete needs remove. Backend app/organization authorization remains authoritative. Respect returned pending actions and OAuth scope errors; do not claim that confirmation grants permissions.
+Read/get/search/download need Files read permission; create/import/upload need create (imports and upload finalization also need read/update), rename/move need update, delete needs remove. Backend solution/organization authorization remains authoritative. Respect returned pending actions and OAuth scope errors; do not claim that confirmation grants permissions.
 
 ### Browse and share existing assets
 
@@ -96,7 +105,7 @@ On `FILE_DUPLICATE_NAME`, inspect the existing destination; do not overwrite or 
 
 ## Calendar and public bookings
 
-Use the native Calendario module and an existing authorized calendar. One public booking page belongs to one calendar; do not create an unrelated Forms page or treat the meeting's invited people as additional calendars. Resolve the calendar, app scope, connected provider and current configuration before proposing changes. For a new calendar, use the discovered create tool and supported provider connection; never invent a connected account or credential.
+Use the native Calendario module and an existing authorized calendar. One public booking page belongs to one calendar; do not create an unrelated Forms page or treat the meeting's invited people as additional calendars. Resolve the calendar, solution scope, connected provider and current configuration before proposing changes. For a new calendar, use the discovered create tool and supported provider connection; never invent a connected account or credential.
 
 ### Tools and configuration access
 
@@ -104,7 +113,7 @@ Call `bt_mcp_find_tools` with `moduleKey: "calendar"` and the requested intent. 
 
 | Tool | Inputs and effect |
 | --- | --- |
-| `bt_calendar_get_booking_settings` | `calendarId`, plus `appId` for an app calendar. Reads complete `config`, current `version`, provider capabilities, publication state, `publicPath` and `publicUrl` when the application base URL is configured. A new page has version 0, defaults and no link. |
+| `bt_calendar_get_booking_settings` | `calendarId`, plus `appId` for a solution calendar. Reads complete `config`, current `version`, provider capabilities, publication state, `publicPath` and `publicUrl` when the solution base URL is configured. A new page has version 0, defaults and no link. |
 | `bt_calendar_save_booking_settings` | Same target, latest `version`, complete reviewed `config` and `confirmation: "APPROVED"`. Saves the rules without changing publication state. Editing a published page updates its live rules; saving a new page leaves it in draft. |
 | `bt_calendar_set_booking_state` | Same target, latest `version`, `state: "published"` or `"paused"`, and `confirmation: "APPROVED"`. Publishes/resumes or pauses the saved page. |
 | `bt_calendar_regenerate_booking_link` | Same target, latest `version` and `confirmation: "APPROVED"`. Invalidates the previous link, returning the new server-issued link without cancelling reservations or changing publication state. |
@@ -157,7 +166,7 @@ Edits/cancellations made through BotTasker update reservation occupancy. Automat
 
 ## Conversation Read Capabilities
 
-Use the Conversaciones worker when an agent or workflow must inspect customer conversations without changing them. This capability is always scoped to the current organization and `appId`; never ask the user for organization scope and never try to override either scope through tool input. The app role needs both `conversations:read` and `messages:read`.
+Use the Conversaciones worker when an agent or workflow must inspect customer conversations without changing them. This capability is always scoped to the current organization and `appId`; never ask the user for organization scope and never try to override either scope through tool input. The solution role needs both `conversations:read` and `messages:read`.
 
 For AI Agents, discover and equip the single `conversation_tools` action. It exposes these runtime tools:
 

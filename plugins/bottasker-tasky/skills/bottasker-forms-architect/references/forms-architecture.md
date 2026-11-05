@@ -113,7 +113,7 @@ Before creating or updating:
 3. Ensure required target fields have a form field or static mapping.
 4. Use Base de datos (Data Hub) specialist rules for complex relations, uniqueness, lookups, and dates.
 
-The connector calls Base de datos (Data Hub) record creation and adds `sourceRefs` with the form and submission. This is the right choice for candidates, leads, orders, applications, requests, assets, documents, and other operational entities.
+The connector calls Base de datos (Data Hub) record creation and adds `sourceRefs` with the form and submission. This is the right choice for candidates, leads, orders, solutions, requests, assets, documents, and other operational entities.
 
 ### dynamicTable.createRecord
 

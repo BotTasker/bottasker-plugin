@@ -9,7 +9,16 @@ When creating, editing, duplicating, or manipulating AI Agents, also load `botta
 
 Use this skill to build AI agents and workflow automations in BotTasker.
 
-For complex AI Agent systems with subagents, dynamically discovered tools, tool configuration schemas, or natural-language app blueprints, delegate planning to `bottasker-ai-agent-architect` first. Continue here when the approved plan needs workflow graphs, action instances, edges, or test runs.
+For complex AI Agent systems with subagents, dynamically discovered tools, tool configuration schemas, or natural-language solution blueprints, delegate planning to `bottasker-ai-agent-architect` first. Continue here when the approved plan needs workflow graphs, action instances, edges, or test runs.
+
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -18,7 +27,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 ## Workflow
 
 1. Call `bt_context_get_profile`.
-2. Resolve `appId` when the workflow or agent belongs to an app.
+2. Resolve `appId` when the workflow or agent belongs to a solution.
 3. Discover automation building blocks:
    - `bt_ai_agent_tools_discover`
    - `bt_registry_list_workers`
@@ -99,7 +108,7 @@ Discover the `Conversaciones` worker (`conversations-manager`) and use its read-
 
 When the conversation ID is not already present in workflow input, place `find_conversations` first. If its output is ambiguous, branch to an explicit selection/review step or add a narrower channel/identifier condition; never map the first candidate automatically. Map the selected candidate ID into later nodes. For pagination, continue only when `hasMore` is true and map `nextBefore` into the next `before` input; every loop must have a hard page/run limit.
 
-These nodes inherit organization and `appId` from the workflow action instance and reject missing app scope. Do not map organization/app values from event payloads or user-controlled variables. The app role needs `conversations:read` and `messages:read`. The nodes are read-only and their message output excludes provider raw payloads, internal metadata, and attachment URLs.
+These nodes inherit organization and `appId` from the workflow action instance and reject missing solution scope. Do not map organization/app values from event payloads or user-controlled variables. The solution role needs `conversations:read` and `messages:read`. The nodes are read-only and their message output excludes provider raw payloads, internal metadata, and attachment URLs.
 
 Do not use the agent-only `conversation_tools` action in workflows. It has `actionType: "mcp_bt"` and `ignore_in: ["workflow"]`; the four actions above use `actionType: "work"` and are the deterministic workflow surface.
 
@@ -153,7 +162,7 @@ Discover workers and action schemas first. The single native family is **Carrito
 | `set_cart_status` | cartId, open/ready_for_checkout/checked_out/abandoned; optional requiredFields customer/deliveryAddress when preparing checkout. Never paid. |
 | `mark_cart_paid` | cartId, optional paymentEvidenceFileId; confirms an already verified payment with the saved author's permission. |
 | `add_payment_evidence` | cartId, fileId; optional before/after paid, no new payment event. |
-| `get_paid_cart` | cartId; rereads canonical paid status and paidAt within the app. |
+| `get_paid_cart` | cartId; rereads canonical paid status and paidAt within the solution. |
 | `on_cart_paid` | Native input trigger for workflows and agents. |
 
 The eleven general work actions return found/cartId/cart for single-cart operations; `find_carts` returns a paginated list. Inspect actual payment-node output schemas separately. Branch on found before using results. Map real IDs using the variable picker, e.g. `{{2.cartId}}` and `{{2.cart.items[0].lineId}}`, not manually guessed IDs. Config supports literal/wrapped values and native droppable fields. These eleven general actions are workflow-only (`work`, ignored in agent discovery), not agent tool addons. Edits require open; explicitly reopen ready_for_checkout first. Paid carts remain immutable.
@@ -162,4 +171,4 @@ Marking a cart paid emits backend `sales_cart.paid`; the native trigger exposes 
 
 A trigger dispatches only when its parent workflow/agent is active and the input node is enabled. Saving an inactive graph or manually testing nodes does not prove the native event was delivered. When explicitly authorized to test the real event, use only a clearly labeled synthetic cart and isolated test automation, temporarily activate only that test input, mark paid from the cart module, inspect every node's persisted execution/output and repeat confirmation to check duplicate protection. Disable the test automation afterward. Keep real carts, existing follow-ups, messaging and Meta submissions unchanged. Do not mark tests passed from graph creation alone.
 
-For paid services/packages, configure the approved domain model and downstream grants explicitly; payment itself does not book appointments or create service entitlements. Add app-scoped idempotency before creating balances/records. Do not activate follow-ups as part of wiring a payment trigger.
+For paid services/packages, configure the approved domain model and downstream grants explicitly; payment itself does not book appointments or create service entitlements. Add solution-scoped idempotency before creating balances/records. Do not activate follow-ups as part of wiring a payment trigger.

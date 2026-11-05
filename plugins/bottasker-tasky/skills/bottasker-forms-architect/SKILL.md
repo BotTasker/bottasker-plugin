@@ -9,6 +9,15 @@ Use this skill as the specialist for BotTasker Forms. Forms capture structured i
 
 For detailed design rules, field schemas, connector behavior, mappings, and failure modes, read `references/forms-architecture.md`.
 
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
+
 ## Response language
 
 Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
@@ -16,7 +25,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 ## Mandatory Flow
 
 1. Call `bt_context_get_profile`.
-2. Resolve `appId` before working with app-scoped forms.
+2. Resolve `appId` before working with solution-scoped forms.
 3. Use `bt_mcp_find_tools` or `bt_mcp_list_skills`/`bt_mcp_load_skill` before assuming a concrete Forms tool exists.
 4. List existing forms with `bt_forms_list` before creating a new one.
 5. List connector definitions with `bt_forms_list_connector_definitions` before choosing a target.
@@ -68,7 +77,7 @@ Do not present `webhook/http` or `notification` as available unless discovery sh
 
 - Complex Base de datos (Data Hub) modeling: delegate to `bottasker-data-architect`.
 - Workflow graph design or trigger setup: delegate to `bottasker-automation-engineer`.
-- Forms as part of a complete app blueprint: delegate through `bottasker-app-builder`.
+- Forms as part of a complete solution blueprint: delegate through `bottasker-app-builder`.
 - Agents that consume, create, or explain forms: coordinate with `bottasker-ai-agent-architect`.
 - Files, Knowledge Base, conversations, messages, and calls: delegate to `bottasker-ops-builder`.
 
@@ -76,4 +85,4 @@ Do not present `webhook/http` or `notification` as available unless discovery sh
 
 Use `bt_forms_list`, `bt_forms_get`, `bt_forms_list_connector_definitions`, `bt_forms_get_connector_target_fields`, `bt_forms_get_connector_config_options`, `bt_forms_create_from_wizard`, `bt_forms_create`, `bt_forms_update`, `bt_forms_regenerate_public_token`, `bt_forms_archive`, `bt_forms_delete`, `bt_forms_list_submissions`, and `bt_forms_get_submission`.
 
-For app discovery use `bt_apps_list`, `bt_apps_get`, and `bt_apps_list_modules`. For Base de datos (Data Hub) and Dynamic Table dependencies use the relevant specialist tools before creating or mapping forms.
+For solution discovery use `bt_apps_list`, `bt_apps_get`, and `bt_apps_list_modules`. For Base de datos (Data Hub) and Dynamic Table dependencies use the relevant specialist tools before creating or mapping forms.

@@ -10,6 +10,46 @@ import { readJson } from './environment/runtime.mjs'
 
 const repository = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const pluginId = 'plugin_asdk_app_0123456789abcdef0123456789abcdef'
+
+test('default package retains all 16 skills and the native HTTP connection without app registration or local execution', (t) => {
+  const root = fixture(t)
+  const result = buildPackage({ root })
+  assert.equal(result.profile, 'direct')
+  const portable = readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky']
+  assert.equal(portable.type, 'streamable-http')
+  assert.equal(portable.url, 'https://api.bottasker.ai/mcp')
+  const version = readJson(path.join(result.plugin, 'plugin.json')).version
+  assert.deepEqual(portable.headers, { 'x-bottasker-native-protocol': '1', 'x-bottasker-plugin-version': version })
+  assert.equal(portable.extensions, undefined)
+  assert.equal(portable.command, undefined)
+  assert.equal(fs.existsSync(path.join(result.plugin, '.app.json')), false)
+  assert.equal(fs.existsSync(path.join(result.plugin, 'local-executor')), false)
+  assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 16)
+  const claude = readJson(path.join(result.plugin, 'claude.mcp.json')).mcpServers['bottasker-tasky']
+  const codex = readJson(path.join(result.plugin, '.mcp.json')).mcpServers['bottasker-tasky']
+  assert.deepEqual(claude.headers, portable.headers)
+  assert.deepEqual(codex.http_headers, portable.headers)
+})
+
+for (const [file, key] of [['mcp.json', 'headers'], ['claude.mcp.json', 'headers'], ['.mcp.json', 'http_headers']]) {
+  test(`native ${file} rejects credential injection and stale transport versions`, (t) => {
+    const root = fixture(t)
+    const input = path.join(root, 'plugins/bottasker-tasky', file)
+    const original = readJson(input)
+    for (const mutate of [
+      server => { server[key].Authorization = 'not-a-credential' },
+      server => { server[key]['x-bottasker-plugin-version'] = '0.2.41' },
+      server => { server[key]['x-bottasker-native-protocol'] = '2' },
+      server => { server.bearer_token_env_var = 'DO_NOT_USE' },
+      server => { server.command = 'node' },
+    ]) {
+      const config = structuredClone(original)
+      mutate(config.mcpServers['bottasker-tasky'])
+      fs.writeFileSync(input, JSON.stringify(config))
+      assert.equal(spawnSync(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')], { encoding: 'utf8' }).status, 1)
+    }
+  })
+}
 function fixture(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tasky-package-'))
   t.after(() => fs.rmSync(root, { recursive: true, force: true }))
@@ -34,11 +74,11 @@ function cloudArchive(root, mutate = () => {}) {
   return { zip, manifest, apps }
 }
 
-test('default build includes direct MCP and 15 skills without a registered app', (t) => {
+test('default build includes direct MCP and 16 skills without a registered app', (t) => {
   const root = fixture(t)
   const result = buildPackage({ root })
   assert.equal(result.profile, 'direct')
-  assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 15)
+  assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 16)
   assert.equal(fs.existsSync(path.join(result.plugin, '.app.json')), false)
   const portable = readJson(path.join(result.plugin, 'plugin.json'))
   const compatibility = readJson(path.join(result.plugin, '.codex-plugin/plugin.json'))
@@ -77,7 +117,9 @@ test('ChatGPT update adds skills to the same cloud plugin without duplicating MC
   const downloaded = cloudArchive(root)
   const result = buildPackage({ root, profile: 'chatgpt-update', existingPluginZip: downloaded.zip })
   const entries = execFileSync('unzip', ['-Z1', result.zip], { encoding: 'utf8' }).trim().split('\n')
-  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 15)
+  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 16)
+  assert.ok(entries.includes('skills/bottasker-support-tickets-architect/SKILL.md'))
+  assert.ok(entries.includes('skills/bottasker-support-tickets-architect/agents/openai.yaml'))
   assert.equal(result.existingPluginName, downloaded.manifest.name)
   assert.equal(result.appId, pluginId.replace(/^plugin_/, ''))
   assert.deepEqual(readJson(path.join(result.plugin, '.app.json')), downloaded.apps)
@@ -141,7 +183,9 @@ test('submission ZIP contains skills, OAuth, legal metadata and onboarding, with
   assert.ok(entries.includes('plugin.json'))
   assert.ok(entries.includes('mcp.json'))
   assert.ok(entries.includes('LICENSE'))
-  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 15)
+  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 16)
+  assert.ok(entries.includes('skills/bottasker-support-tickets-architect/SKILL.md'))
+  assert.ok(entries.includes('skills/bottasker-support-tickets-architect/agents/openai.yaml'))
   assert.ok(!entries.some((entry) => /\.app\.json|\.env|hooks\/|\.tasky-runtime/.test(entry)))
   const manifest = readJson(path.join(result.plugin, 'plugin.json'))
   assert.equal(manifest.extensions['com.openai'].review.demo_recording_url, 'https://youtu.be/GE1NGw_v7jc')
@@ -171,10 +215,11 @@ test('connected package uses only the supplied registered app and leaves canonic
     readJson(path.join(root, 'plugins/bottasker-tasky/plugin.json')).extensions['com.openai'].publication)
   assert.equal(fs.readFileSync(path.join(root, 'plugins/bottasker-tasky/plugin.json'), 'utf8'), original)
   assert.equal(fs.existsSync(path.join(root, 'plugins/bottasker-tasky/.app.json')), false)
-  const entries = execFileSync('unzip', ['-Z1', result.zip], { encoding: 'utf8' }).trim().split('\n')
-  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 15)
-  assert.equal(readJson(path.join(result.plugin, '.codex-plugin/plugin.json')).mcpServers, undefined)
   assert.equal(readJson(path.join(result.plugin, 'plugin.json')).extensions['com.openai'].review, undefined)
+  assert.equal(readJson(path.join(result.plugin, '.codex-plugin/plugin.json')).mcpServers, undefined)
+  assert.equal(fs.existsSync(path.join(result.plugin, 'mcp.json')), false)
+  const entries = execFileSync('unzip', ['-Z1', result.zip], { encoding: 'utf8' }).trim().split('\n')
+  assert.equal(entries.filter((entry) => /^skills\/[^/]+\/SKILL.md$/.test(entry)).length, 16)
   assert.ok(!entries.some((entry) => /(^|\/)(mcp\.json|\.mcp\.json|claude\.mcp\.json|\.claude-plugin)(\/|$)/.test(entry)))
 })
 
@@ -189,7 +234,7 @@ for (const identity of [
     const result = buildPackage({ root, profile: 'connected', pluginId: identity })
     assert.equal(result.appId, 'asdk_app_0123456789abcdef0123456789abcdef')
     assert.equal(readJson(path.join(result.plugin, '.app.json')).apps['bottasker-tasky'].id, result.appId)
-    assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 15)
+    assert.equal(fs.readdirSync(path.join(result.plugin, 'skills')).length, 16)
     assert.equal(fs.existsSync(path.join(result.plugin, 'mcp.json')), false)
     assert.throws(() => buildPackage({ root, profile: 'submission', pluginId: identity }))
   })
@@ -213,6 +258,7 @@ test('repository runtime stays desktop-compatible while submission preserves exp
   const runtime = readJson(path.join(root, 'plugins/bottasker-tasky/mcp.json'))
   assert.deepEqual(runtime.mcpServers['bottasker-tasky'], {
     type: 'streamable-http', url: 'https://api.bottasker.ai/mcp',
+    headers: { 'x-bottasker-native-protocol': '1', 'x-bottasker-plugin-version': readJson(path.join(root, 'plugins/bottasker-tasky/plugin.json')).version },
   })
   const result = buildPackage({ root, profile: 'submission' })
   const server = readJson(path.join(result.plugin, 'mcp.json')).mcpServers['bottasker-tasky']
@@ -255,7 +301,7 @@ test('validator rejects runtime extensions rejected by the native desktop MCP lo
   fs.writeFileSync(file, JSON.stringify(mcp))
   const result = spawnSync(process.execPath, [path.join(root, 'scripts/validate-plugin.mjs')], { encoding: 'utf8' })
   assert.equal(result.status, 1)
-  assert.match(result.stderr, /desktop compatibility/)
+  assert.match(result.stderr, /runtime portable MCP/)
 })
 
 test('submission packaging rejects an OAuth template pointing at another environment', (t) => {

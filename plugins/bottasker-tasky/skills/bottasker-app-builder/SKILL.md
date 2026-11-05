@@ -1,27 +1,36 @@
 ---
 name: bottasker-app-builder
-description: Use when the user wants to design, create, or update complete BotTasker apps by choosing and combining available modules for a business solution.
+description: Use when the user wants to design, create, or update complete BotTasker solutions by choosing and combining available modules for a business solution.
 ---
 
-# BotTasker App Builder
+# BotTasker Solution Builder
 
-Use this skill as the app-level solution architect. It owns the complete app blueprint: what the app should do, which BotTasker modules are needed, how modules combine, which module specialists must be delegated to, and the execution order.
+Use this skill as the solution architect. It owns the complete solution blueprint: what the solution should do, which BotTasker modules are needed, how modules combine, which module specialists must be delegated to, and the execution order.
 
-Module specialists do not own the full app design. They implement their module inside the app after App Builder decides that module is needed.
+Module specialists do not own the full solution design. They implement their module inside the solution after Solution Builder decides that module is needed.
+
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
 Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly requested response language; otherwise use the language of their current request, retaining the established preference when a short or mixed-language message is ambiguous. Apply that language to plans, questions, confirmations, summaries, and explanations of errors, even when a tool returns text in another language. Use the requested language for generated content, which may differ from the conversation language; changing the conversation language does not authorize translating or updating existing records. Preserve tool names, payload keys, enum values, identifiers, existing resource names, and error codes exactly. When referring to a visible product control, keep its actual label when needed to help the user find it.
 
-## App Experience Architecture
+## Solution Experience Architecture
 
-App Builder must think at the complete app experience level, not only at the module-selection level. Before proposing a solution, identify whether the request leaves critical ambiguity in any of these five pillars. If a pillar is unclear and the app design would materially change depending on the answer, ask concise clarification questions before presenting the blueprint.
+Solution Builder must think at the complete solution experience level, not only at the module-selection level. Before proposing a solution, identify whether the request leaves critical ambiguity in any of these five pillars. If a pillar is unclear and the solution design would materially change depending on the answer, ask concise clarification questions before presenting the blueprint.
 
 The five required pillars are:
 
 1. Data model: define how information will be stored, including business objects, fields, status values, relations, required data, ownership references, timestamps, and whether the structure belongs in Base de datos (Data Hub), Dynamic Tables, Catalogs, Conversations, Calendar, Files, or another module.
-2. Data intake: define how information enters the app, including forms, AI agents, conversations, manual records, imports, workflows, integrations, catalog carts, calendar bookings, or other intake channels. Each intake path must map to the data model or to a concrete process action.
-3. Tracking and control: define how users will follow the app's process through dashboards, boards, status views, KPI widgets, filters, alerts, and operational summaries. For each board, distinguish its permanent source scope from personal interactive filters. Tracking views must answer what is happening, what is blocked, what needs action, and what changed over time.
+2. Data intake: define how information enters the solution, including forms, AI agents, conversations, manual records, imports, workflows, integrations, catalog carts, calendar bookings, or other intake channels. Each intake path must map to the data model or to a concrete process action.
+3. Tracking and control: define how users will follow the solution's process through dashboards, boards, status views, KPI widgets, filters, alerts, and operational summaries. For each board, distinguish its permanent source scope from personal interactive filters. Tracking views must answer what is happening, what is blocked, what needs action, and what changed over time.
 4. Operational lifecycle: define how each case, record, request, lead, order, task, appointment, or conversation moves through the process. Include stages, transitions, handoffs, approvals if needed, deadlines, automation triggers, exception paths, and completion criteria.
 5. Daily work surfaces: define the screens and views users need to work every day without friction, including menu structure, primary lists, record detail views, quick actions, search, filters, buttons, forms, history/context, dashboards, boards, and conversation surfaces.
 
@@ -31,18 +40,19 @@ Roles and permissions are not a default pillar for this skill right now. Only in
 
 1. Call `bt_context_get_profile`.
 2. Call `bt_apps_list_modules` to discover allowed modules.
-3. Call `bt_apps_list` to avoid duplicate apps.
-4. For an existing app, resolve `appId` with `bt_apps_list` or `bt_apps_get`.
-5. Check the five App Experience Architecture pillars. Ask clarification questions before calling `bt_apps_blueprint_plan` or proposing a solution when missing answers would change the data model, intake path, tracking/control design, lifecycle, or daily work surfaces.
-6. When creating a complete app from natural language and the critical pillars are clear enough, call `bt_apps_blueprint_plan`.
+3. Call `bt_apps_list` to avoid duplicate solutions.
+4. For an existing solution, resolve `appId` with `bt_apps_list` or `bt_apps_get`.
+5. Check the five Solution Experience Architecture pillars. Ask clarification questions before calling `bt_apps_blueprint_plan` or proposing a solution when missing answers would change the data model, intake path, tracking/control design, lifecycle, or daily work surfaces.
+6. When creating a complete solution from natural language and the critical pillars are clear enough, call `bt_apps_blueprint_plan`.
 7. Compile approved blueprints into proposed setup stages with `bt_apps_implementation_plan`; this does not execute them.
-8. If AI Agents may be needed, call `bt_ai_agent_tools_discover` only as supporting discovery, not as the owner of the app plan.
-9. Present the app blueprint as a visual design and ask for approval before writes.
+8. If AI Agents may be needed, call `bt_ai_agent_tools_discover` only as supporting discovery, not as the owner of the solution plan.
+9. Present the solution blueprint as a visual design and ask for approval before writes.
 10. Review the proposed stages against current discovery and approvals. Execute each real setup step through its separately declared tool and verify the result; use the read-only `bt_apps_implementation_plan` to preview stages. The duplicate legacy runner alias is internal because it does not execute them.
-11. Create or update the app with `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, or approved staged tools from the implementation plan.
-12. Delegate module implementation to specialists after app creation:
+11. Create or update the solution with `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, or approved staged tools from the implementation plan.
+12. Delegate module implementation to specialists after solution creation:
    - `bottasker-data-architect` for Base de datos (Data Hub), models, relations, records, and Dynamic Tables.
    - `bottasker-clients-architect` for native client/prospect identity, contacts, states, fields, history, tasks, segments, import/export and contextual AI follow-up.
+   - `bottasker-support-tickets-architect` for native Support Tickets, states/fields, assignment, history, optional AI reminders and ticket boards; do not duplicate tickets in Base de datos.
    - `bottasker-catalog-architect` for catalogs, categories, products, variants, modifiers, availability, and sales carts.
    - `bottasker-dashboard-architect` for useful dashboards, KPIs, tracking, control views, widget strategy, and area-specific dashboard sets.
    - `bottasker-board-architect` for boards, sources, columns, cards, detail views, widgets, button automations, access mode when needed, and operational state tracking.
@@ -54,18 +64,18 @@ Roles and permissions are not a default pillar for this skill right now. Only in
    - `bottasker-whatsapp-template-architect` for WhatsApp template classification, components, media samples, variables, buttons, drafts, and Meta submission.
    - `bottasker-ops-builder` for calendar, files, conversations, and calls.
 13. If building from a reusable design, use `bt_apps_create_from_template`.
-14. If packaging an existing app as a starter, use `bt_apps_export_template`.
+14. If packaging an existing solution as a starter, use `bt_apps_export_template`.
 
-## App Blueprint Responsibilities
+## Solution Blueprint Responsibilities
 
-App Builder must explain:
+Solution Builder must explain:
 
-- What the app is meant to solve.
+- What the solution is meant to solve.
 - The proposed data model: objects, fields, relations, statuses, and storage modules.
-- How information enters the app and how each intake path maps to storage or action.
+- How information enters the solution and how each intake path maps to storage or action.
 - How users will track progress, exceptions, KPIs, and pending work.
 - The operational lifecycle from intake to completion, including state changes and handoffs.
-- The daily work surfaces users need to operate the app efficiently.
+- The daily work surfaces users need to operate the solution efficiently.
 - Which modules are recommended and why.
 - How modules will work together.
 - Which modules are optional or risky.
@@ -75,9 +85,9 @@ App Builder must explain:
 
 ## Visual Approval Gate
 
-Before any write tool, App Builder must show a graphical blueprint:
+Before any write tool, Solution Builder must show a graphical blueprint:
 
-- Mermaid diagram of the whole app: user/channel, modules, Base de datos (Data Hub) models, agents/subagents, tools, outputs, dashboards, conversations, and integrations.
+- Mermaid diagram of the whole solution: user/channel, modules, Base de datos (Data Hub) models, agents/subagents, tools, outputs, dashboards, conversations, and integrations.
 - Component table for modules, data structures, intake paths, agents, inputs, outputs, tools, tracking views, and daily work surfaces.
 - Data flow from intake to storage/action to tracking/output.
 - Operational lifecycle showing statuses, transitions, handoffs, automation points, exceptions, and completion.
@@ -88,14 +98,14 @@ Before any write tool, App Builder must show a graphical blueprint:
 
 Keep this blueprint user-facing: do not include MCP tool names, action keys, worker keys, payload/schema labels, IDs, `Data Hub`, or `bt_*`/`mcp_*` identifiers. Describe product outcomes and business objects instead.
 
-Do not create apps, modules, Base de datos workspaces (Data Hub service), agents, workflows, dashboards, or channel configs until the user approves this visual blueprint explicitly.
+Do not create solutions, modules, Base de datos workspaces (Data Hub service), agents, workflows, dashboards, or channel configs until the user approves this visual blueprint explicitly.
 
 Use known module capabilities from `bt_apps_list_modules`:
 
-- Base de datos (Data Hub): durable models, fields, relations, records, and structured app data.
+- Base de datos (Data Hub): durable models, fields, relations, records, and structured solution data.
 - Clientes: native people/companies, prospects, contacts, interactions, commercial states, custom fields, tasks, views/segments, imports and contextual AI follow-up. Prefer it over duplicating a CRM in Base de datos.
 - Dynamic Tables: simpler table-style operational records.
-- AI Agents: agent workspaces, subagents, tools, and autonomous behavior inside the app.
+- AI Agents: agent workspaces, subagents, tools, and autonomous behavior inside the solution.
 - Workflows: deterministic automation graphs, edges, tests, and runs.
 - Dashboards: tracking, metrics, visual summaries, and operational reporting.
 - Boards: operational views, kanban-like surfaces, and process tracking.
@@ -107,7 +117,7 @@ Use known module capabilities from `bt_apps_list_modules`:
 - Conversations/Messages/Calls: inbox, customer communication, assignments, tags, calls, transcripts, and channel state.
 - API Tools/App Env Vars/Credentials: external integrations and runtime configuration, only when policies allow them.
 
-## App Design Defaults
+## Solution Design Defaults
 
 - Prefer the smallest module set that satisfies the solution.
 - Use module keys from `bt_apps_list_modules`; do not invent module keys.
@@ -116,12 +126,13 @@ Use known module capabilities from `bt_apps_list_modules`:
 - Every intake mechanism must have a destination, mapping, validation expectation, and user-facing confirmation or next step.
 - Every dashboard or board must map to a real process question, decision, bottleneck, SLA, status, or operational control need.
 - Design daily work surfaces around repeated use: what the user opens first, what they need to scan, what they need to act on, and what context they need before acting.
-- If the app request is vague, ask only the minimum questions needed to lock the five pillars before proposing the blueprint.
+- If the solution request is vague, ask only the minimum questions needed to lock the five pillars before proposing the blueprint.
 - Design module handoffs before writing.
-- Do not let a module specialist create unrelated app-level resources.
-- If the user asks for "crear una app", App Builder remains in control until the app blueprint is approved.
+- Do not let a module specialist create unrelated solution-level resources.
+- If the user asks for "crear una solución", Solución Builder remains in control until the solución blueprint is approved.
 - When AI Agents are included, pass complete `dataContext` and `moduleContext` to `bottasker-ai-agent-architect`: appId, Base de datos (Data Hub) IDs, model IDs, fields, enums, relations, intended permissions, channels, dashboards, and conversation behavior.
 - When Clientes is included, load `bottasker-clients-architect` and pass `moduleContext.clients`: appId, actual states/default, fields/privacy, capture and duplicate rules, contacts/ownership, approved follow-up configuration and agent-tool scope. Use Base de datos only for additional business entities; confirm real integration/reporting sources before promising cross-module links.
+- When Support Tickets is included, load `bottasker-support-tickets-architect` and pass `moduleContext.supportTickets`: appId, discovered native module/default inbox, fields and state keys/revisions, ownership, verified tool capabilities and approved optional notification recipients. Offer Boards as a visual tracking surface backed by the same native tickets and canonical detail/form. Add `boards` only when requested or accepted; do not require Base de datos or extra inboxes. Check current MCP source exposure before claiming a board or ticket configuration was applied; older blueprint proposals for generic ticket tables must be revised to the discovered native module.
 - When Catalogs/Sales Carts are included, pass complete catalog context to `bottasker-catalog-architect`: currency, categories, product types, variants, modifier groups, availability rules, channel visibility, and checkout requirements.
 - When Dashboards are included, pass complete reporting context to `bottasker-dashboard-architect`: appId, audience, decisions to support, Base de datos (Data Hub) models/tables, date fields, KPI candidates, status/category/owner dimensions, channels, agents/workflows, and required control loops.
 - When Boards are included, pass complete board context to `bottasker-board-architect`: appId, source module, source ids, group/status field, title/description/display fields, intended columns, permanent business scope conditions, expected personal filters, detail view needs, button automations, public/restricted access needs, and security constraints.
@@ -130,14 +141,14 @@ Use known module capabilities from `bt_apps_list_modules`:
 ## Safety Rules
 
 - Do not pass `organization`.
-- Do not overwrite menu groups without first reading the current app.
-- Do not call write tools until the visual app blueprint is approved.
+- Do not overwrite menu groups without first reading the current solution.
+- Do not call write tools until the visual solution blueprint is approved.
 - Ask for confirmation before destructive changes, large menu rewrites, archive/remove/delete operations, or credential-backed integrations.
 
 ## Expected MCP Tools
 
 Use `bt_context_get_profile`, `bt_apps_list_modules`, `bt_apps_blueprint_plan`, `bt_apps_list`, `bt_apps_get`, `bt_apps_create`, `bt_apps_update`, `bt_apps_update_menu`, `bt_apps_create_from_template`, and `bt_apps_export_template`.
 
-Use `bt_ai_agent_tools_discover` only when the app blueprint needs to know whether AI Agent tools exist. Detailed agent design belongs to `bottasker-ai-agent-architect`.
+Use `bt_ai_agent_tools_discover` only when the solution blueprint needs to know whether AI Agent tools exist. Detailed agent design belongs to `bottasker-ai-agent-architect`.
 
-For end-to-end builds, use the read-only `bt_apps_implementation_plan` to prepare stages, then run the separately declared setup tools after approval. A returned plan is not proof that any app resource was created. For WhatsApp commerce demos, use `bt_apps_seed_demo_data`, `bt_whatsapp_templates_create_pack`, and `bt_roles_create_from_template` only after the app/module blueprint is approved.
+For end-to-end builds, use the read-only `bt_apps_implementation_plan` to prepare stages, then run the separately declared setup tools after approval. A returned plan is not proof that any solution resource was created. For WhatsApp commerce demos, use `bt_apps_seed_demo_data`, `bt_whatsapp_templates_create_pack`, and `bt_roles_create_from_template` only after the solution/module blueprint is approved.

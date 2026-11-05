@@ -2,6 +2,6 @@ interface:
   display_name: "BotTasker Ops Builder"
   short_description: "Build calendar, files, knowledge, conversations, calls, and operational modules."
   brand_color: "#2563EB"
-  default_prompt: "Build operational modules for a BotTasker app."
+  default_prompt: "Build operational modules for a BotTasker solution."
 policy:
   allow_implicit_invocation: true

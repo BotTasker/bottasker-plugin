@@ -1,0 +1,7 @@
+interface:
+  display_name: "BotTasker Support Tickets"
+  short_description: "Native support solutions, boards and ticket metrics."
+  brand_color: "#2563EB"
+  default_prompt: "Use $bottasker-support-tickets-architect to add native Tickets to my BotTasker solution represent them in Boards for follow-up, and visualize ticket metrics in Dashboards."
+policy:
+  allow_implicit_invocation: true

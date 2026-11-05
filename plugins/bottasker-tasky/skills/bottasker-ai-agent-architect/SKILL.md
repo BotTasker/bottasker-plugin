@@ -1,13 +1,22 @@
 ---
 name: bottasker-ai-agent-architect
-description: "Use when the user wants to design, create, edit, duplicate or manage AI Agents in an existing or approved BotTasker app: conversation protection, message limits, follow-up, incoming message grouping, subagents, tools, inputs and outputs."
+description: "Use when the user wants to design, create, edit, duplicate or manage AI Agents in an existing or approved BotTasker solution: conversation protection, message limits, follow-up, incoming message grouping, subagents, tools, inputs and outputs."
 ---
 
 # BotTasker AI Agent Architect
 
-Use this skill only as the specialist for the BotTasker `ai-agents` module. It does not own complete app design, module selection, Base de datos (Data Hub) modeling, dashboards, conversations, or workflows unless App Builder has delegated that part of an approved app blueprint.
+Use this skill only as the specialist for the BotTasker `ai-agents` module. It does not own complete solution design, module selection, Base de datos (Data Hub) modeling, dashboards, conversations, or workflows unless Solution Builder has delegated that part of an approved solution blueprint.
 
-If the user asks to create a complete app, route to `bottasker-app-builder` first. Return here only after App Builder has selected AI Agents as a required module and has provided the app context.
+If the user asks to create a complete solution, route to `bottasker-app-builder` first. Return here only after Solution Builder has selected AI Agents as a required module and has provided the solution context.
+
+
+## Native tool loading
+
+In Codex or Claude Code, the canonical `bt_*` operations below may be deferred. Use the client’s native tool search to load the exact operation and its input schema before calling it; use the returned namespace rather than inventing a function name. Follow `bottasker-router` for native discovery and approvals. In BotTasker’s in-app Tasky, use the tools supplied by its runtime instead.
+
+## Product terminology
+
+Present the BotTasker business container as **solution/solutions** in English, **solución/soluciones** in Spanish, and **solução/soluções** in Brazilian Portuguese. Interpret older requests for BotTasker apps as requests for solutions. Preserve technical names such as `app`, `apps`, `appId`, `bt_apps_*`, skill identifiers, routes, permission codes and payload fields; preserve authored names and data. External applications and the act of applying changes keep their original meaning.
 
 ## Response language
 
@@ -20,9 +29,9 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - Call `bt_ai_agent_tools_discover` with `search` set to the user's natural-language capability intent when the request mentions any tool, action, input, output, worker, or business capability. Use an empty search only for broad inventory.
    - Call `bt_mcp_list_skills` and load relevant dynamic skills with `bt_mcp_load_skill`.
 2. Resolve `appId`:
-   - If the user names an existing app, call `bt_apps_list` and choose the exact app.
-   - If multiple apps match, ask the user which one to use.
-   - If this is a new app, stop and ask App Builder to create or approve the app first.
+   - If the user names an existing solution, call `bt_apps_list` and choose the exact solution.
+   - If multiple solutions match, ask the user which one to use.
+   - If this is a new solution, stop and ask Solution Builder to create or approve the solution first.
 3. Decide whether this is simple or plan-worthy:
    - If the user asks for a narrow, existing-agent change (for example, add one already existing Knowledge Base/document/tool, update the agent prompt, or attach one validated input/output/tool), do not build a visual blueprint. For Knowledge Base/document/tool work, load or delegate to `bottasker-knowledge-base-assistant`; for form design or form-linked agent behavior, load or delegate to `bottasker-forms-architect`; inspect current items, prepare/validate the config, execute the non-destructive write, verify, and summarize.
    - Use `bt_ai_agent_blueprint_plan` only for new agent systems, multi-component changes, unclear architecture, external communication setup, credential-sensitive tools, broad rewrites, or changes with real risks/pending decisions.
@@ -34,7 +43,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - Call `bt_ai_agent_validate_item_config` for every prepared `initialConfig`.
    - Ask only important unresolved questions.
 4. Ask for explicit approval only when required:
-   - Present a visual blueprint of all app/agent components using Mermaid plus tables for plan-worthy work.
+   - Present a visual blueprint of all solution/agent components using Mermaid plus tables for plan-worthy work.
    - Do not call remove/archive/delete, external-send/template submission, public access, credential changes, broad multi-item rewrites, or risky configuration tools until the user clearly approves the visual blueprint.
    - For non-destructive add/update/configuration tasks with validated config and no unresolved risk, execute directly. Do not ask the user to approve a plan whose risk section says none/low.
    - Approval must be requested with real selectable options through `propose_interaction`/`assistantActions`; never write approval options only as Markdown text. Include at least `confirm_plan` (Aprobar y ejecutar) and `revise_plan` options.
@@ -62,7 +71,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 Always present plans with these sections:
 
 - Objetivo del modulo AI Agents
-- Contexto de app recibido
+- Contexto de solution recibido
 - Agente principal y subagentes
 - Herramientas por agente
 - Configuracion requerida
@@ -77,7 +86,7 @@ Always present plans with these sections:
 Before broad, risky, or multi-component AI Agent work, show:
 
 - A Mermaid diagram with the data flow: user/channel -> input -> main agent -> subagents -> tools -> outputs.
-- A component table listing modules, Base de datos models (Data Hub service), agents, subagents, inputs, outputs, tools, and dashboards/ops modules referenced by App Builder.
+- A component table listing modules, Base de datos models (Data Hub service), agents, subagents, inputs, outputs, tools, and dashboards/ops modules referenced by Solution Builder.
 - A configuration matrix for every item to be added.
 - When proactivity is relevant, a proactivity row with objective, trigger, required context, delay/cadence, maximum attempts, stop conditions, timezone, channel/audience, tools, escalation, and human control.
 - Pending parameters and risks.
@@ -101,7 +110,7 @@ For each input/output/tool item, include:
 - `actionKey`.
 - `agentTargetId` when `itemType: "tool"`.
 - `initialConfig` safe summary, never secrets.
-- Source of every configured value: user decision, created resource ID, app context, default, or pending.
+- Source of every configured value: user decision, created resource ID, solution context, default, or pending.
 - Result of `bt_ai_agent_validate_item_config`.
 
 ## Dynamic Discovery Rules
@@ -111,7 +120,7 @@ For each input/output/tool item, include:
 - Treat skill discovery and tool/node discovery as separate layers. `list_solution_skills` can choose the right specialist, but only `bt_ai_agent_tools_discover`, `bt_mcp_find_tools`, and schema/config tools can prove whether a concrete agent tool or node exists.
 - Discovery is hybrid: results may be exact, semantic, or both. Treat `matchType: "semantic"`, `matchedBy: "semantic"`, `matchedBy: "keyword+semantic"`, and `semanticScore` as signals that the tool may satisfy the user's intent even when the literal name does not match.
 - For any user request like "can the agent do X?", first run `bt_ai_agent_tools_discover` with `search` equal to X in natural language. Do not answer "no" only because you do not know a tool name or because a literal search term is absent.
-- Do not ask the user whether to explore available tools. A capability question already authorizes read-only discovery; ask only for missing app/resource/configuration details after discovery finds a plausible candidate.
+- Do not ask the user whether to explore available tools. A capability question already authorizes read-only discovery; ask only for missing solution/resource/configuration details after discovery finds a plausible candidate.
 - If semantic discovery returns a plausible candidate, inspect its config schema with `bt_ai_agent_tool_get_config_schema` before deciding whether it can be equipped.
 - If no exact result appears but semantic candidates exist, evaluate those candidates and explain the user-facing capability in product language. Only say a capability is unavailable after discovery returns no usable exact or semantic candidate for the agent scope.
 - Treat `bt_ai_agent_tool_get_config_schema` as the source of truth for configuration fields.
@@ -120,13 +129,13 @@ For each input/output/tool item, include:
 - If a new BotTasker module or worker appears later, use the discovery results instead of local knowledge.
 - Respect `ignore_in: ["agent"]`: do not equip tools that discovery excludes.
 - Never include API keys, credential values, tokens, cookies, or authorization headers in plans, configs, or messages.
-- Do not choose app modules here. Module selection belongs to `bottasker-app-builder`.
+- Do not choose solution modules here. Module selection belongs to `bottasker-app-builder`.
 - Do not design Base de datos (Data Hub) models here. Request `bottasker-data-architect` output as `dataContext`.
 - Do not design dashboards, boards, forms, conversations, catalogs, files, or knowledge here. Request `bottasker-dashboard-architect` output for dashboard/control context, `bottasker-board-architect` output for board/source/widget/security context, `bottasker-forms-architect` output for form capture/submission/mapping context, `bottasker-knowledge-base-assistant` output for Knowledge Base context and agent knowledge tools, and `bottasker-ops-builder` output for other operational module context.
 
 ## Native client follow-up
 
-For Clients capture, qualification, tasks or follow-up, load `bottasker-clients-architect` and use `moduleContext.clients`. Discover the native Clients tool and its real scope/options; enable **Usar el seguimiento con IA configurado** (`start_followup`) only when the approved design uses it. The backend injects follow-up instructions automatically; the app administrator does not paste another prompt. Preserve unrelated tool selections and channel Response items. App configuration, equipped capability and an individual client cycle are separate. Only one next task is pending, assigned to the resolved AI agent, and the next step is created after confirmed success. Do not enable a second simple agent follow-up or another timer for the same purpose. Later follow-up depends on conversation context; stop for completion, rejection, No contactar or human takeover.
+For Clients capture, qualification, tasks or follow-up, load `bottasker-clients-architect` and use `moduleContext.clients`. Discover the native Clients tool and its real scope/options; enable **Usar el seguimiento con IA configurado** (`start_followup`) only when the approved design uses it. The backend injects follow-up instructions automatically; the solution administrator does not paste another prompt. Preserve unrelated tool selections and channel Response items. solution configuration, equipped capability and an individual client cycle are separate. Only one next task is pending, assigned to the resolved AI agent, and the next step is created after confirmed success. Do not enable a second simple agent follow-up or another timer for the same purpose. Later follow-up depends on conversation context; stop for completion, rejection, No contactar or human takeover.
 
 ## Agent Design Rules
 
@@ -137,15 +146,15 @@ For Clients capture, qualification, tasks or follow-up, load `bottasker-clients-
 - Never add an input/output/tool with empty config when the schema has required fields.
 - Inputs are inbound triggers such as an incoming WhatsApp, Telegram, WebChat, Instagram, or Messenger message. Configure credentials, automatic conversation registration, transcription, scheduler/timezone, filters, and human handoff options when present in schema. A channel Actions tool is never the inbound input.
 - For WhatsApp, Telegram, and WebChat inputs, enabling automatic conversation registration also gives every subagent the contextual `manage_conversation_tags` runtime tool. The tool lists, creates/reuses, assigns, and removes labels only on the verified current conversation; it does not need to be added as a workspace item.
-- When the business process uses labels for routing, qualification, urgency, lifecycle, or handoff, include explicit prompt guidance describing which label names to apply/remove and at what moment. Do not invent label IDs or colors; the runtime resolves names in the app-scoped catalog and assigns a default color to newly created labels.
+- When the business process uses labels for routing, qualification, urgency, lifecycle, or handoff, include explicit prompt guidance describing which label names to apply/remove and at what moment. Do not invent label IDs or colors; the runtime resolves names in the solution-scoped catalog and assigns a default color to newly created labels.
 - A conversational output is the standard response action for the same channel that received the message. Keep one Response per channel unless the approved design is explicitly receive-only. Every production message input of that channel must reference it. A channel Actions tool does not replace this response output.
 - Agents may have multiple accounts and inputs. A shared Response takes credentials from the exact input that received the current message, while recipient context comes from that conversation. Validate every input-to-Response reference and keep credentials, recipient context, and conversation identity isolated by channel.
-- For tools that write data, map every required parameter to either user input, model IDs created earlier, app context, or a fixed approved value.
+- For tools that write data, map every required parameter to either user input, model IDs created earlier, solution context, or a fixed approved value.
 - For Base de datos (Data Hub) MCP tools, configuring model access is mandatory: set least-privilege `globalPermissions` and non-empty `modelPermissions` for every selected model, explicitly deciding `read` (Leer), `create` (Crear), and `update` (Editar) per model. Do not grant `update` or `manage_schema` unless the approved plan requires it.
 - For Base de datos (Data Hub) `date` fields, agents must output `YYYY-MM-DD` exactly, for example `2026-05-31`; convert natural language dates before tool calls.
 - For Base de datos (Data Hub) `datetime` fields, agents must output ISO 8601, preferred `YYYY-MM-DDTHH:mm`, for example `2026-05-31T14:30`.
 - For communication tools, confirm channel, audience, and message behavior before execution.
-- Before creating a new agent, list existing agents in the target app and reuse an agent with the same purpose/name instead of creating duplicates. The MCP create tools are idempotent; if they return `idempotent:true` or `reusedExisting:true`, continue with that agent ID.
+- Before creating a new agent, list existing agents in the target solution and reuse an agent with the same purpose/name instead of creating duplicates. The MCP create tools are idempotent; if they return `idempotent:true` or `reusedExisting:true`, continue with that agent ID.
 - Before adding subagents, inputs, outputs, or tools to an existing/reused agent, call `bt_ai_agents_list_items` and do not add an item that already exists with the same `itemType`, `workerRegistryId`, `actionKey`, and target agent.
 - After adding or updating an item directly, verify with `bt_ai_agents_get` or `bt_ai_agents_list_items` and answer with a compact before/after summary.
 
@@ -173,7 +182,7 @@ First activation requested by the user uses this preset unless they specify othe
 
 This preset is NOT an instruction to activate protection on all agents. An agent with no settings remains disabled. The legacy inactive baseline is `enabled:false`, `mode:"observe"`, `sensitivity:"conservative"`, `pauseMinutes:1440`, and both limits 0, without `configured:true`. On its first activation replace that untouched baseline with the preset. For partial or customized settings, fill missing values from the preset and preserve saved choices, including explicit 0. On reactivation of a previously configured agent retain all saved values. Never use a truthiness fallback that turns a saved 0 into 3 or 15.
 
-Channels are identified automatically from incoming messages; do not add a `channels` selector or write the obsolete `conversationProtection.channels` field. Supported chat channels include Webchat, WhatsApp, Telegram, Messenger, Instagram, email (Gmail/Outlook), Slack, and Chatwoot. Voice and real-time calls are excluded, including voice modality and call transcripts. Scope is isolated by organization, app, channel, account and conversation; this is not a shared quota across all contacts or agents.
+Channels are identified automatically from incoming messages; do not add a `channels` selector or write the obsolete `conversationProtection.channels` field. Supported chat channels include Webchat, WhatsApp, Telegram, Messenger, Instagram, email (Gmail/Outlook), Slack, and Chatwoot. Voice and real-time calls are excluded, including voice modality and call transcripts. Scope is isolated by organization, solution, channel, account and conversation; this is not a shared quota across all contacts or agents.
 
 The detector uses rules over repeated exchanges and reply timing, without calling a classification model. One greeting, one bot disclosure, or a few fast messages are not proof that someone is an AI. Do not promise perfect detection or suggest testing by spending credits on live agent conversations without authorization.
 
@@ -235,7 +244,7 @@ For Files assets, use `bottasker-ops-builder` to verify actual folders/files or 
 
 When an AI Agent must inspect past customer conversations, discover and equip the single Conversaciones tool action whose action key is `conversation_tools`. Do not equip the workflow-only actions `find_conversations`, `get_conversation`, `get_conversation_activity`, or `get_recent_messages`; discovery marks those with `ignore_in: ["agent"]`.
 
-Prepare and validate the tool config before adding it. All four capabilities are enabled by default through `enable_find_conversations`, `enable_get_conversation`, `enable_get_conversation_activity`, and `enable_get_recent_messages`. Apply least privilege by disabling capabilities the agent does not need, then read back the saved item. The tool requires no organization or app selector: it inherits both from the trusted action instance and rejects execution without an app scope.
+Prepare and validate the tool config before adding it. All four capabilities are enabled by default through `enable_find_conversations`, `enable_get_conversation`, `enable_get_conversation_activity`, and `enable_get_recent_messages`. Apply least privilege by disabling capabilities the agent does not need, then read back the saved item. The tool requires no organization or solution selector: it inherits both from the trusted action instance and rejects execution without a solution scope.
 
 Runtime tools and safe usage:
 
@@ -337,7 +346,7 @@ For every planned Base de datos (DataHub) agent tool:
 - Call `bt_ai_agent_prepare_item_config` and `bt_ai_agent_validate_item_config` before `bt_ai_agents_add_item`.
 - When calling `bt_ai_agents_add_item`, include the same context used for preparation when it helps: `intent`, `selectedResources`, `dataContext`, and `moduleContext`. For Base de datos this lets the MCP complete or repair `dataHub`, `globalPermissions`, and `modelPermissions` instead of saving an incomplete tool.
 - Configure `dataHub`, `globalPermissions`, `modelPermissions`, `includeSensitiveFields`, `restrictRecordsByContext`, and `maxDefaultRows` when those schema fields are present.
-- When the desired tool is `data_hub`, pass `selectedResources.dataHubId` plus `selectedResources.modelIds` or `selectedResources.models` whenever the app context has them. If all models in the Hub are approved, pass only `dataHubId` and let `bt_ai_agent_prepare_item_config` generate `modelPermissions` from the Hub.
+- When the desired tool is `data_hub`, pass `selectedResources.dataHubId` plus `selectedResources.modelIds` or `selectedResources.models` whenever the solution context has them. If all models in the Hub are approved, pass only `dataHubId` and let `bt_ai_agent_prepare_item_config` generate `modelPermissions` from the Hub.
 - Never call `bt_ai_agents_add_item` for `data_hub` when `bt_ai_agent_prepare_item_config.readyToAdd` is false or when `initialConfig.modelPermissions` is missing, empty, has no enabled model, or leaves a selected model without explicit `read`, `create`, and `update` decisions. A Base de datos tool with `0 habilitados` or unchecked model permissions is not configured.
 - If the Base de datos tool already exists on the agent but its action instance has empty or incomplete `modelPermissions`, repair it with `bt_action_instances_update_config` using a prepared and validated config before reporting success.
 - Treat the DataHub permission matrix as an execution gate. For each model, record whether the agent may:

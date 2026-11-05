@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.42
+
+- Discover and invoke the 353 stable MCP operations through native Codex tool search or Claude Code ToolSearch, without a local JavaScript executor.
+- Adapt all 16 skills, preserving in-app Tasky behavior, native OAuth, role/solution scope checks, and approvals.
+- Identify the native transport with non-secret version headers; explain incompatible plugin updates without retrying operations.
+
+## 0.2.41
+
+- Present BotTasker apps as solutions in all 16 skills and starter prompts.
+- Update English, Spanish and Brazilian Portuguese listing text.
+- Preserve technical tool/skill names, routes, authorization and authored content.
+
+## 0.2.40
+
+- Add the native Support Tickets specialist for apps, permissions, configuration, activity, private files and optional AI notifications.
+- Teach native Boards visual tracking with shared ticket records, detail and forms; avoid duplicate database models.
+- Teach Dashboard KPIs, breakdowns and time trends through the native provider and typed discovery tools.
+- Route Router, App Builder, Board Architect and Dashboard Architect to the specialist; package all 16 skills.
+
 ## 0.2.38
 
 - Restore direct MCP + all 15 skills as the default local Codex installation and package profile, with native production OAuth and no registered-app dependency.

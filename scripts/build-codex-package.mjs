@@ -147,7 +147,7 @@ if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import
         'node scripts/build-codex-package.mjs chatgpt-update --existing-plugin-zip=<downloaded-plugin.zip>\n' +
         'node scripts/build-codex-package.mjs submission\n' +
         'Builds a ZIP; direct/submission/connected also generate a local marketplace. Does not install, register, authenticate, or publish.\n' +
-        'Default: direct (MCP + 15 skills with native OAuth, no registered app required).\n' +
+        'Default: direct (MCP + 16 skills with native OAuth, no registered app required).\n' +
         'Connected accepts an asdk_app_… App ID, plugin_asdk_app_… ID, or https://chatgpt.com/plugins/… URL.\n' +
         'ChatGPT update preserves the name and app mapping from Download plugin ZIP; upload its output with Upload new version.\n' +
         'The registered app must already be available to the current account; the build cannot verify access.')

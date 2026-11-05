@@ -119,12 +119,12 @@ Run the same functional cases with the demo account in Spanish, Brazilian Portug
 
 | Scenario | Prompt or action | Expected result |
 | --- | --- | --- |
-| Spanish | `Muéstrame mis apps de BotTasker y resume sus módulos.` | Read-only discovery and a Spanish summary. |
-| Brazilian Portuguese | `Mostre meus apps do BotTasker e resuma os módulos.` | The equivalent read-only discovery and a Brazilian Portuguese summary. |
-| English | `Show my BotTasker apps and summarize their modules.` | The equivalent read-only discovery and an English summary. |
+| Spanish | `Muéstrame mis soluciones de BotTasker y resume sus módulos.` | Read-only discovery and a Spanish summary. |
+| Brazilian Portuguese | `Mostre minhas soluções do BotTasker e resuma os módulos.` | The equivalent read-only discovery and a Brazilian Portuguese summary. |
+| English | `Show my BotTasker solutions and summarize their modules.` | The equivalent read-only discovery and an English summary. |
 | Explicit switch | After the Spanish case: `Continue in English.` Then: `Agora responda em português.` | Each next answer follows the requested language without restarting discovery unnecessarily. |
 | Separate content language | `Explícame en español y redacta en portugués un mensaje de bienvenida, sin guardarlo ni enviarlo.` | Spanish explanation and Portuguese draft, with no write or send. |
-| Existing data | Repeat the app-list case in another language. | Existing app names and stored values retain their exact values. |
+| Existing data | Repeat the app-list case in another language. | Existing solution names and stored values retain their exact values. |
 | Error explanation | Trigger the same validation/policy error in each language. | The explanation follows the conversation; error codes and permission requirements remain accurate. |
 
 ## Authorization
@@ -137,7 +137,7 @@ Run the same functional cases with the demo account in Spanish, Brazilian Portug
 
 ## Tool behavior
 
-- Read the authenticated profile and list available apps.
+- Read the authenticated profile and list available solutions.
 - Create one reversible test resource and verify it with a read-back.
 - Attempt a destructive tool without elevation and expect `403 insufficient_scope`.
 - Trigger a validation error and confirm it remains an explicit tool error rather than feedback or simulated success.
