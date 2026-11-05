@@ -50,6 +50,8 @@ In Codex and Claude Code, first load the operations below through the client's n
 - If keyword discovery and semantic discovery disagree, prefer the discovered candidate as a possibility and validate it. Only report that a capability is missing after discovery returns no usable exact or semantic candidate for the requested module/scope.
 - Do not ask the user for permission to explore available capabilities. If the user asks whether Tasky can do something, run discovery directly and answer from verified skills + tools/nodes.
 
+For Files operations, route to `bottasker-ops-builder` and distinguish browsing/managing the solution's actual assets from equipping an agent component. A missing callable tool in the current client inventory is not proof that the server has no such operation. Use capability discovery when available; report an incomplete/unverified inventory when the discovery tool itself is missing. Do not claim a skill or an editor component makes an unavailable operation callable.
+
 ## Risk-Based Execution Rule
 
 For simple, low-risk requests, do the work directly after discovery and validation. A request is simple when it targets an existing solution/resource, has the required IDs or can resolve them from context, uses non-destructive write tools, has no unresolved human decision, and no external-send/public-access/credential/security impact.

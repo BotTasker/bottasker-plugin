@@ -19,6 +19,22 @@
 - Teach Dashboard KPIs, breakdowns and time trends through the native provider and typed discovery tools.
 - Route Router, App Builder, Board Architect and Dashboard Architect to the specialist; package all 16 skills.
 
+## 0.2.38
+
+- Restore direct MCP + all 15 skills as the default local Codex installation and package profile, with native production OAuth and no registered-app dependency.
+- Keep connected App + skills, ChatGPT updates and public submissions explicit; local installation never requires or modifies Platform.
+- Document targeted Tasky cleanup and preserve Bottasker Developer and unrelated plugins.
+- Teach native Files browsing, bounded name search, metadata, private URL import, signed uploads, rename/move and permanent deletion with exact MCP inputs and verification.
+- Separate Tasky file operations, agent Files configuration and conversation delivery; verify migrated assets before changing agent references and preserve activation state.
+- Distinguish missing client tool exposure from absent backend capability, and explain partial-import reconciliation, expiring links and least-privilege permissions.
+
+
+## 0.2.37
+
+- Make App + 15 skills the default OpenAI package, requiring an explicit registered app identity and never falling back to a direct MCP connection.
+- Remove duplicate MCP declarations and portal-only review metadata from connected Codex packages, matching the ChatGPT update package.
+- Make the GitHub installation guide and agent installation prompt select App + skills for Codex and ChatGPT; retain direct MCP as an explicit compatibility option.
+
 ## 0.2.36
 
 - Teach Clientes predefined and agent-defined follow-up: contextual timing/messages, one dated pending task, review and bounded cycles.

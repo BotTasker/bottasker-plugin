@@ -1,6 +1,6 @@
 ---
 name: bottasker-ops-builder
-description: Use for BotTasker calendars and public booking configuration, availability and meeting participants, or for files, knowledge, conversations, messages, calls, WhatsApp templates and general operational modules.
+description: Use for BotTasker Files/Archivos operations, calendars and public bookings, conversations, messages, calls, and general operational modules. Route Knowledge Base and WhatsApp templates to their specialists.
 ---
 
 # BotTasker Ops Builder
@@ -91,7 +91,7 @@ List root or search by the business name (for example a clinic), inspect candida
 
 To let an agent use these assets, discover, prepare and validate the Files component through `bottasker-ai-agent-architect`. Configure only fields actually exposed by the component: current Files settings include `base_folder`, `enable_list_folder`, `enable_create_folder`, `enable_upload_from_url`, `enable_get_download_url`, `enable_move_entry`, `enable_delete_files`, and `enable_delete_folder`. For a read/send agent, enable listing and download links, and disable unneeded create/import/move/delete capabilities. The base folder is the default starting folder; do not present it as a verified security sandbox. Do not promise OCR, transcription or content parsing unless independently discovered.
 
-Storage is separate from delivery. Sending an image/document needs the solutionropriate channel's enabled Response or legacy Actions sending tool. A download URL, equipped Files tool, final chat reply or saved prompt alone does not prove a message was delivered.
+Storage is separate from delivery. Sending an image/document needs the appropriate channel's enabled Response or legacy Actions sending tool. A download URL, equipped Files tool, final chat reply or saved prompt alone does not prove a message was delivered.
 
 ### Copy assets from Base de datos or a URL
 
