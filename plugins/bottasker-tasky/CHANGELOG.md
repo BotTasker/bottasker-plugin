@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.43
+
+- Teach Tasky how voice agents present catalog products and carts in WebChat and collect choices, confirmations and form fields, including addresses with map pins or current location.
+
 ## 0.2.42
 
 - Discover and invoke the 353 stable MCP operations through native Codex tool search or Claude Code ToolSearch, without a local JavaScript executor.

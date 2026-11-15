@@ -6,7 +6,7 @@
       "url": "https://api.bottasker.ai/mcp",
       "headers": {
         "x-bottasker-native-protocol": "1",
-        "x-bottasker-plugin-version": "0.2.42"
+        "x-bottasker-plugin-version": "0.2.43"
       }
     }
   }
