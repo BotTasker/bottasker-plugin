@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.46
+
+- Discover native Clients datasets and build dashboard widgets for CRM records, tasks, follow-up, and other client operations.
+
 ## 0.2.45
 
 - Align Forms field required/validation/options contracts with MCP, cover every registered connector, and verify form-to-workflow field mappings before production.
