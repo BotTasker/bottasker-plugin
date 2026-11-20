@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.45
+
+- Align Forms field required/validation/options contracts with MCP, cover every registered connector, and verify form-to-workflow field mappings before production.
+- Teach automation mappings to use actual action indexes, event/output paths and typed values, with saved configuration and execution checks.
+
+## 0.2.44
+
+- Discover and use native MCP operations to list, create and update support tickets in the selected solution.
+
 ## 0.2.43
 
 - Teach Tasky how voice agents present catalog products and carts in WebChat and collect choices, confirmations and form fields, including addresses with map pins or current location.

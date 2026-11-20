@@ -29,7 +29,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 3. Use `bt_mcp_find_tools` or `bt_mcp_list_skills`/`bt_mcp_load_skill` before assuming a concrete Forms tool exists.
 4. List existing forms with `bt_forms_list` before creating a new one.
 5. List connector definitions with `bt_forms_list_connector_definitions` before choosing a target.
-6. For Base de datos (Data Hub), Dynamic Table, or Workflow targets, read target fields/options before creating mappings.
+6. For Base de datos (Data Hub) and Dynamic Table targets, read target fields before creating mappings. For Workflow, discover trigger options and inspect the selected workflow/action instance; its connector target-field list can legitimately be empty.
 7. Ask for explicit confirmation before archive/delete, public publishing, token regeneration, access changes, or broad rewrites.
 
 ## Core Concepts
@@ -72,6 +72,33 @@ Do not present `webhook/http` or `notification` as available unless discovery sh
 - Preserve existing mappings unless the user asks to change them.
 - For select/reference options, prefer dynamic `optionsSource` when target fields expose it.
 - Verify with `bt_forms_get` after creates or updates.
+
+## Executable Form Contract
+
+`bt_forms_create` and `bt_forms_update` accept `formDefinition.fields[].required` as a boolean. Set it explicitly for each input from the approved field plan. Example: `{ "id": "email", "key": "correo", "label": "Correo", "type": "email", "required": true, "validation": { "maxLength": 160 } }`. Use singular `validation` for constraints; workflow-node `validations: [{required:true}]` is a different schema. Required belongs to the form field, not to a mapping or only to the destination model. Preserve `required: false` for optional inputs. Content fields do not collect values and cannot enforce required input. Required boolean fields require a supplied value; do not assume this enforces affirmative consent.
+
+Use `settings: { columns: 12, rowHeight: 48, spacing: [12, 12] }` inside `formDefinition`. Each layout item's `i` should equal the field's visual `id`; submissions and mappings use its technical `key`. `optionsSource` is a field property, alongside `options`, `required` and `validation`; copy discovered reference sources rather than replacing IDs with labels. Confirmation config uses `title`, `message`, `buttonLabel`, optional `redirectUrl` and `autoRedirectSeconds`.
+
+Choose the connector that performs the requested outcome, rather than leaving a captured submission disconnected. The MCP tools support every connector returned by discovery. Send `targets: [{ type, enabled: true, config: {...}, mappings: [...] }]` to create/update. Use `bt_forms_create_from_wizard` for a base generated from one connector; it can lock the connector type and resource IDs and may generate only required destination fields. Read the result and add the remaining planned fields without removing those already present. Respect `settings.connectorLocked`/`connectorLock`; do not bypass a lock by editing settings.
+
+| Connector | Required config | Mapping destination |
+| --- | --- | --- |
+| `submissionOnly` | `{}` | No downstream record or automation. |
+| `dataHub.createRecord` | `dataHubId`, `modelId` | Exact target field `key` returned by connector discovery, usually the model field's technical name. |
+| `dynamicTable.createRecord` | `tableId` | Exact target field `key` returned by connector discovery. |
+| `workflow.trigger` | `workflowId`, `triggerActionInstanceId` | Keys inside the workflow's `formData`; discover the trigger with `bt_forms_get_connector_config_options`, `fieldKey: "triggerActionInstanceId"`, `config: {workflowId}`. |
+
+For example, a field with visual id `email`, technical key `correo` and label `Correo` maps with `{ "targetFieldName": "email", "sourceType": "formField", "formFieldKey": "correo" }`. Both top-level target `mappings` and `config.mappings` are accepted; use one location consistently. This copies the actual value, not `"correo"`, a label, or `{{correo}}`. Static mappings use literal `staticValue`; the connector normalizes static values to strings, so validate the destination's accepted type. Captured form-field values retain their supplied types.
+
+For `workflow.trigger`, the event payload is `{ submissionId, formId, formData, rawFormData, metadata }`. With the mapping above, `formData.email` contains the captured `correo`; `rawFormData.correo` retains the original submission. With no mappings, `formData` contains all original keys. Once any mappings exist, only mapped keys appear in `formData`; include every value required downstream. Destination names are literal object keys, not nested paths.
+
+If the discovered trigger has `actionIndex: 2`, downstream config can reference `{{2.formData.email}}`, `{{2.rawFormData.correo}}` and `{{2.submissionId}}`. Replace `2` with the real action index returned by workflow/action-instance reads, never its ID, label or position guessed from the canvas. Pass the selected IDs, action index, complete event example and field-to-path mapping to `bottasker-automation-engineer`.
+
+Multiple enabled targets are supported by the general create/update tools when the form is not connector-locked. They consume the original submission independently; a later target does not automatically receive a previous target's created record ID. Use a workflow when operations depend on each other's outputs. Targets are not one transaction: inspect each `targetResults` entry before retrying to avoid repeating successful writes.
+
+## Production Verification
+
+Read back the saved form and check every field's key/type/required flag, options, layout, connector IDs and mapping. For an authorized controlled submission, verify that an omitted required input is rejected before downstream writes, and that a valid submission carries distinct sample values through every mapping. Use non-sensitive synthetic values and inspect the actual created record or workflow node events. A `completed` submission or successful workflow dispatch proves connector acceptance, not completion of all asynchronous workflow steps. If a real execution is not authorized or available, report the configuration checks and the remaining execution check separately. Publish or activate only within the user's approved scope.
 
 ## Delegation
 
