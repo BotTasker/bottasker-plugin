@@ -42,6 +42,7 @@ Dashboards must help the user follow up, control, and decide. Avoid vanity dashb
    - `bt_data_hub_list_models`
    - `bt_data_hub_list_fields`
    - dashboard source/field discovery tools when available, for example `bt_dashboards_list_sources` or `bt_dashboards_list_available_fields`.
+   - When the dashboard reports on the native Clientes module, call `bt_dashboards_get_clients_source` and use **Native Clients Source** below.
    - When the dashboard reports on customer communication, discover the native `Conversaciones` provider and follow the exact contract in **Native Conversations Source** below. Do not model conversations as Base de datos records merely to make them reportable.
 4. Read existing dashboards before writing:
    - `bt_dashboards_list`
@@ -112,6 +113,7 @@ Use the solution's real source of truth:
 - Dynamic Tables for simpler operational tables.
 - Catalogs/products/sales carts for commerce metrics.
 - Conversations/messages/calls for communication metrics.
+- Native Clientes for client and prospect counts, CRM activity, overdue tasks, follow-up, relationships, segments, audit, and imports.
 - Native Support Tickets for ticket counts, open/overdue/unassigned work, state/priority/owner breakdowns and resolution/age metrics. No Database replica is required.
 - AI Agents/workflows/runs for automation metrics.
 - Calendar/appointments for availability and scheduling metrics.
@@ -175,6 +177,28 @@ BotTasker dashboards can query conversations and messages directly from the curr
 4. Exercise the relevant drill-down and confirm that it stays within the same solution and source dataset without revealing private message content.
 5. If the result is `stale`, refresh it and verify the new `generatedAt` and effective range. Do not report success from a cached, stale, ambiguous, or empty result unless an independently verified source count proves that zero is correct for that exact range and filters.
 
+## Native Clients Source
+
+Call `bt_dashboards_get_clients_source` with the resolved `appId`. For each authorized dataset selected, call it again with `datasetId` to discover the actual field keys, types, and options. The source contract is `providerKey: "clients"`, `sourceId: "clients"`, with the discovered dataset ID. Clients must be enabled and active in the selected solution. Dashboard and native Clients read permissions are checked; datasets can require separate access to contacts, history, follow-up, or imports.
+
+| Dataset | Example metrics |
+| --- | --- |
+| `clients` | Client and prospect counts, people vs companies, lifecycle state and reporting group, owner and tags, archived records and do-not-contact flags, numeric custom field totals and trends |
+| `contacts` | Contacts by client, channel and role |
+| `activities` | Notes, messages, calls and meetings by period or origin |
+| `tasks` | Pending, completed and cancelled tasks, workload by owner or AI agent, overdue pending tasks and due-date trends |
+| `followups` | Cycles by mode, state, channel or AI agent, active cycles, cycles with a recorded response, and sum of steps marked sent |
+| `relations` | People-company relationship counts by role or state |
+| `views` | Visible views and segments, shared versus private, and recorded membership size for static segments |
+| `audit` | Client events by type, actor and date |
+| `imports` | Own import batches, input row counts and completed or failed executions |
+
+Use `metric` with `count` for totals, `grouped` with one dimension for a breakdown, `timeseries` with a discovered date field and timezone for trends, and `table` with explicit field IDs for investigation. Numeric fields support `sum`, `avg`, `min` and `max`. Use `range: { type: "all_time" }` for lifetime counts or an exact date range and cohort for comparisons. All-time series show up to the latest 400 buckets and all-time metrics have no previous period. In the solution viewer an explicitly selected date range overrides the widget's saved range. Use the actual field IDs for custom fields. Grouping by a multi-select field counts a record once per value, so category counts can exceed the unique total.
+
+For current non-archived clients, add `{field:"archived", operator:"equals", value:false}`; merged duplicates are excluded. A commercial state and its reporting group are distinct. Current state distributions measure the selected records' latest state, so do not call them historical conversion rates. For tasks overdue now, use `overdue = true` and select a cohort that retains all relevant pending tasks. For a saved client view or segment, use the `views` options returned when discovering the `clients` dataset, verify the selected view with `bt_clients_get_view` and set `query.source.config.viewId` on the `clients` dataset. The native view filters and membership apply to non-archived records. The `views` dataset's static member count counts recorded IDs, not dynamic matches or unique clients across segments.
+
+Use `bt_dashboards_preview_widget` with the actual widget, then save after approval and run `bt_dashboards_run_widget_query` to verify results. Use native datasets directly. Private fields, contact details, interaction text and follow-up drafts are excluded from reporting. Tasky receives only active custom fields whose normal read access and agent access are enabled. Client widgets require a signed-in viewer with the necessary solution permissions, including when the surrounding dashboard has an external link.
+
 ## Native Support Tickets Source
 
 Coordinate with `bottasker-support-tickets-architect` for native ticket behavior. Use Dashboards for metrics and trends; use Boards to work the same tickets visually with their canonical detail/form. Automatic AI notifications are a separate opt-in capability.
@@ -201,7 +225,7 @@ Ticket metrics are **internal/authenticated**: both native `support-tickets:read
 
 Dashboards can be shared with people who are not signed in and do not have a BotTasker account. The public view is read-only: visitors may change the dashboard date range and refresh its data, but they cannot edit the dashboard, change widgets, or open internal modules and actions.
 
-Native Support Tickets metrics remain internal and cannot be made public by this sharing mechanism. For other supported sources, public sharing is a security-sensitive operation. Before enabling it:
+Native Clientes and Support Tickets metrics remain internal and cannot be made public by this sharing mechanism. For other supported sources, public sharing is a security-sensitive operation. Before enabling it:
 
 1. Read the exact dashboard and confirm its `appId` and intended audience.
 2. Review every visible title, metric, dimension, table field, filter, and empty/error state for confidential or identifying information.
@@ -306,6 +330,7 @@ Use dashboard tools when available:
 - `bt_dashboards_list_provider_sources`
 - `bt_dashboards_list_provider_datasets`
 - `bt_dashboards_list_provider_fields`
+- `bt_dashboards_get_clients_source`
 - `bt_dashboards_list_sources`
 - `bt_dashboards_list_available_fields`
 

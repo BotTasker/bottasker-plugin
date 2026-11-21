@@ -72,6 +72,13 @@ Configure the module through **Configuración / Settings** and its **Estados / S
 
 ## Operate tickets safely
 
+Discover the exact schemas for `bt_tickets_list`, `bt_tickets_create` and `bt_tickets_update` in the connected MCP before calling them. These tools operate on the native default inbox of the selected solution (`appId`).
+
+- List with `bt_tickets_list`. Use search, status, priority or assignee filters to find the intended ticket. Use the returned `id` and string `revision` for edits.
+- Create with `bt_tickets_create`. Supply `values.name`, `values.description` and any other fields required by the solution. When an authorized tool or screen provides configured custom field keys, put those values under `values.customFields`.
+- Update with `bt_tickets_update`. Supply `ticketId`, the last observed `expectedRevision` and only the fields to change. On a revision conflict, list again and reconcile the edit with the current record.
+- Give each create or update its own `requestKey`. Reuse the same key and identical arguments if the result of that write is uncertain.
+
 The native worker covers search, detail, summary, metadata/options, assignee lookup, history, attachment listing, creation, updates, assignment/removal, state change, replies, internal notes, attaching existing files and follow-up lifecycle operations. This is a capability map for discovery, not a list of assumed external tool endpoints.
 
 - Read the current ticket before modifying it. Preserve its **string** revision and pass the contract's `expectedRevision`. On conflict, reload and reconcile the intended change; never overwrite a newer revision blindly.
