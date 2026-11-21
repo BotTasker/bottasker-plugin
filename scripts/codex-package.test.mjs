@@ -31,6 +31,17 @@ test('default package retains all 16 skills and the native HTTP connection witho
   assert.deepEqual(codex.http_headers, portable.headers)
 })
 
+test('packages native Clients reporting discovery in both specialists', (t) => {
+  const root = fixture(t)
+  const { plugin } = buildPackage({ root, profile: 'direct' })
+  for (const skill of ['bottasker-clients-architect', 'bottasker-dashboard-architect']) {
+    const prompt = fs.readFileSync(path.join(plugin, 'skills', skill, 'SKILL.md'), 'utf8')
+    assert.match(prompt, /`bt_dashboards_get_clients_source`/)
+    assert.match(prompt, /`datasetId`/)
+    assert.match(prompt, /query\.source\.config\.viewId/)
+  }
+})
+
 for (const [file, key] of [['mcp.json', 'headers'], ['claude.mcp.json', 'headers'], ['.mcp.json', 'http_headers']]) {
   test(`native ${file} rejects credential injection and stale transport versions`, (t) => {
     const root = fixture(t)

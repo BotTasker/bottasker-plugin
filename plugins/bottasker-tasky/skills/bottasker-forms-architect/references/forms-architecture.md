@@ -36,6 +36,8 @@ Every interactive field needs:
 - `type`: supported field type.
 - Optional: `required`, `placeholder`, `helpText`, `defaultValue`, `options`, `optionsSource`, `validation`.
 
+For MCP create/update, `required` is a field-level boolean, and `validation` is a singular object, for example `{ "required": true, "validation": { "maxLength": 160 } }`. Do not copy automation-node `validations` into a new form. Read back these properties after saving; a destination's required flag does not automatically make a manually defined form field required.
+
 The backend ignores required validation for content fields whose type starts with `content_`. Use content fields to explain sections, not to capture data.
 
 ## Supported Field Types
@@ -136,7 +138,11 @@ Before configuring:
 2. Resolve `triggerActionInstanceId` using connector options.
 3. Decide whether the workflow should receive mapped values or raw form data.
 
-The workflow input includes `submissionId`, `formId`, `formData`, `rawFormData`, and `metadata`.
+The workflow input includes `submissionId`, `formId`, `formData`, `rawFormData`, and `metadata`. The connector's target-field list is currently empty; it is not evidence that workflows are unsupported. Read the selected trigger/action instance and define the event keys deliberately.
+
+With `{targetFieldName: "email", sourceType: "formField", formFieldKey: "correo"}`, mapped `formData.email` contains the value submitted under `correo`, while `rawFormData.correo` retains the original. No mappings means all original fields; one or more mappings means only mapped fields in `formData`. If the actual trigger's `actionIndex` is 2, use `{{2.formData.email}}` downstream. Never substitute a visual label or action instance ID for the index, or invent a `body` wrapper. `targetFieldName` is a literal key, not a path expression.
+
+The general tools accept multiple `targets`, each using the original submitted data. They do not pass created-record outputs between targets, and their writes are not atomic. Use a workflow for dependent operations and inspect each target result before retrying. Respect wizard-generated connector locks.
 
 ## Mapping Details
 
@@ -146,6 +152,8 @@ Mappings are arrays of simple objects. Use:
 - `sourceType`: `formField` or `static`.
 - `formFieldKey`: source field key when `sourceType` is `formField`.
 - `staticValue`: fixed value when `sourceType` is `static`.
+
+The MCP accepts mappings on the target or in `target.config.mappings`; use one location. Map by source `key` and destination metadata `key`, never labels. Form-field values retain their supplied type; static values are normalized to strings by the connector, so check destination coercion before using static booleans, numbers or lists.
 
 Prefer static mappings for values such as:
 

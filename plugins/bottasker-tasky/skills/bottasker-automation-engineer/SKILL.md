@@ -54,6 +54,33 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
 - Add agent tools incrementally and test after each major capability.
 - Ask for confirmation before removing agents, workflows, nodes, or edges.
 
+## Data Mapping Contract
+
+Before configuring an automation, establish a small mapping table for every consumed value: source node ID and actual `actionIndex`, exact output path, sample value/type, destination config key and destination type. Use `bt_workflows_get`, `bt_action_instances_list` and `bt_action_instances_get_details` to inspect saved nodes/config, plus `bt_registry_get_worker_actions` for the selected worker's schema. Read actual outputs with `bt_workflow_runs_get_events` after an authorized execution. Labels, IDs, technical keys, output paths and config keys are different identifiers; do not translate or substitute one for another.
+
+- Node references use `{{<actionIndex>.<outputPath>}}`, for example `{{2.record.id}}` only when node 2 actually returns `{record:{id:...}}`. The number is the persisted `actionIndex`, not the node ID or canvas position. Do not add `data`, `body`, `values` or `record` wrappers without evidence in the output. `{{2.outputData.record.id}}` explicitly addresses output; `{{2.inputData...}}` addresses the node's input instead. Prefer the direct output path for new configurations.
+- A whole-field reference such as `{{2.total}}`, `{{2.enabled}}` or `{{2.items}}` preserves number, boolean, array or object types. Mixing text, as in `Total: {{2.total}}`, produces a string. Keep numeric/boolean/list targets typed and preserve valid `0` and `false`; inspect missing values rather than supplying empty strings or invented defaults.
+- Config may use literals or wrapped fields such as `{ "value": "{{2.record.id}}" }`. Match the selected worker's schema and existing saved shape; do not wrap every field mechanically. `bt_action_instances_update_config` receives the action instance `id` and `config`, not a workflow ID or a generic event payload. Its config update replaces saved config: read it first and preserve unrelated settings.
+- In record `values`/`filters`, use exact technical destination field names and option values from metadata, not visible labels. Reference targets need real record IDs; arrays need arrays rather than comma-separated strings. Verify the worker's actual returned shape instead of assuming every module returns the same envelope.
+- Variables belong to the current workflow execution and use `{{variables.<name>}}` after a Variables node creates them. Names containing punctuation/spaces use the encoded name supplied by the picker. Solution environment values use `{{env.<KEY>}}` only when configured for this solution; neither is a substitute for an upstream node output.
+
+### Forms → workflow → record example
+
+Load `bottasker-forms-architect` for the form and connector. Its `workflow.trigger` event has `{submissionId, formId, formData, rawFormData, metadata}`. It does not have an automatic `body`, `values` or created record. If the form key `correo` is mapped to `targetFieldName: "email"`, the event contains `formData.email` and `rawFormData.correo`. With no connector mappings `formData` retains original keys; with mappings it contains only mapped keys. An empty connector target-field list is valid for workflows; discover `triggerActionInstanceId` from connector config options instead.
+
+For a trigger whose persisted `actionIndex` is **2**, the mapping is:
+
+| Source | Downstream reference | Example destination |
+| --- | --- | --- |
+| Form key `correo` → mapped `email` | `{{2.formData.email}}` | Model field `email` in the create-record node's `values`. |
+| Form key `cantidad` → mapped `quantity` | `{{2.formData.quantity}}` | Numeric model field `quantity`, without surrounding text. |
+| Original form key `correo` | `{{2.rawFormData.correo}}` | Only when the original submitted value is intended. |
+| Submission identifier | `{{2.submissionId}}` | Correlation/source field or deduplication key. |
+
+Use the real trigger index for the created graph. Configure the record node's `values` container in the shape returned by its schema; the table describes individual value mappings. If another node needs the created record ID, read the record node's output and reference its own index/path. A second form connector cannot consume that ID automatically.
+
+Verify saved config and every graph edge, then run an authorized controlled case using distinct values per field. Compare each node's resolved input and actual output with the mapping table and verify the final record/action. Cover required-field omissions, optional missing values, `0`/`false` and any relevant branch. A read-only preview checks configuration only; dispatch success, a runner ID or graph creation alone is insufficient evidence of completed business work. For unavailable execution checks, state what remains unverified before production activation.
+
 ## Base de datos (DataHub) Workflow Nodes
 
 For workflow automations, use the Base de datos (DataHub) `actionType: "work"` nodes returned by `bt_registry_get_worker_actions`. Do not use the MCP actions `data_hub` or `data_hub_schema_admin` in workflows; those are for AI Agents and schema/admin tool exposure.

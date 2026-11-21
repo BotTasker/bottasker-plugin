@@ -47,7 +47,19 @@ Provide Solution Builder and the agent specialist with `moduleContext.clients` c
 
 Use `bt_apps_create` / `bt_apps_update` / `bt_apps_update_menu` through Solution Builder to enable the real module key returned by discovery. Preserve the rest of the solution and menu. Configure native states and custom fields next; equip agents only after that context exists. Do not create demo leads, enable sending, or backfill historical conversations merely because a solution is being configured.
 
-For integrations, discover the real target connector or workflow node. A form is not automatically connected to Clientes: only claim it writes clients after confirming a supported mapping/action and verifying its result. Use `bottasker-forms-architect` and `bottasker-automation-engineer` where needed. Use `bottasker-dashboard-architect` only after verifying a supported Clientes reporting source; never assume a Clients collection is a Base de datos model.
+For integrations, discover the real target connector or workflow node. A form is not automatically connected to Clientes: only claim it writes clients after confirming a supported mapping/action and verifying its result. Use `bottasker-forms-architect` and `bottasker-automation-engineer` where needed. Use the native Clientes source for dashboard reporting.
+
+## Kanban boards from Clients
+
+Use Clients as a native source in Boards for a commercial pipeline or another single-selection property. Discover fields with `bt_boards_get_clients_source` in the solution. Group by `status` or the ID of a custom `select` marked groupable. Hand off to `bottasker-board-architect` for preview, scope, approval, creation with `bt_boards_create_from_clients`, and verification.
+
+Cards open the original client fiche. Moving a card to an allowed column updates that same record with the operator's Board and Client permissions. The board uses active records in the solution and requires authenticated access.
+
+## Reporting in Dashboard
+
+Clientes is a native Dashboard provider. For client KPIs, CRM charts or reports, call `bt_dashboards_get_clients_source` with the selected `appId`, then with the returned `datasetId` for the fields and options. Discovery verifies the Dashboards and Clients permissions for the current solution. Delegate widget design, preview, approval and verification to `bottasker-dashboard-architect`. Build on the native source without copying fiches or history into Base de datos.
+
+Choose the dataset that represents the unit being counted: fiches, contact points, interactions, tasks, follow-up cycles, person-company relations, views and segments, audit events, or the user's own imports. Common KPIs include new prospects by week, current clients by reporting group or owner, overdue pending tasks, cycles with a response, and steps sent. Use a verified view ID in `query.source.config.viewId` on the `clients` dataset to report on a saved view or segment. Keep current state, archive status, and date of entry distinct when explaining results. Do not infer conversion from a current-state count, or delivery from a scheduled follow-up. Tasky uses the custom fields exposed by discovery. Client widgets require an authorized signed-in viewer.
 
 ## Fiches, identity, and contacts
 
