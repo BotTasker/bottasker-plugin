@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.47
+
+- Discover message models and voice call options, and create or update Realtime and Pipeline agents with compatible models, voices and audio settings.
+
 ## 0.2.46
 
 - Discover native Clients datasets and build dashboard widgets for CRM records, tasks, follow-up, and other client operations.
