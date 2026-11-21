@@ -1,6 +1,6 @@
 ---
 name: bottasker-ai-agent-architect
-description: "Use when the user wants to design, create, edit, duplicate or manage AI Agents in an existing or approved BotTasker solution: conversation protection, message limits, follow-up, incoming message grouping, subagents, tools, inputs, outputs and interactive WebChat voice calls."
+description: "Design, create, edit, duplicate or manage BotTasker agents for messages and voice calls, including Realtime models and Pipeline STT/LLM/TTS, voices, channels, subagents, tools, conversation protection and follow-up."
 ---
 
 # BotTasker AI Agent Architect
@@ -38,6 +38,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - Evaluate whether proactive behavior would create measurable value for sales, collections, appointments, recovery, support, or stalled opportunities. Select the correct mechanism using Proactivity Decision Rules; do not add proactivity by default.
    - For every conversational channel, discover its input and Response schema. Adding the first supported input creates the channel Response automatically on current backends; additional accounts on that channel reuse it. Read back the workspace before adding an output. Text sending is intrinsic to Response. Enable only the additional sending capabilities exposed there, such as images or documents. Preserve existing Actions and legacy outputs unless migration was requested.
    - Use `bt_ai_agents_get_create_schema` and `bt_ai_agents_validate_create_payload` before `bt_ai_agents_create` unless using `bt_ai_agents_create_simple`.
+   - For model or voice choices, call `bt_ai_agents_get_model_options` in the selected solution. Follow **Agent Modes and Voice Settings** for creation and updates.
    - Review discovered workers/actions and call `bt_ai_agent_tool_get_config_schema` for any tool that will be attached to an agent.
    - Call `bt_ai_agent_prepare_item_config` for every planned input, output, subagent tool, and agent item.
    - Call `bt_ai_agent_validate_item_config` for every prepared `initialConfig`.
@@ -49,7 +50,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - Approval must be requested with real selectable options through `propose_interaction`/`assistantActions`; never write approval options only as Markdown text. Include at least `confirm_plan` (Aprobar y ejecutar) and `revise_plan` options.
    - Valid approval includes "apruebo", "continua", "crealo", "ejecuta el plan", or an equivalent direct approval.
 5. Execute:
-   - Prefer `bt_ai_agents_create_simple` for a single main agent when no custom workspace graph is required.
+   - Prefer `bt_ai_agents_create_simple` for one main agent, including a single voice agent. Pass `agentMode` and `aiSettings` explicitly for voice.
    - Use `bt_ai_agents_create_from_blueprint` only when `bt_ai_agent_blueprint_plan.executionPayload` is complete and approved.
    - Create the main AI Agent.
    - Add subagents with `bt_ai_agents_add_item` using `itemType: "agent"`.
@@ -63,8 +64,43 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - Use `bt_action_instances_update_config` only to repair or update an existing action instance after validation.
 6. Verify:
    - Read back the agent with `bt_ai_agents_get`.
+   - Verify a voice agent's node has `config.agentMode: "call"`, the selected `config.aiSettings`, and the intended input and output connections when requested.
    - After creating or updating proactive behavior, verify the saved execution setting and every scheduler/event/channel item involved.
    - Check action instances with `bt_action_instances_get_details` when available.
+
+## Agent Modes and Voice Settings
+
+- **Messages** use `agentMode: "default"`. Discover providers with `bt_ai_agents_get_model_options` and send `provider` on a second call to list its message models. Save the exact IDs in `aiSettings.provider` and `aiSettings.model`. Legacy `chat` and `channel` values resolve to `default`.
+- **Voice calls** use `agentMode: "call"`. Specify `aiSettings.voicePipeline` as `realtime` or `pipeline`. Call `bt_ai_agents_get_model_options` with `appId` and `agentMode: "call"`. Its `processing` list is authoritative for the target installation. Honor the user's choice. If they leave settings to you, choose from the discovered options and use the product defaults for unspecified fields.
+- `bt_ai_agents_create_simple` accepts `name`, `prompt`, optional `role`, `agentMode` and `aiSettings` at the root. In a complete `bt_ai_agents_create` payload, the same settings live under `workspaceConfig.agents[].config.agentMode` and `workspaceConfig.agents[].config.aiSettings`. Validate the full payload before writing. For a blueprint, pass the same `agentMode` and `aiSettings` into `bt_ai_agent_blueprint_plan` and verify they survive in `executionPayload.create`.
+- For edits, read `bt_ai_agents_get`, target the actual `agentNodeId` and send the requested changes in `bt_ai_agents_update_agent_config.configPatch`. Put model or voice changes in `configPatch.aiSettings`; the tool merges the existing settings and retains equipped tools and connections. When changing to a different provider or model, verify that the effective voice remains compatible. There can be one voice node per workspace.
+
+### Realtime
+
+Choose a pair from `realtime` and send its `provider` and `model` with `voicePipeline: "realtime"`. Use an exact compatible `voice` or leave it unset for the model default. If the catalog provides a separate voice list, call again with the profile's `value` as `provider`. Where present, `random` selects a compatible voice. The available profiles can include GPT-Live, GPT Realtime, Gemini Live and Grok Voice. The discovered IDs and capabilities take precedence over these examples.
+
+Use `reasoning_effort` only when the selected profile exposes `reasoningEfforts`, currently GPT Realtime 2.1. Use `noiseCancellation` and `backgroundAudio` only when the tool returns `audio` options. Those audio settings also apply to Pipeline.
+
+### Pipeline (STT → LLM → TTS)
+
+Use `voicePipeline: "pipeline"` with the exact IDs returned under `pipeline`.
+
+| Setting | What to choose |
+| --- | --- |
+| `pipelineSttModel` | Transcription model from `pipeline.stt` |
+| `pipelineSttLanguage` | Language listed for that STT model. Use `multi` only for a model that supports it. |
+| `pipelineKeyterms` | Optional Deepgram Nova-3 vocabulary. Up to 30 terms of at most 50 characters, separated by commas or newlines. |
+| `pipelineLlmModel` | Conversation model from `pipeline.llm` |
+| `pipelineTtsModel` | Speech synthesis model from `pipeline.tts` |
+| `pipelineCatalogVoice` | Exact voice `value` returned for that TTS model, in `language:voiceId` format. |
+| `pipelineExpressive` | Set `true` only for a model that exposes `expressive: true`. |
+| `noiseCancellation`, `backgroundAudio` | Optional audio options from the tool. |
+
+To find a voice, call `bt_ai_agents_get_model_options` with `appId`, `agentMode: "call"` and `pipelineTtsModel`. Filter by name, language, or locale with `voiceSearch`. Continue with `voiceOffset: nextOffset` when needed. If the user leaves voice selection open, omit `pipelineCatalogVoice` to use the synthesis model's default. Use the model-specific `defaultLanguage` for STT when no language was chosen.
+
+### Connect and verify calls
+
+Create the voice node before attaching a call input. Discover and validate the exact input, output, and required connection for the requested channel. Depending on discovery, the solution may support WebChat, WebRTC, WhatsApp calls, or telephony. For WebChat, follow the WebChat call configuration below. Treat activation, public sharing, and outbound calls as separate operations. Read back the saved `agentMode`, processing, effective model(s), voice, and channel connection before telling the user what is ready.
 
 ## Blueprint Format
 
@@ -418,6 +454,9 @@ Message and call contracts are separate. WhatsApp or WebChat call inputs/outputs
 Core discovery and planning:
 
 - `bt_context_get_profile`
+- `bt_ai_agents_get_model_options`
+- `bt_ai_agents_get_create_schema`
+- `bt_ai_agents_validate_create_payload`
 - `bt_ai_agent_tools_discover`
 - `bt_ai_agent_tool_get_config_schema`
 - `bt_ai_agent_prepare_item_config`
@@ -429,7 +468,10 @@ Core discovery and planning:
 Execution tools:
 
 - `bt_ai_agents_create`
+- `bt_ai_agents_create_simple`
+- `bt_ai_agents_create_from_blueprint`
 - `bt_ai_agents_update`
+- `bt_ai_agents_update_agent_config`
 - `bt_ai_agents_add_item`
 - `bt_ai_agents_get`
 - `bt_action_instances_update_config`
