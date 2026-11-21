@@ -49,6 +49,12 @@ Use `bt_apps_create` / `bt_apps_update` / `bt_apps_update_menu` through Solution
 
 For integrations, discover the real target connector or workflow node. A form is not automatically connected to Clientes: only claim it writes clients after confirming a supported mapping/action and verifying its result. Use `bottasker-forms-architect` and `bottasker-automation-engineer` where needed. Use the native Clientes source for dashboard reporting.
 
+## Kanban boards from Clients
+
+Use Clients as a native source in Boards for a commercial pipeline or another single-selection property. Discover fields with `bt_boards_get_clients_source` in the solution. Group by `status` or the ID of a custom `select` marked groupable. Hand off to `bottasker-board-architect` for preview, scope, approval, creation with `bt_boards_create_from_clients`, and verification.
+
+Cards open the original client fiche. Moving a card to an allowed column updates that same record with the operator's Board and Client permissions. The board uses active records in the solution and requires authenticated access.
+
 ## Reporting in Dashboard
 
 Clientes is a native Dashboard provider. For client KPIs, CRM charts or reports, call `bt_dashboards_get_clients_source` with the selected `appId`, then with the returned `datasetId` for the fields and options. Discovery verifies the Dashboards and Clients permissions for the current solution. Delegate widget design, preview, approval and verification to `bottasker-dashboard-architect`. Build on the native source without copying fiches or history into Base de datos.

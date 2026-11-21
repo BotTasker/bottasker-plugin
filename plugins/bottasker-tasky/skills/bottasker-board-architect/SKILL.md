@@ -31,6 +31,7 @@ Support Spanish, Brazilian Portuguese, and English. Follow the user's explicitly
    - `bt_boards_get`
    - `bt_boards_get_board_data`
 4. Discover the source before designing:
+   - Clients: call `bt_boards_get_clients_source` with the solution and read the groupable fields and choices. See Native Clients below.
    - Native Support Tickets: load `bottasker-support-tickets-architect`, discover ticket source options/groupable fields and callable board tools. Keep the same native records and canonical ticket detail/form; do not require a Base de datos model.
    - Base de datos (Data Hub): `bt_data_hub_list_hubs`, `bt_data_hub_list_models`, `bt_data_hub_list_fields`.
    - Dynamic Tables: `bt_dynamic_tables_list`, `bt_dynamic_tables_get`.
@@ -57,6 +58,7 @@ Do not call create, update, move, delete, public link, role, user, file, or auto
 
 Prefer structured sources:
 
+- `clients`: native client records grouped by commercial status or another available single-selection field.
 - `support-tickets`: native support operations, incidents and requests. Read the native source rules below; do not duplicate records in another source or use the generic detail designer.
 - `data-hub-model`: best for durable solution entities, relationships, solution records, and AI-written data.
 - `dynamic-table`: best for simple table-backed operational tracking.
@@ -70,7 +72,7 @@ For source-backed boards:
 - `displayFields` should be concise: owner, due date, priority, amount, customer, status, channel, or next action.
 - Permanent scope conditions should narrow the operational dataset when one source feeds multiple boards.
 
-If native Tickets lacks the requested grouping, consult `bottasker-support-tickets-architect` about its supported custom fields. For other structured sources, hand off to `bottasker-data-architect` when a suitable group field is missing.
+If Clients lacks the requested grouping, consult `bottasker-clients-architect` about native states and custom single-selection fields. If native Tickets lacks the requested grouping, consult `bottasker-support-tickets-architect` about its supported custom fields. For other structured sources, hand off to `bottasker-data-architect` when a suitable group field is missing.
 
 ## Permanent Board Scope
 
@@ -111,6 +113,13 @@ Creation and mutation behavior:
 - For non-deterministic rules such as amount greater than 100 or a date range, the submitted values must already satisfy the scope.
 - Do not attempt to edit or move a card in a way that changes a scoped field or takes it outside the board. Update the source record through the appropriate data workflow only when the user intends to change board membership.
 - A source update can make a record enter or leave the board; treat this as a realtime membership transition, not as data loss.
+
+## Native Clients source
+
+- Use `bt_boards_get_clients_source` with `appId`. Choose a field marked `groupable`. Use `status` for commercial states or the real custom field ID for a single-selection field. A read-only grouping such as client type can be displayed without drag updates. Use `choices` as stored values and `choiceLabels` for presentation.
+- Preview with `bt_boards_get_available_columns` and `sourceType: "clients"`. Pass `sourceConfig.groupByField` and any typed permanent `filters`. After approval, use `bt_boards_create_from_clients` with the same group field and scope plus the card display fields. Use `bt_boards_update_source_config` with `sourceType: "clients"` to change the grouping of an existing Clients board.
+- The board shows active client records from that solution, and each card opens its native fiche. Moving to another allowed column writes the selected value on the original client and requires both Board and Client update access. Archived records and merged aliases are excluded. The board requires signed-in access to both modules. Manage creation, editing, archiving, and detailed history in Clients.
+- Verify the board, returned columns, and one existing client with `bt_boards_get_board_data`. If the current connector lacks a Clients source tool, report the capability available from the Boards creation screen and the verified connector limitation.
 
 ## Native Support Tickets source
 
@@ -156,7 +165,7 @@ Rules:
 
 ## Detail View And Widgets
 
-For native `support-tickets`, use the canonical Tickets detail and shared create/edit form. Do not call prepare/update detail-view widget tools for this source. Follow the Native Support Tickets source section instead. For other sources, design item details from source fields, not from generic widget names.
+For native `clients`, use the client fiche in Clients. For native `support-tickets`, use the canonical Tickets detail and shared create/edit form. Do not call prepare/update detail-view widget tools for this source. Follow the Native Support Tickets source section instead. For other sources, design item details from source fields, not from generic widget names.
 
 Required order:
 
@@ -334,6 +343,8 @@ Use the configuration reads to inspect saved editor data. For a non-executing ch
 Changing a button, its bindings or referenced workflow requires repeating its read-only validation and reviewing the changed configuration. The automation and trigger choice reads return `{options: [...]}` for the editor; the trigger schema read returns the saved input-binding definition for configuration. Neither grants execution rights.
 
 ## Expected MCP Tools
+
+Clients source: `bt_boards_get_clients_source`, `bt_boards_create_from_clients`.
 
 Use:
 
