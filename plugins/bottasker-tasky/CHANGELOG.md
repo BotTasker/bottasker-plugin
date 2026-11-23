@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.48
+
+- Discover voice agents and outbound SIP triggers for client follow-up, schedule a call with confirmed consent and context, and verify the saved outcome while supporting the existing message flow.
+
 ## 0.2.47
 
 - Discover message models and voice call options, and create or update Realtime and Pipeline agents with compatible models, voices and audio settings.
